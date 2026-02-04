@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import { DraftsProvider } from "@/contexts/DraftsContext";
 import { HelpDrawer } from "@/components/help/HelpDrawer";
+import { PlatformTour } from "@/components/tour/PlatformTour";
 import Dashboard from "./pages/Dashboard";
 import TRFs from "./pages/TRFs";
 import TRFDetail from "./pages/TRFDetail";
@@ -68,6 +69,8 @@ const App = () => (
             </Routes>
             {/* Global Help Drawer - available on all pages */}
             <HelpDrawer />
+            {/* Platform Tour for new users */}
+            <PlatformTour />
           </BrowserRouter>
         </TooltipProvider>
       </DraftsProvider>
