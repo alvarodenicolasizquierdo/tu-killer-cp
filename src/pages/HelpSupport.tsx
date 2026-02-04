@@ -356,11 +356,13 @@ export default function HelpSupport() {
         </div>
 
         {/* Intent Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {filteredIntents.map(intent => (
             <IntentCard
               key={intent.id}
-              intent={intent}
+              icon={intent.icon}
+              title={intent.label}
+              description={intent.description}
               onClick={() => handleIntentClick(intent.id)}
               isActive={selectedArticle?.intentId === intent.id}
             />
