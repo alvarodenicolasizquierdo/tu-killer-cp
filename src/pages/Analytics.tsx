@@ -25,9 +25,11 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
   LineChart as LineChartIcon,
-  Calendar
+  Calendar,
+  Filter
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { CollectionReadinessFunnel } from '@/components/reports/CollectionReadinessFunnel';
 
 const trfTrendData = [
   { month: 'Sep', submitted: 45, completed: 42, rejected: 3 },
@@ -315,6 +317,11 @@ export default function Analytics() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Collection Readiness Funnel */}
+      <div className="mb-6">
+        <CollectionReadinessFunnel />
       </div>
     </AppLayout>
   );
