@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Grid3X3, List, Package, AlertTriangle, CheckCircle2, Clock, ChevronRight, Download, RefreshCw, X, Check } from 'lucide-react';
+import { Search, Filter, Grid3X3, List, Package, AlertTriangle, CheckCircle2, Clock, ChevronRight, Download, RefreshCw, X, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,10 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { mockProducts, mockSuppliers } from '@/data/mockData';
 import { Product } from '@/types';
+import { CSVImportDialog } from '@/components/products/CSVImportDialog';
 
 const Products = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const Products = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const categories = useMemo(() => {
     const cats = [...new Set(mockProducts.map(p => p.category))];
@@ -123,6 +125,12 @@ const Products = () => {
     
     clearSelection();
   }, [selectedProducts, toast, clearSelection]);
+
+  const handleCSVImport = useCallback((products: { code: string; name: string; category: string; supplier: string; complianceStatus: Product['complianceStatus'] }[]) => {
+    // In a real app, this would make API calls to create the products
+    console.log('Importing products:', products);
+    // The toast is shown by the dialog component
+  }, []);
 
   const getComplianceColor = (status: Product['complianceStatus']) => {
     switch (status) {
@@ -302,6 +310,10 @@ const Products = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+            </Button>
             <Button variant="outline" onClick={exportToCSV}>
               <Download className="h-4 w-4 mr-2" />
               Export CSV
@@ -509,6 +521,13 @@ const Products = () => {
             <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
           </Card>
         )}
+
+        {/* CSV Import Dialog */}
+        <CSVImportDialog
+          open={isImportDialogOpen}
+          onOpenChange={setIsImportDialogOpen}
+          onImport={handleCSVImport}
+        />
       </div>
     </AppLayout>
   );
