@@ -14,6 +14,7 @@ import {
   Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EscalationPanel } from './EscalationPanel';
 
 export interface GuidedResolutionData {
   id: string;
@@ -37,8 +38,9 @@ interface GuidedResolutionProps {
   onStepComplete?: (stepIndex: number) => void;
 }
 
-export function GuidedResolution({ data, onEscalate, onStepComplete }: GuidedResolutionProps) {
+export function GuidedResolution({ data, onStepComplete }: GuidedResolutionProps) {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [showEscalation, setShowEscalation] = useState(false);
 
   const handleStepClick = (index: number) => {
     const newCompleted = new Set(completedSteps);
@@ -234,7 +236,7 @@ export function GuidedResolution({ data, onEscalate, onStepComplete }: GuidedRes
                 <Button 
                   variant="destructive" 
                   size="sm"
-                  onClick={onEscalate}
+                  onClick={() => setShowEscalation(true)}
                   className="shrink-0"
                 >
                   Escalate to SGS
@@ -257,6 +259,14 @@ export function GuidedResolution({ data, onEscalate, onStepComplete }: GuidedRes
           </div>
         )}
       </div>
+
+      {/* Escalation Panel */}
+      <EscalationPanel
+        open={showEscalation}
+        onOpenChange={setShowEscalation}
+        resolution={data}
+        completedSteps={Array.from(completedSteps)}
+      />
     </ScrollArea>
   );
 }
