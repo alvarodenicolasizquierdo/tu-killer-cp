@@ -19,7 +19,10 @@ import {
   Brain,
   ChevronRight,
   ExternalLink,
-  Info
+  Info,
+  Beaker,
+  FlaskConical,
+  Zap
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -33,6 +36,7 @@ import { mockCollections, mockComponents, getCollectionStatusInfo, canUserApprov
 import { cn } from '@/lib/utils';
 import { useUser } from '@/contexts/UserContext';
 import { AIAssistSuggestion, TestingLevel } from '@/types/styles';
+import { generateTRFCreationSuggestions, generateTestPlanSuggestions } from '@/lib/aiTestPlanSuggestions';
 import {
   Tooltip,
   TooltipContent,
@@ -58,8 +62,75 @@ export default function StyleDetail() {
     if (!collection) return [];
     const suggestions: AIAssistSuggestion[] = [];
 
+    // Determine next testing level needed
+    let nextTestingLevel: TestingLevel = 'Base';
+    if (collection.baseTesting.status === 'approved') {
+      nextTestingLevel = 'Bulk';
+    }
+    if (collection.bulkTesting.status === 'approved') {
+      nextTestingLevel = 'Garment';
+    }
+
+    // Get intelligent test plan suggestions
+    const { tests, labs, confidence } = generateTestPlanSuggestions(
+      collection, 
+      nextTestingLevel, 
+      linkedComponents
+    );
+
+    // Main test plan pre-fill suggestion
+    if (tests.length > 0 && (
+      collection.baseTesting.status === 'not_started' ||
+      (collection.baseTesting.status === 'approved' && collection.bulkTesting.status === 'not_started') ||
+      (collection.bulkTesting.status === 'approved' && collection.garmentTesting.status === 'not_started')
+    )) {
+      const requiredTests = tests.filter(t => t.priority === 'required');
+      const fabricCount = linkedComponents.filter(c => c.type === 'Fabric').length;
+      const trimCount = linkedComponents.filter(c => c.type === 'Trim').length;
+
+      suggestions.push({
+        id: `prefill-${nextTestingLevel.toLowerCase()}-tests`,
+        type: 'test_plan',
+        title: `Pre-fill ${nextTestingLevel} Test Plan`,
+        description: `${requiredTests.length} tests recommended for ${collection.name}`,
+        confidence,
+        reasoning: [
+          `Analyzed ${linkedComponents.length} components: ${fabricCount} fabric(s), ${trimCount} trim(s)`,
+          `Construction type: ${linkedComponents[0]?.construction || 'Mixed'}`,
+          `Department: ${collection.department} - specific requirements applied`,
+          `Estimated turnaround: ${Math.max(...tests.map(t => t.estimatedDays))} days at ${labs[0]?.labName || 'recommended lab'}`
+        ],
+        suggestedValues: {
+          tests: tests.map(t => ({
+            name: t.testName,
+            code: t.testCode,
+            priority: t.priority
+          })),
+          lab: labs[0]?.labName
+        },
+        action: { label: 'Apply to TRF', type: 'apply' }
+      });
+
+      // Lab assignment suggestion
+      if (labs.length > 0) {
+        suggestions.push({
+          id: 'lab-assignment',
+          type: 'test_plan',
+          title: `Assign to ${labs[0].labName}`,
+          description: `${labs[0].matchScore}% capability match`,
+          confidence: labs[0].matchScore,
+          reasoning: [
+            `Capabilities: ${labs[0].capabilities.join(', ')}`,
+            `Turnaround: ${labs[0].turnaround}`,
+            `Prior success with ${collection.supplierName}: 92%`
+          ],
+          action: { label: 'Select Lab', type: 'apply' }
+        });
+      }
+    }
+
     // Component suggestions
-    if (collection.componentIds.length < 3) {
+    if (collection.componentIds.length < 3 && !collection.baseTesting.isLocked) {
       suggestions.push({
         id: 'add-components',
         type: 'component_set',
@@ -72,6 +143,21 @@ export default function StyleDetail() {
           'More components = better DPP passport coverage'
         ],
         action: { label: 'View Suggestions', type: 'apply' }
+      });
+    }
+
+    // High area component warning
+    const highAreaNonFabric = linkedComponents.filter(c => c.areaPercentage > 10 && c.type !== 'Fabric');
+    if (highAreaNonFabric.length > 0) {
+      suggestions.push({
+        id: 'high-area-warning',
+        type: 'approval_block',
+        title: `High-area components need full testing`,
+        description: `${highAreaNonFabric.length} non-fabric component(s) exceed 10% area`,
+        confidence: 100,
+        reasoning: highAreaNonFabric.map(c => 
+          `${c.name} (${c.type}): ${c.areaPercentage}% area requires full testing per policy`
+        )
       });
     }
 
@@ -93,19 +179,27 @@ export default function StyleDetail() {
 
     // Care label suggestions
     if (!collection.careLabelPackage && collection.bulkTesting.status === 'approved') {
+      const primaryFabric = linkedComponents.find(c => c.type === 'Fabric');
+      const isCotton = primaryFabric?.composition.toLowerCase().includes('cotton');
+      const isPolyester = primaryFabric?.composition.toLowerCase().includes('polyester');
+      
       suggestions.push({
         id: 'care-label-suggest',
         type: 'care_label',
         title: 'Pre-fill care labels',
-        description: 'AI can suggest care symbols based on component materials',
-        confidence: 85,
+        description: 'AI suggests care symbols based on component materials',
+        confidence: 89,
         reasoning: [
-          `Primary material: ${linkedComponents[0]?.composition || 'Not set'}`,
-          'Similar products use standard wash/dry/iron symbols',
+          `Primary material: ${primaryFabric?.composition || 'Not set'}`,
+          isCotton ? 'Cotton composition: Standard wash at 30-40°C recommended' : 
+          isPolyester ? 'Polyester composition: Low heat tumble dry safe' : 
+          'Mixed materials: Conservative care instructions applied',
           'Care instructions affect consumer safety compliance'
         ],
         suggestedValues: {
-          symbols: ['wash-30', 'no-bleach', 'tumble-low', 'iron-med']
+          symbols: isCotton 
+            ? ['wash-30', 'no-bleach', 'tumble-low', 'iron-med']
+            : ['wash-40', 'no-bleach', 'tumble-low', 'iron-med']
         },
         action: { label: 'Apply Suggestions', type: 'apply' }
       });
@@ -131,10 +225,28 @@ export default function StyleDetail() {
       });
     }
 
+    // Fast-track eligibility
+    if (collection.riskScore < 25 && collection.supplierName.includes('Eco')) {
+      suggestions.push({
+        id: 'fast-track',
+        type: 'test_plan',
+        title: 'Eligible for Fast-Track Testing',
+        description: 'Low risk + preferred supplier qualifies for expedited timeline',
+        confidence: 92,
+        reasoning: [
+          `Risk score ${collection.riskScore} is below fast-track threshold (25)`,
+          `${collection.supplierName} has 98% pass rate`,
+          'Can reduce testing cycle by 3-5 days'
+        ],
+        suggestedValues: {
+          fastTrack: true
+        },
+        action: { label: 'Enable Fast-Track', type: 'apply' }
+      });
+    }
+
     // Approval eligibility check
     const canApproveBase = canUserApprove(currentUser.id, 'base');
-    const canApproveBulk = canUserApprove(currentUser.id, 'bulk');
-    const canApproveGarment = canUserApprove(currentUser.id, 'garment');
     
     if (collection.baseTesting.status === 'passed' && !canApproveBase) {
       suggestions.push({
