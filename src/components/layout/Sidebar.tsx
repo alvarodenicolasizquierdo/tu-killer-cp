@@ -15,7 +15,9 @@ import {
   ChevronRight,
   Sparkles,
   LogOut,
-  User
+  User,
+  BookOpen,
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
@@ -45,6 +47,7 @@ const navItems = [
 
 const bottomItems = [
   { icon: Sparkles, label: 'AI Assistant', path: '/ai-assistant' },
+  { icon: BookOpen, label: 'Knowledge Hub', path: '/knowledge-hub' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
