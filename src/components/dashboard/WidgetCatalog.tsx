@@ -1,4 +1,20 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { 
   LayoutGrid, 
   Target, 
@@ -9,11 +25,8 @@ import {
   TrendingUp,
   FileText,
   Users,
-  X,
   Plus,
-  GripVertical
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -24,6 +37,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { SortableWidgetItem } from './SortableWidgetItem';
 
 export interface WidgetConfig {
   id: string;
@@ -112,35 +126,36 @@ export function WidgetCatalog({ widgets, onToggleWidget, onReorderWidgets }: Wid
     item => !widgets.find(w => w.id === item.id && w.enabled)
   );
 
-  const handleMoveUp = (widgetId: string) => {
-    const widgetIndex = enabledWidgets.findIndex(w => w.id === widgetId);
-    if (widgetIndex <= 0) return;
-    
-    const newWidgets = [...widgets];
-    const currentWidget = newWidgets.find(w => w.id === widgetId);
-    const previousWidget = newWidgets.find(w => w.id === enabledWidgets[widgetIndex - 1].id);
-    
-    if (currentWidget && previousWidget) {
-      const tempOrder = currentWidget.order;
-      currentWidget.order = previousWidget.order;
-      previousWidget.order = tempOrder;
-      onReorderWidgets(newWidgets);
-    }
-  };
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
-  const handleMoveDown = (widgetId: string) => {
-    const widgetIndex = enabledWidgets.findIndex(w => w.id === widgetId);
-    if (widgetIndex >= enabledWidgets.length - 1) return;
-    
-    const newWidgets = [...widgets];
-    const currentWidget = newWidgets.find(w => w.id === widgetId);
-    const nextWidget = newWidgets.find(w => w.id === enabledWidgets[widgetIndex + 1].id);
-    
-    if (currentWidget && nextWidget) {
-      const tempOrder = currentWidget.order;
-      currentWidget.order = nextWidget.order;
-      nextWidget.order = tempOrder;
-      onReorderWidgets(newWidgets);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = enabledWidgets.findIndex(w => w.id === active.id);
+      const newIndex = enabledWidgets.findIndex(w => w.id === over.id);
+      
+      const reorderedEnabled = arrayMove(enabledWidgets, oldIndex, newIndex);
+      
+      // Update order values based on new positions
+      const updatedWidgets = widgets.map(w => {
+        const newOrderIndex = reorderedEnabled.findIndex(ew => ew.id === w.id);
+        if (newOrderIndex !== -1) {
+          return { ...w, order: newOrderIndex };
+        }
+        return w;
+      });
+      
+      onReorderWidgets(updatedWidgets);
     }
   };
 
@@ -170,60 +185,33 @@ export function WidgetCatalog({ widgets, onToggleWidget, onReorderWidgets }: Wid
               <span className="w-2 h-2 bg-emerald-500 rounded-full" />
               Active Widgets ({enabledWidgets.length})
             </h4>
-            <div className="space-y-2">
-              <AnimatePresence>
-                {enabledWidgets.map((widget, index) => (
-                  <motion.div
-                    key={widget.id}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:border-primary/30 transition-colors group"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5"
-                        onClick={() => handleMoveUp(widget.id)}
-                        disabled={index === 0}
-                      >
-                        <GripVertical className="w-3 h-3 rotate-90" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5"
-                        onClick={() => handleMoveDown(widget.id)}
-                        disabled={index === enabledWidgets.length - 1}
-                      >
-                        <GripVertical className="w-3 h-3 rotate-90" />
-                      </Button>
-                    </div>
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      {widget.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground">{widget.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{widget.description}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                      onClick={() => onToggleWidget(widget.id)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              {enabledWidgets.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No widgets enabled. Add widgets from the catalog below.
-                </p>
-              )}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={enabledWidgets.map(w => w.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  <AnimatePresence>
+                    {enabledWidgets.map((widget) => (
+                      <SortableWidgetItem
+                        key={widget.id}
+                        widget={widget}
+                        onRemove={onToggleWidget}
+                      />
+                    ))}
+                  </AnimatePresence>
+                  {enabledWidgets.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No widgets enabled. Add widgets from the catalog below.
+                    </p>
+                  )}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
 
           {/* Available Widgets by Category */}
