@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
+import { HelpDrawer } from "@/components/help/HelpDrawer";
 import Dashboard from "./pages/Dashboard";
 import TRFs from "./pages/TRFs";
 import TRFDetail from "./pages/TRFDetail";
@@ -24,6 +25,7 @@ import TestingLevels from "./pages/TestingLevels";
 import CareLabelling from "./pages/CareLabelling";
 import GSW from "./pages/GSW";
 import SelfApprovalLevels from "./pages/SelfApprovalLevels";
+import KnowledgeHub from "./pages/KnowledgeHub";
 
 const queryClient = new QueryClient();
 
@@ -54,9 +56,12 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/notifications" element={<Dashboard />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/knowledge-hub" element={<KnowledgeHub />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          {/* Global Help Drawer - available on all pages */}
+          <HelpDrawer />
         </BrowserRouter>
       </TooltipProvider>
     </UserProvider>
