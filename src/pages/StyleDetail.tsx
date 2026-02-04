@@ -43,6 +43,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ComponentAreaValidator, ComponentAreaSummary, getComponentTestingRequirement } from '@/components/validation/ComponentAreaValidator';
+import { DisabledButtonHelp } from '@/components/help/InlineHelpTooltip';
 
 export default function StyleDetail() {
   const { id } = useParams<{ id: string }>();
@@ -365,23 +366,22 @@ export default function StyleDetail() {
             </Button>
           )}
           {!isBlocked && state.status === 'passed' && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  size="sm" 
-                  className="w-full gap-2"
-                  disabled={!canUserApprove(currentUser.id, level.toLowerCase() as any)}
-                >
+            canUserApprove(currentUser.id, level.toLowerCase() as any) ? (
+              <Button size="sm" className="w-full gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                Approve {level}
+              </Button>
+            ) : (
+              <DisabledButtonHelp
+                reason={`Your approval level doesn't permit ${level} approval. Only users with ${level}-level approval permissions can approve at this stage.`}
+                action="Contact your admin to request elevated permissions."
+              >
+                <Button size="sm" className="w-full gap-2" disabled>
                   <CheckCircle2 className="w-4 h-4" />
                   Approve {level}
                 </Button>
-              </TooltipTrigger>
-              {!canUserApprove(currentUser.id, level.toLowerCase() as any) && (
-                <TooltipContent>
-                  Your approval level doesn't permit {level} approval
-                </TooltipContent>
-              )}
-            </Tooltip>
+              </DisabledButtonHelp>
+            )
           )}
         </CardContent>
       </Card>
@@ -528,15 +528,22 @@ export default function StyleDetail() {
                       <CardTitle className="text-base">Linked Components</CardTitle>
                       <CardDescription>Components linked to this collection</CardDescription>
                     </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="gap-2"
-                      disabled={collection.baseTesting.isLocked}
-                    >
-                      <Plus className="w-4 h-4" />
-                      Link Component
-                    </Button>
+                    {collection.baseTesting.isLocked ? (
+                      <DisabledButtonHelp
+                        reason="Components are locked after Base approval to maintain testing integrity."
+                        action="Create a new style version to modify components."
+                      >
+                        <Button size="sm" variant="outline" className="gap-2" disabled>
+                          <Plus className="w-4 h-4" />
+                          Link Component
+                        </Button>
+                      </DisabledButtonHelp>
+                    ) : (
+                      <Button size="sm" variant="outline" className="gap-2">
+                        <Plus className="w-4 h-4" />
+                        Link Component
+                      </Button>
+                    )}
                   </div>
                   {collection.baseTesting.isLocked && (
                     <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 rounded-md px-3 py-2 mt-2">
