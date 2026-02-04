@@ -16,6 +16,7 @@ import { TRFTimeline } from '@/components/trf/TRFTimeline';
 import { TRFTestResults } from '@/components/trf/TRFTestResults';
 import { TRFDocuments } from '@/components/trf/TRFDocuments';
 import { TRFApprovalWorkflow } from '@/components/trf/TRFApprovalWorkflow';
+import { AIAssessmentStrip } from '@/components/ai/AIAssessmentStrip';
 import { 
   ArrowLeft, 
   ChevronDown,
@@ -156,6 +157,35 @@ export default function TRFDetail() {
           </Button>
         </div>
       </div>
+
+      {/* AI Assessment Strip */}
+      <AIAssessmentStrip
+        assessment={{
+          objectType: 'trf',
+          objectId: trf.id,
+          readiness: trf.progress,
+          readinessTrend: trf.progress >= 80 ? 'up' : trf.progress >= 50 ? 'stable' : 'down',
+          confidence: trf.failedTests === 0 && trf.passedTests > 0 
+            ? 'high' 
+            : trf.failedTests > 0 
+              ? 'low' 
+              : 'medium',
+          primaryRisk: trf.failedTests > 0
+            ? `${trf.failedTests} test(s) failed - requires attention`
+            : trf.slaRemaining && trf.slaRemaining <= 24
+              ? 'SLA deadline approaching'
+              : trf.status === 'pending_review'
+                ? 'Awaiting approval review'
+                : 'No critical issues detected',
+          recommendation: trf.failedTests > 0
+            ? 'Review failed tests and initiate retest protocol'
+            : trf.slaRemaining && trf.slaRemaining <= 24
+              ? 'Prioritize completion to meet SLA deadline'
+              : trf.status === 'pending_review'
+                ? 'Submit for final approval to complete workflow'
+                : `Continue testing - ${trf.testCount - trf.passedTests - trf.failedTests} tests remaining`,
+        }}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content - 2 columns */}
