@@ -191,6 +191,34 @@ export interface Product {
   };
 }
 
+// Inspection types
+export type InspectionType = 'factory_audit' | 'quality_check' | 'social_compliance' | 'environmental' | 'pre_shipment';
+export type InspectionStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'postponed';
+
+export interface Inspection {
+  id: string;
+  type: InspectionType;
+  title: string;
+  description?: string;
+  factoryId: string;
+  factoryName: string;
+  supplierId: string;
+  supplierName: string;
+  location: string;
+  scheduledDate: string;
+  scheduledTime?: string;
+  duration: number; // hours
+  status: InspectionStatus;
+  priority: Priority;
+  assignee?: string;
+  auditorTeam?: string[];
+  findings?: number;
+  passRate?: number;
+  notes?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
 // AI Chat types
 export interface ChatMessage {
   id: string;
