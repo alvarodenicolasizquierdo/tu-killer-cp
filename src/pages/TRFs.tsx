@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { mockTRFs } from '@/data/mockData';
 import { TRF, TRFStatus, Priority } from '@/types';
@@ -57,7 +58,7 @@ const priorityConfig: Record<Priority, { label: string; color: string }> = {
   info: { label: 'Info', color: 'bg-blue-500' },
 };
 
-function TRFTableRow({ trf, index }: { trf: TRF; index: number }) {
+function TRFTableRow({ trf, index, onClick }: { trf: TRF; index: number; onClick: () => void }) {
   const status = statusConfig[trf.status];
   const priority = priorityConfig[trf.priority];
   const StatusIcon = status.icon;
@@ -68,6 +69,7 @@ function TRFTableRow({ trf, index }: { trf: TRF; index: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
       className="group hover:bg-muted/50 cursor-pointer"
+      onClick={onClick}
     >
       <TableCell>
         <div className="flex items-center gap-2">
@@ -126,7 +128,7 @@ function TRFTableRow({ trf, index }: { trf: TRF; index: number }) {
   );
 }
 
-function TRFKanbanCard({ trf, index }: { trf: TRF; index: number }) {
+function TRFKanbanCard({ trf, index, onClick }: { trf: TRF; index: number; onClick: () => void }) {
   const priority = priorityConfig[trf.priority];
 
   return (
@@ -138,6 +140,7 @@ function TRFKanbanCard({ trf, index }: { trf: TRF; index: number }) {
         "p-3 rounded-lg bg-card border border-border hover:border-primary/30",
         "hover:shadow-md cursor-pointer transition-all"
       )}
+      onClick={onClick}
     >
       <div className="flex items-start justify-between mb-2">
         <Badge variant="outline" className="text-xs">
@@ -162,6 +165,7 @@ function TRFKanbanCard({ trf, index }: { trf: TRF; index: number }) {
 }
 
 export default function TRFs() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -258,7 +262,7 @@ export default function TRFs() {
               </TableHeader>
               <TableBody>
                 {filteredTRFs.map((trf, index) => (
-                  <TRFTableRow key={trf.id} trf={trf} index={index} />
+                  <TRFTableRow key={trf.id} trf={trf} index={index} onClick={() => navigate(`/trfs/${trf.id}`)} />
                 ))}
               </TableBody>
             </Table>
@@ -274,7 +278,7 @@ export default function TRFs() {
               </div>
               <div className="space-y-2 min-h-[200px] p-2 bg-muted/30 rounded-lg">
                 {column.trfs.map((trf, index) => (
-                  <TRFKanbanCard key={trf.id} trf={trf} index={index} />
+                  <TRFKanbanCard key={trf.id} trf={trf} index={index} onClick={() => navigate(`/trfs/${trf.id}`)} />
                 ))}
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity } from '@/types';
+import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument } from '@/types';
 
 // Demo users for role switching
 export const demoUsers: User[] = [
@@ -49,6 +49,106 @@ export const demoUsers: User[] = [
   }
 ];
 
+// Timeline events for TRF detail
+const trfTimeline: TRFTimelineEvent[] = [
+  {
+    id: 'event-001',
+    type: 'created',
+    title: 'TRF Created',
+    description: 'Test Request Form initiated for Cotton T-Shirt Collection SS26',
+    actor: 'Sarah Chen',
+    timestamp: '2026-01-15T09:00:00Z'
+  },
+  {
+    id: 'event-002',
+    type: 'submitted',
+    title: 'TRF Submitted',
+    description: 'Request submitted for lab processing',
+    actor: 'Sarah Chen',
+    timestamp: '2026-01-15T14:30:00Z'
+  },
+  {
+    id: 'event-003',
+    type: 'sample_received',
+    title: 'Sample Received',
+    description: '3 fabric swatches received at SGS Hong Kong lab',
+    actor: 'Lab Reception',
+    timestamp: '2026-01-18T10:15:00Z'
+  },
+  {
+    id: 'event-004',
+    type: 'testing_started',
+    title: 'Testing Initiated',
+    description: 'Chemical analysis and physical testing commenced',
+    actor: 'Dr. Elena Martinez',
+    timestamp: '2026-01-20T08:00:00Z'
+  },
+  {
+    id: 'event-005',
+    type: 'test_completed',
+    title: 'Physical Tests Completed',
+    description: 'Tensile strength, pilling, and color fastness tests passed',
+    actor: 'Lab Team A',
+    timestamp: '2026-01-28T16:00:00Z'
+  },
+  {
+    id: 'event-006',
+    type: 'test_completed',
+    title: 'Chemical Tests Completed',
+    description: '10 of 12 tests completed. Minor deviation noted on pH level.',
+    actor: 'Dr. Elena Martinez',
+    timestamp: '2026-02-02T11:30:00Z'
+  },
+  {
+    id: 'event-007',
+    type: 'document_uploaded',
+    title: 'Test Report Uploaded',
+    description: 'Preliminary test report uploaded for review',
+    actor: 'Dr. Elena Martinez',
+    timestamp: '2026-02-03T14:00:00Z'
+  },
+  {
+    id: 'event-008',
+    type: 'comment',
+    title: 'Review Comment',
+    description: 'pH deviation (9.1 vs 9.0 threshold) is within acceptable variance. Recommend approval with notation.',
+    actor: 'Lab Supervisor',
+    timestamp: '2026-02-04T09:00:00Z'
+  },
+  {
+    id: 'event-009',
+    type: 'review_requested',
+    title: 'Review Requested',
+    description: 'TRF sent to buyer for final approval',
+    actor: 'System',
+    timestamp: '2026-02-04T09:15:00Z'
+  }
+];
+
+// Test results for TRF detail
+const trfTests: TRFTest[] = [
+  { id: 'test-001', name: 'Formaldehyde Content', category: 'Chemical', status: 'passed', result: '< 20 ppm', threshold: '< 75 ppm', completedAt: '2026-02-02T10:00:00Z' },
+  { id: 'test-002', name: 'pH Level', category: 'Chemical', status: 'passed', result: '9.1', threshold: '4.0 - 9.0', completedAt: '2026-02-02T10:30:00Z', notes: 'Slight deviation within acceptable variance' },
+  { id: 'test-003', name: 'AZO Dyes', category: 'Chemical', status: 'passed', result: 'Not Detected', threshold: '< 30 ppm', completedAt: '2026-02-02T11:00:00Z' },
+  { id: 'test-004', name: 'Heavy Metals (Lead)', category: 'Chemical', status: 'passed', result: '< 10 ppm', threshold: '< 90 ppm', completedAt: '2026-02-02T11:30:00Z' },
+  { id: 'test-005', name: 'Tensile Strength', category: 'Physical', status: 'passed', result: '385 N', threshold: '> 200 N', completedAt: '2026-01-28T14:00:00Z' },
+  { id: 'test-006', name: 'Tear Strength', category: 'Physical', status: 'passed', result: '28 N', threshold: '> 15 N', completedAt: '2026-01-28T14:30:00Z' },
+  { id: 'test-007', name: 'Pilling Resistance', category: 'Physical', status: 'passed', result: 'Grade 4', threshold: '≥ Grade 3', completedAt: '2026-01-28T15:00:00Z' },
+  { id: 'test-008', name: 'Color Fastness (Washing)', category: 'Color', status: 'passed', result: 'Grade 4-5', threshold: '≥ Grade 4', completedAt: '2026-01-28T15:30:00Z' },
+  { id: 'test-009', name: 'Color Fastness (Light)', category: 'Color', status: 'passed', result: 'Grade 5', threshold: '≥ Grade 4', completedAt: '2026-01-28T16:00:00Z' },
+  { id: 'test-010', name: 'Color Fastness (Rubbing)', category: 'Color', status: 'passed', result: 'Grade 4', threshold: '≥ Grade 3', completedAt: '2026-01-28T16:00:00Z' },
+  { id: 'test-011', name: 'Dimensional Stability', category: 'Physical', status: 'in_progress', threshold: '< 5% shrinkage' },
+  { id: 'test-012', name: 'Fiber Composition', category: 'Composition', status: 'pending', threshold: '100% Cotton (±3%)' },
+];
+
+// Documents for TRF detail
+const trfDocuments: TRFDocument[] = [
+  { id: 'doc-001', name: 'Product Specification Sheet.pdf', type: 'specification', uploadedBy: 'Sarah Chen', uploadedAt: '2026-01-15T09:05:00Z', size: '2.4 MB' },
+  { id: 'doc-002', name: 'Sample Photos.zip', type: 'sample_photo', uploadedBy: 'Marcus Wong', uploadedAt: '2026-01-17T11:30:00Z', size: '15.8 MB' },
+  { id: 'doc-003', name: 'Certificate of Analysis - Raw Material.pdf', type: 'coa', uploadedBy: 'Textile Supplier Ltd', uploadedAt: '2026-01-18T08:00:00Z', size: '1.2 MB' },
+  { id: 'doc-004', name: 'Preliminary Test Report.pdf', type: 'test_report', uploadedBy: 'Dr. Elena Martinez', uploadedAt: '2026-02-03T14:00:00Z', size: '3.8 MB' },
+];
+
 // TRF Mock Data
 export const mockTRFs: TRF[] = [
   {
@@ -69,7 +169,14 @@ export const mockTRFs: TRF[] = [
     passedTests: 10,
     failedTests: 1,
     riskScore: 72,
-    slaRemaining: 24
+    slaRemaining: 24,
+    description: 'Spring/Summer 2026 Cotton T-Shirt collection testing for EU and US markets. Includes basic tees, v-necks, and crew neck styles in 8 colorways.',
+    productCode: 'TSC-SS26-001',
+    lotNumber: 'LOT-2026-001234',
+    sampleCount: 3,
+    timeline: trfTimeline,
+    tests: trfTests,
+    documents: trfDocuments
   },
   {
     id: 'trf-002',
@@ -89,7 +196,11 @@ export const mockTRFs: TRF[] = [
     passedTests: 6,
     failedTests: 2,
     riskScore: 58,
-    slaRemaining: 72
+    slaRemaining: 72,
+    description: 'Kids denim collection ages 4-14. Stretch denim with reinforced knees.',
+    productCode: 'KDJ-2026-002',
+    lotNumber: 'LOT-2026-001235',
+    sampleCount: 5
   },
   {
     id: 'trf-003',
@@ -107,7 +218,11 @@ export const mockTRFs: TRF[] = [
     testCount: 24,
     passedTests: 24,
     failedTests: 0,
-    riskScore: 12
+    riskScore: 12,
+    description: 'GOTS certified organic cotton onesies for newborns 0-12 months.',
+    productCode: 'OBO-2026-003',
+    lotNumber: 'LOT-2026-001236',
+    sampleCount: 8
   },
   {
     id: 'trf-004',
@@ -126,7 +241,11 @@ export const mockTRFs: TRF[] = [
     passedTests: 0,
     failedTests: 0,
     riskScore: 25,
-    slaRemaining: 240
+    slaRemaining: 240,
+    description: 'High-impact sports bras with moisture-wicking technology.',
+    productCode: 'SBP-2026-004',
+    lotNumber: 'LOT-2026-001237',
+    sampleCount: 4
   },
   {
     id: 'trf-005',
@@ -143,7 +262,11 @@ export const mockTRFs: TRF[] = [
     category: 'Outerwear',
     testCount: 20,
     passedTests: 0,
-    failedTests: 0
+    failedTests: 0,
+    description: 'Synthetic down alternative insulation for winter outerwear.',
+    productCode: 'WJI-2026-005',
+    lotNumber: 'LOT-2026-001238',
+    sampleCount: 2
   },
   {
     id: 'trf-006',
@@ -161,7 +284,11 @@ export const mockTRFs: TRF[] = [
     testCount: 16,
     passedTests: 8,
     failedTests: 4,
-    riskScore: 85
+    riskScore: 85,
+    description: 'Premium silk blouse collection for professional wear.',
+    productCode: 'SBC-2026-006',
+    lotNumber: 'LOT-2026-001239',
+    sampleCount: 6
   }
 ];
 
