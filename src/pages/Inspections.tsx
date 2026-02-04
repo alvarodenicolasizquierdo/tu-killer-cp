@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,10 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockInspections, mockSuppliers } from '@/data/mockData';
+import { toast } from 'sonner';
+import { mockInspections as initialInspections, mockSuppliers } from '@/data/mockData';
 import { Inspection, InspectionType, InspectionStatus } from '@/types';
 import InspectionForm from '@/components/inspections/InspectionForm';
 import InspectionCard from '@/components/inspections/InspectionCard';
+import CalendarDayCell from '@/components/inspections/CalendarDayCell';
+import { useInspectionDragDrop } from '@/hooks/useInspectionDragDrop';
 
 const Inspections = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 1, 1)); // Feb 2026
@@ -21,6 +24,16 @@ const Inspections = () => {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [inspections, setInspections] = useState<Inspection[]>(initialInspections);
+
+  const {
+    dragState,
+    handleDragStart,
+    handleDragEnd,
+    handleDrop,
+    isDragOver,
+    setIsDragOver,
+  } = useInspectionDragDrop();
 
   const inspectionTypes: { value: InspectionType; label: string }[] = [
     { value: 'factory_audit', label: 'Factory Audit' },
@@ -31,12 +44,12 @@ const Inspections = () => {
   ];
 
   const filteredInspections = useMemo(() => {
-    return mockInspections.filter(insp => {
+    return inspections.filter(insp => {
       const matchesType = typeFilter === 'all' || insp.type === typeFilter;
       const matchesStatus = statusFilter === 'all' || insp.status === statusFilter;
       return matchesType && matchesStatus;
     });
-  }, [typeFilter, statusFilter]);
+  }, [inspections, typeFilter, statusFilter]);
 
   const monthDays = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -44,11 +57,11 @@ const Inspections = () => {
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  const getInspectionsForDate = (date: Date) => {
+  const getInspectionsForDate = useCallback((date: Date) => {
     return filteredInspections.filter(insp => 
       isSameDay(parseISO(insp.scheduledDate), date)
     );
-  };
+  }, [filteredInspections]);
 
   const selectedDateInspections = selectedDate 
     ? getInspectionsForDate(selectedDate)
@@ -92,16 +105,46 @@ const Inspections = () => {
     }
   };
 
-  // Stats based on filtered inspections
-  const stats = useMemo(() => {
-    const upcoming = mockInspections.filter(i => i.status === 'scheduled').length;
-    const inProgress = mockInspections.filter(i => i.status === 'in_progress').length;
-    const completed = mockInspections.filter(i => i.status === 'completed').length;
-    const cancelled = mockInspections.filter(i => i.status === 'cancelled').length;
-    const postponed = mockInspections.filter(i => i.status === 'postponed').length;
-    const critical = mockInspections.filter(i => i.priority === 'critical' && i.status !== 'completed').length;
-    return { upcoming, inProgress, completed, cancelled, postponed, critical };
+  // Handle inspection reschedule
+  const handleReschedule = useCallback((inspectionId: string, newDate: string) => {
+    setInspections(prev => prev.map(insp => {
+      if (insp.id === inspectionId) {
+        const updatedInsp = { ...insp, scheduledDate: newDate };
+        toast.success(
+          `Rescheduled "${insp.title}"`,
+          { description: `Moved to ${format(parseISO(newDate), 'EEEE, MMMM d, yyyy')}` }
+        );
+        return updatedInsp;
+      }
+      return insp;
+    }));
   }, []);
+
+  const handleDragOverCell = useCallback((e: React.DragEvent, day: Date) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setIsDragOver(format(day, 'yyyy-MM-dd'));
+  }, [setIsDragOver]);
+
+  const handleDragLeaveCell = useCallback(() => {
+    setIsDragOver(null);
+  }, [setIsDragOver]);
+
+  const handleDropOnCell = useCallback((e: React.DragEvent, day: Date) => {
+    e.preventDefault();
+    handleDrop(day, handleReschedule);
+  }, [handleDrop, handleReschedule]);
+
+  // Stats based on all inspections
+  const stats = useMemo(() => {
+    const upcoming = inspections.filter(i => i.status === 'scheduled').length;
+    const inProgress = inspections.filter(i => i.status === 'in_progress').length;
+    const completed = inspections.filter(i => i.status === 'completed').length;
+    const cancelled = inspections.filter(i => i.status === 'cancelled').length;
+    const postponed = inspections.filter(i => i.status === 'postponed').length;
+    const critical = inspections.filter(i => i.priority === 'critical' && i.status !== 'completed').length;
+    return { upcoming, inProgress, completed, cancelled, postponed, critical };
+  }, [inspections]);
 
   // Filtered counts for tabs
   const tabCounts = useMemo(() => ({
@@ -252,9 +295,17 @@ const Inspections = () => {
               <Card className="lg:col-span-2">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      {format(currentMonth, 'MMMM yyyy')}
-                    </CardTitle>
+                    <div>
+                      <CardTitle className="text-lg">
+                        {format(currentMonth, 'MMMM yyyy')}
+                      </CardTitle>
+                      {dragState.isDragging && (
+                        <p className="text-sm text-primary mt-1 flex items-center gap-1">
+                          <GripVertical className="h-3 w-3" />
+                          Drop on a date to reschedule
+                        </p>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1">
                       <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                         <ChevronLeft className="h-4 w-4" />
@@ -286,38 +337,25 @@ const Inspections = () => {
                       const dayInspections = getInspectionsForDate(day);
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
                       const isToday = isSameDay(day, new Date(2026, 1, 4)); // Mock today as Feb 4, 2026
+                      const dayKey = format(day, 'yyyy-MM-dd');
 
                       return (
-                        <motion.button
-                          key={day.toISOString()}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedDate(day)}
-                          className={`
-                            aspect-square p-1 rounded-lg border transition-all
-                            ${isSelected ? 'border-primary bg-primary/10' : 'border-transparent hover:border-border'}
-                            ${isToday ? 'bg-accent' : ''}
-                          `}
-                        >
-                          <div className="h-full flex flex-col">
-                            <span className={`text-sm ${isToday ? 'font-bold' : ''}`}>
-                              {format(day, 'd')}
-                            </span>
-                            {dayInspections.length > 0 && (
-                              <div className="flex-1 flex flex-wrap gap-0.5 mt-1 overflow-hidden">
-                                {dayInspections.slice(0, 3).map(insp => (
-                                  <div
-                                    key={insp.id}
-                                    className={`w-1.5 h-1.5 rounded-full ${getTypeColor(insp.type)}`}
-                                  />
-                                ))}
-                                {dayInspections.length > 3 && (
-                                  <span className="text-[10px] text-muted-foreground">+{dayInspections.length - 3}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </motion.button>
+                        <CalendarDayCell
+                          key={dayKey}
+                          day={day}
+                          inspections={dayInspections}
+                          isSelected={!!isSelected}
+                          isToday={isToday}
+                          isDragOver={isDragOver === dayKey}
+                          isDragging={dragState.isDragging}
+                          draggedInspectionId={dragState.draggedInspection?.id || null}
+                          onSelect={setSelectedDate}
+                          onDragStart={handleDragStart}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={handleDragOverCell}
+                          onDragLeave={handleDragLeaveCell}
+                          onDrop={handleDropOnCell}
+                        />
                       );
                     })}
                   </div>
@@ -330,6 +368,14 @@ const Inspections = () => {
                         <span className="text-muted-foreground">{type.label}</span>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Drag hint */}
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <GripVertical className="h-3 w-3" />
+                      Drag inspection dots to reschedule (completed/cancelled cannot be moved)
+                    </p>
                   </div>
                 </CardContent>
               </Card>
