@@ -199,13 +199,15 @@ export const screenHelpContext: Record<string, {
     title: 'Suppliers',
     description: 'Monitor supplier compliance and performance.',
     primaryCategory: 'suppliers',
-    commonQuestionIds: ['q-021', 'q-022', 'q-023'],
+    commonQuestionIds: ['q-021', 'q-022', 'q-023', 'q-031', 'q-032'],
+    tipOfTheDay: 'Send sustainability questionnaires to suppliers before their annual review to maintain compliance.'
   },
   '/analytics': {
     title: 'Analytics & Reports',
     description: 'Data insights and operational reporting.',
     primaryCategory: 'reporting',
-    commonQuestionIds: ['q-024', 'q-025'],
+    commonQuestionIds: ['q-024', 'q-025', 'q-033', 'q-034', 'q-035'],
+    tipOfTheDay: 'Use the Collection Readiness Funnel to identify bottlenecks before they impact launch dates.'
   },
   '/settings': {
     title: 'Settings',
@@ -520,6 +522,108 @@ export const contextualQuestions: ContextualQuestion[] = [
     objectType: 'testing',
     source: { type: 'webinar', reference: 'Testing Standards Webinar' },
     askedCount: 298
+  },
+  // Supplier questions
+  {
+    id: 'q-021',
+    question: 'How do I invite a supplier to complete the sustainability questionnaire?',
+    answer: 'Click the "Invite to Questionnaire" button on any supplier row. This sends an automated email with a link to the sustainability questionnaire. You can track response status in the supplier profile.',
+    confidence: 96,
+    screenContext: '/suppliers',
+    objectType: 'supplier',
+    source: { type: 'guide', reference: 'Supplier Engagement Guide' },
+    askedCount: 312
+  },
+  {
+    id: 'q-022',
+    question: 'What do the supplier compliance percentages mean?',
+    answer: 'Compliance percentage reflects: valid certifications (40%), questionnaire completion (25%), on-time document submissions (20%), and historical test pass rates (15%). Suppliers below 70% are flagged for review.',
+    confidence: 94,
+    screenContext: '/suppliers',
+    objectType: 'supplier',
+    source: { type: 'sop', reference: 'Supplier Compliance Framework' },
+    askedCount: 278
+  },
+  {
+    id: 'q-023',
+    question: 'Why is a supplier marked as "At Risk"?',
+    answer: 'Suppliers are flagged At Risk when: compliance score drops below 60%, certificates are expired or expiring within 30 days, or they have 3+ failed TRFs in the last quarter. Click the supplier to see specific issues.',
+    confidence: 92,
+    screenContext: '/suppliers',
+    objectType: 'supplier',
+    source: { type: 'ai', reference: 'Risk pattern analysis' },
+    askedCount: 198
+  },
+  {
+    id: 'q-031',
+    question: 'How do I add a new supplier to the system?',
+    answer: 'Click "Add Supplier" and enter required details: company name, contact info, and primary product categories. New suppliers must complete the sustainability questionnaire and upload required certifications before being approved for orders.',
+    confidence: 95,
+    screenContext: '/suppliers',
+    objectType: 'supplier',
+    source: { type: 'guide', reference: 'Supplier Onboarding Guide' },
+    askedCount: 167
+  },
+  {
+    id: 'q-032',
+    question: 'What certifications are required for suppliers?',
+    answer: 'Required certifications depend on product category. Apparel suppliers typically need: OEKO-TEX or GOTS (for sustainability), ISO 9001 (quality), and any market-specific certifications (e.g., REACH for EU). Check the supplier profile for specific requirements.',
+    confidence: 91,
+    screenContext: '/suppliers',
+    objectType: 'supplier',
+    source: { type: 'sop', reference: 'Supplier Certification Requirements' },
+    askedCount: 145
+  },
+  // Analytics questions
+  {
+    id: 'q-024',
+    question: 'How is the Collection Readiness Funnel calculated?',
+    answer: 'The funnel shows progression through lifecycle stages: Components Ready → TRFs Submitted → Testing Complete → Approved. Each bar shows the count and percentage of styles at that stage. Click any stage to drill down.',
+    confidence: 93,
+    screenContext: '/analytics',
+    objectType: 'report',
+    source: { type: 'guide', reference: 'Analytics Dashboard Guide' },
+    askedCount: 234
+  },
+  {
+    id: 'q-025',
+    question: 'What does the TRF Turnaround Time chart show?',
+    answer: 'This chart displays average time from TRF submission to approval, broken down by testing level (Base, Bulk, Product). Compare against SLA targets (dashed lines) to identify bottlenecks. Hover for specific values.',
+    confidence: 91,
+    screenContext: '/analytics',
+    objectType: 'report',
+    source: { type: 'webinar', reference: 'Q4 Metrics Webinar' },
+    askedCount: 189
+  },
+  {
+    id: 'q-033',
+    question: 'Can I export analytics data for reporting?',
+    answer: 'Yes, click the export icon in the top-right of any chart to download as CSV or PDF. For full dashboard exports, use the "Export All" button. Data exports are available for the selected date range only.',
+    confidence: 97,
+    screenContext: '/analytics',
+    objectType: 'report',
+    source: { type: 'guide', reference: 'Analytics Export Guide' },
+    askedCount: 156
+  },
+  {
+    id: 'q-034',
+    question: 'Why are some analytics charts showing incomplete data?',
+    answer: 'Charts may show partial data if: the date range includes future dates, data is still being processed (allow 24h for recent data), or you lack permissions for certain categories. Check the "Data as of" timestamp for currency.',
+    confidence: 88,
+    screenContext: '/analytics',
+    objectType: 'report',
+    source: { type: 'ai', reference: 'Data availability analysis' },
+    askedCount: 112
+  },
+  {
+    id: 'q-035',
+    question: 'How do I compare performance across different time periods?',
+    answer: 'Use the date range selector to choose your primary period, then toggle "Compare to Previous Period" to overlay historical data. You can compare week-over-week, month-over-month, or custom ranges.',
+    confidence: 94,
+    screenContext: '/analytics',
+    objectType: 'report',
+    source: { type: 'guide', reference: 'Analytics Comparison Features' },
+    askedCount: 134
   },
   // Approval questions
   {
