@@ -57,15 +57,21 @@ const categories: HelpCategory[] = [
   { id: 'notifications', label: 'Notifications & Approvals', icon: AlertTriangle, articleCount: 6 },
 ];
 
-const intents: HelpIntent[] = [
-  { id: 'create-audit', label: 'Create an Audit', icon: ClipboardCheck, description: 'Start a new factory audit from scratch' },
-  { id: 'create-workbook', label: 'Create a Workbook', icon: BookOpen, description: 'Build a test workbook for your styles' },
-  { id: 'submit-lab', label: 'Submit to Lab', icon: Beaker, description: 'Send samples for laboratory testing' },
-  { id: 'link-fabric', label: 'Link Fabric to Style', icon: Link2, description: 'Associate fabric components with styles' },
-  { id: 'export-excel', label: 'Export to Excel', icon: Download, description: 'Download reports and data as spreadsheets' },
-  { id: 'upload-photos', label: 'Upload Photos', icon: Camera, description: 'Add images to audits or inspections' },
-  { id: 'fix-tab', label: 'Fix Missing Tab', icon: AlertTriangle, description: 'Troubleshoot hidden or missing tabs' },
-  { id: 'care-issue', label: 'Care Code / Label Issue', icon: FileSpreadsheet, description: 'Resolve care labeling problems' },
+const intents: (HelpIntent & { categoryId: string })[] = [
+  { id: 'create-audit', label: 'Create an Audit', icon: ClipboardCheck, description: 'Start a new factory audit', categoryId: 'audits' },
+  { id: 'create-workbook', label: 'Create a Workbook', icon: BookOpen, description: 'Build a test workbook for styles', categoryId: 'audits' },
+  { id: 'submit-lab', label: 'Submit TRF', icon: Beaker, description: 'Submit a Test Request Form', categoryId: 'audits' },
+  { id: 'send-to-lab', label: 'Send to Lab', icon: Beaker, description: 'Send samples for testing', categoryId: 'audits' },
+  { id: 'link-fabric', label: 'Link Fabric to Style', icon: Link2, description: 'Associate fabric components', categoryId: 'fabrics' },
+  { id: 'fabric-test-link', label: 'Fabric Test Link Missing', icon: AlertTriangle, description: 'Fabric linked but no test', categoryId: 'fabrics' },
+  { id: 'export-excel', label: 'Export to Excel', icon: Download, description: 'Download data as spreadsheet', categoryId: 'reports' },
+  { id: 'excel-missing', label: 'Excel Missing Fields', icon: FileSpreadsheet, description: 'Export has missing columns', categoryId: 'reports' },
+  { id: 'upload-photos', label: 'Upload Photos', icon: Camera, description: 'Add images to records', categoryId: 'photos' },
+  { id: 'phone-upload', label: 'Upload from Phone', icon: Camera, description: 'Mobile photo upload issues', categoryId: 'photos' },
+  { id: 'fix-tab', label: 'Fix Missing Tab', icon: AlertTriangle, description: 'Tab not visible', categoryId: 'dashboard' },
+  { id: 'supplier-tabs', label: 'Supplier Missing Tabs', icon: AlertTriangle, description: 'Supplier can\'t see PD tabs', categoryId: 'dashboard' },
+  { id: 'care-issue', label: 'Care Code Issue', icon: FileSpreadsheet, description: 'Care label problems', categoryId: 'care' },
+  { id: 'label-generation', label: 'Generate Care Labels', icon: Link2, description: 'Create care label artwork', categoryId: 'care' },
 ];
 
 const articles: HelpArticle[] = [
@@ -342,11 +348,7 @@ export default function HelpSupport() {
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setActiveResolution(null);
-    // Show first article in category
-    const categoryArticle = articles.find(a => a.categoryId === categoryId);
-    if (categoryArticle) {
-      setSelectedArticle(categoryArticle);
-    }
+    setSelectedArticle(null); // Clear article to show category intents
   };
 
   const handleResolutionMatch = (resolution: GuidedResolutionData) => {
@@ -400,17 +402,41 @@ export default function HelpSupport() {
           />
         </div>
 
-        {/* CENTER: Dynamic Article / Guided Resolution */}
+        {/* CENTER: Dynamic Article / Guided Resolution / Category Intents */}
         <div className="col-span-5">
           {activeResolution ? (
             <div className="bg-card rounded-xl border border-border shadow-sm h-full">
               <GuidedResolution
                 data={activeResolution}
                 onEscalate={() => {
-                  // Could open a support ticket modal
                   console.log('Escalating to SGS support');
                 }}
               />
+            </div>
+          ) : selectedCategory && !selectedArticle ? (
+            <div className="bg-card rounded-xl border border-border shadow-sm h-full p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
+                {categories.find(c => c.id === selectedCategory)?.label}
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {intents
+                  .filter(intent => intent.categoryId === selectedCategory)
+                  .map(intent => (
+                    <IntentCard
+                      key={intent.id}
+                      icon={intent.icon}
+                      title={intent.label}
+                      description={intent.description}
+                      onClick={() => handleIntentClick(intent.id)}
+                      variant="compact"
+                    />
+                  ))}
+              </div>
+              {intents.filter(i => i.categoryId === selectedCategory).length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No topics in this category yet.
+                </p>
+              )}
             </div>
           ) : (
             <ArticlePanel
