@@ -17,7 +17,8 @@ import {
   LogOut,
   User,
   BookOpen,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
@@ -48,6 +49,7 @@ const navItems = [
 const bottomItems = [
   { icon: Sparkles, label: 'AI Assistant', path: '/ai-assistant' },
   { icon: BookOpen, label: 'Knowledge Hub', path: '/knowledge-hub' },
+  { icon: ShieldCheck, label: 'Help Admin', path: '/help-admin', adminOnly: true },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 

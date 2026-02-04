@@ -26,6 +26,7 @@ import CareLabelling from "./pages/CareLabelling";
 import GSW from "./pages/GSW";
 import SelfApprovalLevels from "./pages/SelfApprovalLevels";
 import KnowledgeHub from "./pages/KnowledgeHub";
+import HelpAdmin from "./pages/HelpAdmin";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/notifications" element={<Dashboard />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/knowledge-hub" element={<KnowledgeHub />} />
+            <Route path="/help-admin" element={<HelpAdmin />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
