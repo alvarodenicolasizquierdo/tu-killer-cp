@@ -168,6 +168,14 @@ export interface Activity {
 }
 
 // Product types
+export interface ProductImage {
+  id: string;
+  url: string;
+  alt: string;
+  isPrimary?: boolean;
+  uploadedAt?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -177,6 +185,7 @@ export interface Product {
   supplierId: string;
   description?: string;
   imageUrl?: string;
+  images?: ProductImage[];
   status: 'active' | 'pending' | 'discontinued';
   complianceStatus: 'compliant' | 'pending_review' | 'non_compliant';
   lastTested?: string;
