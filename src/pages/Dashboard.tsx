@@ -128,6 +128,7 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
+        data-tour="ai-context"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -228,7 +229,7 @@ export default function Dashboard() {
           
           {/* Tasks widget - shown for buyer/admin or as secondary for other roles */}
           {(showTasksWidget || (!isSupplier && layoutConfig.primaryWidget !== 'tasks')) && (
-            <Card className="border-2 border-ai-primary/20">
+            <Card className="border-2 border-ai-primary/20" data-tour="tasks-widget">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -284,11 +285,13 @@ export default function Dashboard() {
 
           {/* Scenario Simulator - hide for suppliers */}
           {!isSupplier && (
-            <ScenarioSimulator
+            <div data-tour="scenario-simulator">
+              <ScenarioSimulator
               scenarioState={scenarioState}
               onScenarioChange={setScenarioState}
-              impact={scenarioImpact}
-            />
+                impact={scenarioImpact}
+              />
+            </div>
           )}
 
           {/* Activity Feed - if enabled */}
@@ -307,7 +310,7 @@ export default function Dashboard() {
         {/* Right Column - Readiness & Context */}
         <div className="space-y-6">
           {/* Readiness Gauge */}
-          <Card>
+          <Card data-tour="readiness-gauge">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-muted-foreground" />
