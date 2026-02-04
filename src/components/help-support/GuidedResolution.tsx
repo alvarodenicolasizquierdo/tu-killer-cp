@@ -25,6 +25,8 @@ export interface GuidedResolutionData {
     action: string;
     detail?: string;
   }[];
+  // Hidden tags for Carlos AI intent matching (not displayed to users)
+  tags?: string[];
   aiNotes?: {
     rootCauseTags: string[];
     confidence?: number;
