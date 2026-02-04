@@ -366,6 +366,8 @@ export const mockSuppliers: Supplier[] = [
   {
     id: 'supplier-001',
     name: 'Textile Supplier Ltd',
+    email: 'procurement@textilesupplier.cn',
+    contactPerson: 'Li Wei',
     country: 'China',
     factoryCount: 3,
     status: 'active',
@@ -379,6 +381,8 @@ export const mockSuppliers: Supplier[] = [
   {
     id: 'supplier-002',
     name: 'Denim Masters Co',
+    email: 'quality@denimmasters.vn',
+    contactPerson: 'Nguyen Thi Mai',
     country: 'Vietnam',
     factoryCount: 2,
     status: 'at-risk',
@@ -392,6 +396,8 @@ export const mockSuppliers: Supplier[] = [
   {
     id: 'supplier-003',
     name: 'EcoTextile Inc',
+    email: 'sustainability@ecotextile.in',
+    contactPerson: 'Priya Sharma',
     country: 'India',
     factoryCount: 1,
     status: 'active',
@@ -405,6 +411,8 @@ export const mockSuppliers: Supplier[] = [
   {
     id: 'supplier-004',
     name: 'ActiveWear Partners',
+    email: 'compliance@activewear.cn',
+    contactPerson: 'Zhang Chen',
     country: 'China',
     factoryCount: 4,
     status: 'active',
