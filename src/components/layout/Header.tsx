@@ -1,0 +1,122 @@
+import { useState } from 'react';
+import { Search, Bell, MessageSquare, Command } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { mockNotifications } from '@/data/mockData';
+import { cn } from '@/lib/utils';
+
+interface HeaderProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export function Header({ title, subtitle }: HeaderProps) {
+  const [searchFocused, setSearchFocused] = useState(false);
+  const unreadCount = mockNotifications.filter(n => !n.isRead).length;
+
+  return (
+    <header className="h-16 bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-40">
+      <div className="h-full flex items-center justify-between px-6">
+        {/* Left - Title */}
+        <div>
+          {title && (
+            <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+          )}
+          {subtitle && (
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          )}
+        </div>
+
+        {/* Right - Search & Actions */}
+        <div className="flex items-center gap-3">
+          {/* AI Search */}
+          <motion.div
+            animate={{ width: searchFocused ? 400 : 280 }}
+            className="relative"
+          >
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Ask CARLOS anything..."
+              className={cn(
+                "pl-10 pr-12 h-10 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/30",
+                searchFocused && "bg-background shadow-lg border border-border"
+              )}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+            />
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+              <Command className="w-3 h-3" />K
+            </kbd>
+          </motion.div>
+
+          {/* Notifications */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="flex items-center justify-between">
+                Notifications
+                <Badge variant="secondary">{unreadCount} new</Badge>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {mockNotifications.slice(0, 4).map((notification) => (
+                <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3 cursor-pointer">
+                  <div className="flex items-center gap-2 w-full">
+                    <span className={cn(
+                      "w-2 h-2 rounded-full shrink-0",
+                      notification.type === 'error' && "bg-priority-critical",
+                      notification.type === 'warning' && "bg-priority-at-risk",
+                      notification.type === 'success' && "bg-priority-on-track",
+                      notification.type === 'info' && "bg-priority-info"
+                    )} />
+                    <span className={cn(
+                      "text-sm font-medium flex-1",
+                      !notification.isRead && "text-foreground",
+                      notification.isRead && "text-muted-foreground"
+                    )}>
+                      {notification.title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                    {notification.message}
+                  </p>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-center text-sm text-primary cursor-pointer">
+                View all notifications
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* AI Quick Chat */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="relative hover:bg-gradient-to-r hover:from-ai-primary/10 hover:to-ai-secondary/10"
+          >
+            <MessageSquare className="w-5 h-5 text-ai-primary" />
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}

@@ -1,0 +1,247 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Package, 
+  Factory, 
+  FlaskConical, 
+  BarChart3, 
+  Bell, 
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  LogOut,
+  User
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+
+const navItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
+  { icon: FileText, label: 'TRFs', path: '/trfs', badge: '12' },
+  { icon: Package, label: 'Products', path: '/products', badge: null },
+  { icon: Factory, label: 'Suppliers', path: '/suppliers', badge: '2' },
+  { icon: FlaskConical, label: 'Lab', path: '/lab', badge: '5' },
+  { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
+  { icon: Bell, label: 'Notifications', path: '/notifications', badge: '4' },
+];
+
+const bottomItems = [
+  { icon: Sparkles, label: 'AI Assistant', path: '/ai-assistant' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
+];
+
+export function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
+  const { currentUser, availableUsers, setCurrentUser } = useUser();
+
+  return (
+    <motion.aside
+      initial={false}
+      animate={{ width: isCollapsed ? 72 : 260 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      className="fixed left-0 top-0 h-screen bg-sidebar flex flex-col z-50"
+    >
+      {/* Logo Section */}
+      <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg ai-gradient flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-lg">C</span>
+          </div>
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="overflow-hidden"
+              >
+                <span className="text-sidebar-foreground font-semibold text-lg whitespace-nowrap">
+                  CARLOS
+                </span>
+                <span className="text-sidebar-muted text-xs block -mt-0.5">
+                  by SGS
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 py-4 px-3 overflow-y-auto scrollbar-thin">
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  'sidebar-link group relative',
+                  isActive && 'active'
+                )}
+              >
+                <item.icon className="w-5 h-5 shrink-0" />
+                <AnimatePresence>
+                  {!isCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex-1 whitespace-nowrap"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {item.badge && !isCollapsed && (
+                  <Badge 
+                    variant="secondary" 
+                    className={cn(
+                      "ml-auto text-xs",
+                      isActive 
+                        ? "bg-white/20 text-white" 
+                        : "bg-sidebar-accent text-sidebar-foreground"
+                    )}
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+                {item.badge && isCollapsed && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* AI Assistant Section */}
+        <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
+          {bottomItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  'sidebar-link',
+                  isActive && 'active',
+                  item.path === '/ai-assistant' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
+                )}
+              >
+                <item.icon className={cn(
+                  "w-5 h-5 shrink-0",
+                  item.path === '/ai-assistant' && !isActive && 'text-ai-primary'
+                )} />
+                <AnimatePresence>
+                  {!isCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className={cn(
+                        "whitespace-nowrap",
+                        item.path === '/ai-assistant' && !isActive && 'ai-gradient-text font-medium'
+                      )}
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Collapse Button */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-20 w-6 h-6 bg-sidebar border border-sidebar-border rounded-full flex items-center justify-center text-sidebar-muted hover:text-sidebar-foreground transition-colors"
+      >
+        {isCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+      </button>
+
+      {/* User Section */}
+      <div className="p-3 border-t border-sidebar-border">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="w-full">
+            <div className={cn(
+              "flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer",
+              isCollapsed && "justify-center"
+            )}>
+              <Avatar className="w-8 h-8 shrink-0">
+                <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-sm">
+                  {currentUser.avatar}
+                </AvatarFallback>
+              </Avatar>
+              <AnimatePresence>
+                {!isCollapsed && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex-1 text-left overflow-hidden"
+                  >
+                    <p className="text-sm font-medium text-sidebar-foreground truncate">
+                      {currentUser.name}
+                    </p>
+                    <p className="text-xs text-sidebar-muted truncate">
+                      {getRoleDisplayName(currentUser.role)}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel>Switch Demo User</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {availableUsers.map((user) => (
+              <DropdownMenuItem
+                key={user.id}
+                onClick={() => setCurrentUser(user)}
+                className={cn(
+                  "cursor-pointer",
+                  currentUser.id === user.id && "bg-accent"
+                )}
+              >
+                <Avatar className="w-6 h-6 mr-2">
+                  <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                    {user.avatar}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{getRoleDisplayName(user.role)}</p>
+                </div>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer text-muted-foreground">
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </motion.aside>
+  );
+}
