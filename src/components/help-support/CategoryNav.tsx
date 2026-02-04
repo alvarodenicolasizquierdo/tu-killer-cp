@@ -39,7 +39,7 @@ export function CategoryNav({
   const totalItems = categories.length + popularTopics.length;
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key)) return;
+    if (!['ArrowUp', 'ArrowDown', 'Enter', 'Escape', 'Home', 'End'].includes(e.key)) return;
     
     e.preventDefault();
 
@@ -49,7 +49,11 @@ export function CategoryNav({
       return;
     }
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'Home') {
+      setFocusedIndex(0);
+    } else if (e.key === 'End') {
+      setFocusedIndex(totalItems - 1);
+    } else if (e.key === 'ArrowDown') {
       setFocusedIndex(prev => (prev < totalItems - 1 ? prev + 1 : 0));
     } else if (e.key === 'ArrowUp') {
       setFocusedIndex(prev => (prev > 0 ? prev - 1 : totalItems - 1));
