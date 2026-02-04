@@ -1,4 +1,4 @@
-import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument, Product, Inspection } from '@/types';
+import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument, Product, ProductImage, Inspection } from '@/types';
 
 // Demo users for role switching
 export const demoUsers: User[] = [
@@ -612,6 +612,12 @@ export const mockProducts: Product[] = [
     activeTRFs: 1,
     passRate: 83,
     riskScore: 72,
+    images: [
+      { id: 'img-001-1', url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600', alt: 'White cotton t-shirt front view', isPrimary: true },
+      { id: 'img-001-2', url: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600', alt: 'Cotton t-shirt stack' },
+      { id: 'img-001-3', url: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600', alt: 'T-shirt on hanger' },
+      { id: 'img-001-4', url: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600', alt: 'T-shirt fabric close-up' }
+    ],
     specifications: {
       material: '100% Organic Cotton',
       weight: '180 GSM',
@@ -633,6 +639,10 @@ export const mockProducts: Product[] = [
     activeTRFs: 1,
     passRate: 67,
     riskScore: 58,
+    images: [
+      { id: 'img-002-1', url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=600', alt: 'Kids denim jeans', isPrimary: true },
+      { id: 'img-002-2', url: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=600', alt: 'Denim fabric texture' }
+    ],
     specifications: {
       material: '98% Cotton, 2% Elastane',
       weight: '320 GSM',
@@ -654,6 +664,9 @@ export const mockProducts: Product[] = [
     activeTRFs: 0,
     passRate: 100,
     riskScore: 12,
+    images: [
+      { id: 'img-003-1', url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600', alt: 'Baby onesie', isPrimary: true }
+    ],
     specifications: {
       material: '100% GOTS Organic Cotton',
       weight: '160 GSM',

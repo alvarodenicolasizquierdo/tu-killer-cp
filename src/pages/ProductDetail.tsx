@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { mockProducts, mockTRFs, mockSuppliers } from '@/data/mockData';
 import { Product } from '@/types';
+import ProductImageGallery from '@/components/products/ProductImageGallery';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -113,6 +114,13 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Product Image Gallery */}
+            <ProductImageGallery 
+              images={product.images || []} 
+              productName={product.name}
+              editable={true}
+            />
+
             {/* Description */}
             {product.description && (
               <Card>
