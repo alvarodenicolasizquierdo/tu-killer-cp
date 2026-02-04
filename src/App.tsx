@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import Dashboard from "./pages/Dashboard";
 import TRFs from "./pages/TRFs";
+import TRFDetail from "./pages/TRFDetail";
 import Suppliers from "./pages/Suppliers";
 import Lab from "./pages/Lab";
 import Analytics from "./pages/Analytics";
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/trfs" element={<TRFs />} />
+            <Route path="/trfs/:id" element={<TRFDetail />} />
             <Route path="/products" element={<Dashboard />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/lab" element={<Lab />} />

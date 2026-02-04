@@ -29,6 +29,37 @@ export type TRFStatus =
   | 'rejected' 
   | 'completed';
 
+export interface TRFTimelineEvent {
+  id: string;
+  type: 'created' | 'submitted' | 'sample_received' | 'testing_started' | 'test_completed' | 'review_requested' | 'approved' | 'rejected' | 'comment' | 'document_uploaded' | 'retest_requested';
+  title: string;
+  description?: string;
+  actor: string;
+  timestamp: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface TRFTest {
+  id: string;
+  name: string;
+  category: string;
+  status: 'pending' | 'in_progress' | 'passed' | 'failed' | 'retest';
+  result?: string;
+  threshold?: string;
+  completedAt?: string;
+  notes?: string;
+}
+
+export interface TRFDocument {
+  id: string;
+  name: string;
+  type: 'coa' | 'test_report' | 'sample_photo' | 'specification' | 'other';
+  uploadedBy: string;
+  uploadedAt: string;
+  size: string;
+  url?: string;
+}
+
 export interface TRF {
   id: string;
   reference: string;
@@ -48,6 +79,13 @@ export interface TRF {
   failedTests: number;
   riskScore?: number;
   slaRemaining?: number; // hours
+  description?: string;
+  productCode?: string;
+  lotNumber?: string;
+  sampleCount?: number;
+  timeline?: TRFTimelineEvent[];
+  tests?: TRFTest[];
+  documents?: TRFDocument[];
 }
 
 // Task types for AI inbox
