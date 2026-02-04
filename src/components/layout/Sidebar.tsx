@@ -33,11 +33,12 @@ import { Badge } from '@/components/ui/badge';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
+  { icon: Package, label: 'Styles', path: '/styles', badge: '6' },
+  { icon: FlaskConical, label: 'Components', path: '/components', badge: null },
+  { icon: FileText, label: 'Testing Levels', path: '/testing-levels', badge: '3' },
+  { icon: ClipboardCheck, label: 'Care Labels', path: '/care-labelling', badge: '2' },
+  { icon: Factory, label: 'GSW', path: '/gsw', badge: '1' },
   { icon: FileText, label: 'TRFs', path: '/trfs', badge: '12' },
-  { icon: Package, label: 'Products', path: '/products', badge: null },
-  { icon: Factory, label: 'Suppliers', path: '/suppliers', badge: '2' },
-  { icon: FlaskConical, label: 'Lab', path: '/lab', badge: '5' },
-  { icon: ClipboardCheck, label: 'Inspections', path: '/inspections', badge: '3' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
   { icon: Bell, label: 'Notifications', path: '/notifications', badge: '4' },
 ];

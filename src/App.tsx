@@ -17,6 +17,13 @@ import Analytics from "./pages/Analytics";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Styles from "./pages/Styles";
+import StyleDetail from "./pages/StyleDetail";
+import Components from "./pages/Components";
+import TestingLevels from "./pages/TestingLevels";
+import CareLabelling from "./pages/CareLabelling";
+import GSW from "./pages/GSW";
+import SelfApprovalLevels from "./pages/SelfApprovalLevels";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +36,13 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/styles" element={<Styles />} />
+            <Route path="/styles/:id" element={<StyleDetail />} />
+            <Route path="/components" element={<Components />} />
+            <Route path="/testing-levels" element={<TestingLevels />} />
+            <Route path="/care-labelling" element={<CareLabelling />} />
+            <Route path="/gsw" element={<GSW />} />
+            <Route path="/approval-levels" element={<SelfApprovalLevels />} />
             <Route path="/trfs" element={<TRFs />} />
             <Route path="/trfs/:id" element={<TRFDetail />} />
             <Route path="/products" element={<Products />} />
