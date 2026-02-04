@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sparkles, Bot, User, Zap, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GuidedResolutionData } from './GuidedResolution';
-import { guidedResolutions } from '@/data/guidedResolutions';
+import { helpKnowledgeBase, matchArticleByQuery, HelpArticle } from '@/data/helpKnowledgeBase';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -49,24 +49,39 @@ const intentMatchers: { id: string; keywords: string[]; resolution: string }[] =
   { id: 'carecode-not-applying', keywords: ['care code', 'carecode', 'code not applying', 'care code changes', 'label not updating', 'care code update'], resolution: 'carecode-not-applying' },
 ];
 
-function matchIntent(message: string): GuidedResolutionData | null {
-  const lowerMessage = message.toLowerCase();
-  
-  for (const matcher of intentMatchers) {
-    for (const keyword of matcher.keywords) {
-      if (lowerMessage.includes(keyword)) {
-        return guidedResolutions[matcher.resolution] || null;
-      }
+// Convert HelpArticle to GuidedResolutionData
+function articleToResolution(article: HelpArticle): GuidedResolutionData {
+  return {
+    id: article.id,
+    title: article.title,
+    intent: `You want to: ${article.intent}`,
+    causes: article.why_usually_happens,
+    steps: article.fix_steps.map((step, i) => ({
+      action: `Step ${i + 1}`,
+      detail: step
+    })),
+    tags: article.tags,
+    aiNotes: {
+      rootCauseTags: article.ai_hidden_notes.root_cause_tags,
+      confidence: article.ai_hidden_notes.triage_priority === 'high' ? 0.95 : 
+                  article.ai_hidden_notes.triage_priority === 'medium' ? 0.85 : 0.75,
+      relatedIssues: []
     }
+  };
+}
+
+function matchIntent(message: string): GuidedResolutionData | null {
+  const matchedArticle = matchArticleByQuery(message);
+  if (matchedArticle) {
+    return articleToResolution(matchedArticle);
   }
-  
   return null;
 }
 
 function generateConversationalResponse(resolution: GuidedResolutionData): string {
   const causesSummary = resolution.causes.slice(0, 2).join(' or ');
   
-  return `I see what's happening. **${resolution.title.replace("I can't", "You're trying to").replace("I can't", "You want to")}**
+  return `I see what's happening. **${resolution.title}**
 
 This usually happens when ${causesSummary.toLowerCase()}.
 
