@@ -16,7 +16,9 @@ import {
   FileText,
   Calendar,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  ExternalLink,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -200,6 +202,32 @@ export default function Suppliers() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Supplier Questionnaire CTA */}
+      <Card className="mb-6 border-ai-primary/30 bg-gradient-to-r from-ai-primary/5 via-background to-ai-secondary/5">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-ai-primary to-ai-secondary flex items-center justify-center shrink-0">
+                <ClipboardList className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Supplier Sustainability Questionnaire</h3>
+                <p className="text-sm text-muted-foreground">
+                  Invite suppliers to complete the UKI sustainability assessment for enhanced compliance insights
+                </p>
+              </div>
+            </div>
+            <Button 
+              className="ai-gradient border-0 shrink-0"
+              onClick={() => window.open('https://suppllier-uki-questionnaire.manus.space/', '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Open Questionnaire
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Supplier Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
