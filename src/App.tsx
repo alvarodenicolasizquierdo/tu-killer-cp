@@ -7,6 +7,8 @@ import { UserProvider } from "@/contexts/UserContext";
 import Dashboard from "./pages/Dashboard";
 import TRFs from "./pages/TRFs";
 import TRFDetail from "./pages/TRFDetail";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import Suppliers from "./pages/Suppliers";
 import Lab from "./pages/Lab";
 import Analytics from "./pages/Analytics";
@@ -27,7 +29,8 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/trfs" element={<TRFs />} />
             <Route path="/trfs/:id" element={<TRFDetail />} />
-            <Route path="/products" element={<Dashboard />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/lab" element={<Lab />} />
             <Route path="/analytics" element={<Analytics />} />
