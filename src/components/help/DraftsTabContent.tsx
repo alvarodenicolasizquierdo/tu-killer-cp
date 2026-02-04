@@ -45,56 +45,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock data for saved drafts
-const initialDrafts = [
-  {
-    id: 'draft-1',
-    question: 'How do I request a rush TRF approval for urgent orders?',
-    answer: 'For urgent TRF approvals, navigate to the TRF detail page and click the "Request Rush" button in the top toolbar. This will escalate the request to senior approvers and flag it as high priority. Rush requests typically receive response within 4 hours during business hours.',
-    sourceType: 'sme',
-    createdBy: 'Leo Martinez',
-    createdAt: '2026-02-04T09:15:00Z',
-    lastModified: '2026-02-04T10:30:00Z',
-    originalQuestionId: 'uq-1',
-    status: 'in_review',
-  },
-  {
-    id: 'draft-2',
-    question: 'What happens if a supplier fails the same test twice?',
-    answer: 'When a supplier fails the same test twice, the system automatically triggers a Supplier Performance Review (SPR). The supplier status changes to "At Risk" and they receive a formal notification. A corrective action plan must be submitted within 14 days, and retesting is required before any new TRFs can be approved.',
-    sourceType: 'sop',
-    createdBy: 'Emma Wilson',
-    createdAt: '2026-02-03T16:45:00Z',
-    lastModified: '2026-02-03T16:45:00Z',
-    originalQuestionId: 'uq-2',
-    status: 'draft',
-  },
-  {
-    id: 'draft-3',
-    question: 'How do I export test results to PDF for auditors?',
-    answer: 'To export test results: 1) Open the TRF detail page, 2) Click the "Export" dropdown in the top-right, 3) Select "PDF Report", 4) Choose sections to include (results, timeline, approvals), 5) Click Generate. The PDF will download automatically and includes digital signatures for audit compliance.',
-    sourceType: 'email',
-    createdBy: 'Sarah Chen',
-    createdAt: '2026-02-02T11:20:00Z',
-    lastModified: '2026-02-04T08:00:00Z',
-    originalQuestionId: 'uq-4',
-    status: 'ready',
-  },
-  {
-    id: 'draft-4',
-    question: 'Can I bulk approve components from different styles?',
-    answer: 'Yes, bulk approval is available for users with QA Manager role or higher. Go to Components > Select multiple components using checkboxes > Click "Bulk Actions" > "Approve Selected". Note: All selected components must meet minimum testing requirements and cannot have pending failures.',
-    sourceType: 'webinar',
-    createdBy: 'Hajra Malik',
-    createdAt: '2026-02-01T14:30:00Z',
-    lastModified: '2026-02-01T14:30:00Z',
-    originalQuestionId: 'uq-3',
-    status: 'draft',
-  },
-];
-
-type Draft = typeof initialDrafts[0];
+import { useDrafts, Draft } from '@/contexts/DraftsContext';
 
 const getStatusConfig = (status: string) => {
   switch (status) {
@@ -129,7 +80,7 @@ const formatTimeAgo = (timestamp: string) => {
 };
 
 export function DraftsTabContent() {
-  const [drafts, setDrafts] = useState<Draft[]>(initialDrafts);
+  const { drafts, updateDraft, deleteDraft, publishDraft } = useDrafts();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedDraft, setSelectedDraft] = useState<Draft | null>(null);
@@ -156,11 +107,10 @@ export function DraftsTabContent() {
   const handleSaveDraft = () => {
     if (!selectedDraft) return;
     
-    setDrafts(prev => prev.map(d => 
-      d.id === selectedDraft.id 
-        ? { ...d, answer: editedAnswer, sourceType: editedSourceType, lastModified: new Date().toISOString() }
-        : d
-    ));
+    updateDraft(selectedDraft.id, { 
+      answer: editedAnswer, 
+      sourceType: editedSourceType 
+    });
     
     toast({
       title: "Draft updated",
@@ -170,7 +120,7 @@ export function DraftsTabContent() {
   };
 
   const handlePublishDraft = (draft: Draft) => {
-    setDrafts(prev => prev.filter(d => d.id !== draft.id));
+    publishDraft(draft.id);
     
     toast({
       title: "Answer published",
@@ -188,7 +138,7 @@ export function DraftsTabContent() {
   const handleDeleteDraft = () => {
     if (!selectedDraft) return;
     
-    setDrafts(prev => prev.filter(d => d.id !== selectedDraft.id));
+    deleteDraft(selectedDraft.id);
     
     toast({
       title: "Draft deleted",
@@ -199,11 +149,7 @@ export function DraftsTabContent() {
   };
 
   const handleMarkAsReady = (draft: Draft) => {
-    setDrafts(prev => prev.map(d => 
-      d.id === draft.id 
-        ? { ...d, status: 'ready', lastModified: new Date().toISOString() }
-        : d
-    ));
+    updateDraft(draft.id, { status: 'ready' });
     
     toast({
       title: "Marked as ready",

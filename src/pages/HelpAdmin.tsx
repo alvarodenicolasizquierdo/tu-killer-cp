@@ -52,6 +52,8 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useDrafts } from '@/contexts/DraftsContext';
+import { useUser } from '@/contexts/UserContext';
 
 // Mock data for unanswered questions
 const unansweredQuestions = [
@@ -177,16 +179,38 @@ export default function HelpAdmin() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [selectedQuestion, setSelectedQuestion] = useState<typeof unansweredQuestions[0] | null>(null);
   const [answerDraft, setAnswerDraft] = useState('');
+  const [selectedSourceType, setSelectedSourceType] = useState('sop');
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { addDraft, drafts } = useDrafts();
+  const { currentUser } = useUser();
 
   const handleSaveAsDraft = () => {
+    if (!selectedQuestion || !answerDraft.trim()) {
+      toast({
+        title: "Cannot save draft",
+        description: "Please provide an answer before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addDraft({
+      question: selectedQuestion.question,
+      answer: answerDraft,
+      sourceType: selectedSourceType,
+      createdBy: currentUser?.name || 'Current User',
+      originalQuestionId: selectedQuestion.id,
+      status: 'draft',
+    });
+
     toast({
       title: "Draft saved",
-      description: "Your answer has been saved as a draft.",
+      description: "Your answer has been saved to the Drafts tab.",
     });
     setDialogOpen(false);
     setAnswerDraft('');
+    setSelectedSourceType('sop');
   };
 
   const handleAddToKnowledgeBase = () => {
@@ -196,6 +220,7 @@ export default function HelpAdmin() {
     });
     setDialogOpen(false);
     setAnswerDraft('');
+    setSelectedSourceType('sop');
   };
 
   const filteredQuestions = unansweredQuestions.filter(q => {
@@ -306,7 +331,7 @@ export default function HelpAdmin() {
           <TabsTrigger value="drafts" className="gap-2">
             <FileEdit className="h-4 w-4" />
             Drafts
-            <Badge variant="secondary" className="ml-1">4</Badge>
+            <Badge variant="secondary" className="ml-1">{drafts.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="overrides" className="gap-2">
             <AlertTriangle className="h-4 w-4" />
@@ -431,7 +456,7 @@ export default function HelpAdmin() {
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium">Source Type</label>
-                              <Select defaultValue="sop">
+                              <Select value={selectedSourceType} onValueChange={setSelectedSourceType}>
                                 <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
