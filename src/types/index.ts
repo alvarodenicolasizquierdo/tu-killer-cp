@@ -167,6 +167,30 @@ export interface Activity {
   metadata?: Record<string, unknown>;
 }
 
+// Product types
+export interface Product {
+  id: string;
+  name: string;
+  code: string;
+  category: string;
+  supplier: string;
+  supplierId: string;
+  description?: string;
+  imageUrl?: string;
+  status: 'active' | 'pending' | 'discontinued';
+  complianceStatus: 'compliant' | 'pending_review' | 'non_compliant';
+  lastTested?: string;
+  activeTRFs: number;
+  passRate: number;
+  riskScore: number;
+  specifications?: {
+    material?: string;
+    weight?: string;
+    dimensions?: string;
+    origin?: string;
+  };
+}
+
 // AI Chat types
 export interface ChatMessage {
   id: string;

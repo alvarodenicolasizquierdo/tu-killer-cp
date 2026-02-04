@@ -1,4 +1,4 @@
-import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument } from '@/types';
+import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument, Product } from '@/types';
 
 // Demo users for role switching
 export const demoUsers: User[] = [
@@ -595,3 +595,175 @@ export const aiDemoResponses: Record<string, { response: string; suggestions: st
     suggestions: ['Show my pending approvals', 'Summarize today\'s priorities', 'View analytics dashboard']
   }
 };
+
+// Products
+export const mockProducts: Product[] = [
+  {
+    id: 'prod-001',
+    name: 'Cotton T-Shirt Collection SS26',
+    code: 'TSC-SS26-001',
+    category: 'Apparel',
+    supplier: 'Textile Supplier Ltd',
+    supplierId: 'supplier-001',
+    description: 'Premium cotton t-shirts for Spring/Summer 2026. Available in 8 colorways including basic tees, v-necks, and crew necks.',
+    status: 'active',
+    complianceStatus: 'pending_review',
+    lastTested: '2026-02-04',
+    activeTRFs: 1,
+    passRate: 83,
+    riskScore: 72,
+    specifications: {
+      material: '100% Organic Cotton',
+      weight: '180 GSM',
+      dimensions: 'S-3XL',
+      origin: 'China'
+    }
+  },
+  {
+    id: 'prod-002',
+    name: 'Kids Denim Jeans',
+    code: 'KDJ-2026-002',
+    category: 'Apparel',
+    supplier: 'Denim Masters Co',
+    supplierId: 'supplier-002',
+    description: 'Stretch denim jeans for kids ages 4-14 with reinforced knees for durability.',
+    status: 'active',
+    complianceStatus: 'pending_review',
+    lastTested: '2026-02-03',
+    activeTRFs: 1,
+    passRate: 67,
+    riskScore: 58,
+    specifications: {
+      material: '98% Cotton, 2% Elastane',
+      weight: '320 GSM',
+      dimensions: 'Ages 4-14',
+      origin: 'Vietnam'
+    }
+  },
+  {
+    id: 'prod-003',
+    name: 'Organic Baby Onesies',
+    code: 'OBO-2026-003',
+    category: 'Infant Apparel',
+    supplier: 'EcoTextile Inc',
+    supplierId: 'supplier-003',
+    description: 'GOTS certified organic cotton onesies for newborns 0-12 months.',
+    status: 'active',
+    complianceStatus: 'compliant',
+    lastTested: '2026-02-01',
+    activeTRFs: 0,
+    passRate: 100,
+    riskScore: 12,
+    specifications: {
+      material: '100% GOTS Organic Cotton',
+      weight: '160 GSM',
+      dimensions: '0-12 months',
+      origin: 'India'
+    }
+  },
+  {
+    id: 'prod-004',
+    name: 'Sports Bra Performance Line',
+    code: 'SBP-2026-004',
+    category: 'Athletic Wear',
+    supplier: 'ActiveWear Partners',
+    supplierId: 'supplier-004',
+    description: 'High-impact sports bras with moisture-wicking technology for intense workouts.',
+    status: 'active',
+    complianceStatus: 'pending_review',
+    lastTested: '2026-02-04',
+    activeTRFs: 1,
+    passRate: 0,
+    riskScore: 25,
+    specifications: {
+      material: '85% Polyester, 15% Spandex',
+      weight: '220 GSM',
+      dimensions: 'XS-XL',
+      origin: 'China'
+    }
+  },
+  {
+    id: 'prod-005',
+    name: 'Winter Jacket Insulation',
+    code: 'WJI-2026-005',
+    category: 'Outerwear',
+    supplier: 'NorthTech Fabrics',
+    supplierId: 'supplier-001',
+    description: 'Synthetic down alternative insulation for winter outerwear.',
+    status: 'pending',
+    complianceStatus: 'pending_review',
+    lastTested: undefined,
+    activeTRFs: 1,
+    passRate: 0,
+    riskScore: 35,
+    specifications: {
+      material: '100% Recycled Polyester Fill',
+      weight: '120 GSM',
+      dimensions: 'N/A',
+      origin: 'China'
+    }
+  },
+  {
+    id: 'prod-006',
+    name: 'Silk Blouse Collection',
+    code: 'SBC-2026-006',
+    category: 'Formal Wear',
+    supplier: 'Premium Silk Ltd',
+    supplierId: 'supplier-001',
+    description: 'Premium silk blouses for professional wear.',
+    status: 'active',
+    complianceStatus: 'non_compliant',
+    lastTested: '2026-02-02',
+    activeTRFs: 0,
+    passRate: 50,
+    riskScore: 85,
+    specifications: {
+      material: '100% Mulberry Silk',
+      weight: '16 Momme',
+      dimensions: 'XS-XXL',
+      origin: 'China'
+    }
+  },
+  {
+    id: 'prod-007',
+    name: 'Eco-Friendly Sneakers',
+    code: 'EFS-2026-007',
+    category: 'Footwear',
+    supplier: 'EcoTextile Inc',
+    supplierId: 'supplier-003',
+    description: 'Sustainable sneakers made from recycled ocean plastics and organic cotton.',
+    status: 'active',
+    complianceStatus: 'compliant',
+    lastTested: '2026-01-28',
+    activeTRFs: 0,
+    passRate: 95,
+    riskScore: 15,
+    specifications: {
+      material: 'Recycled PET, Organic Cotton Upper',
+      weight: '280g per shoe',
+      dimensions: 'EU 36-46',
+      origin: 'India'
+    }
+  },
+  {
+    id: 'prod-008',
+    name: 'Yoga Leggings Pro',
+    code: 'YLP-2026-008',
+    category: 'Athletic Wear',
+    supplier: 'ActiveWear Partners',
+    supplierId: 'supplier-004',
+    description: 'High-waisted yoga leggings with 4-way stretch and hidden pocket.',
+    status: 'active',
+    complianceStatus: 'compliant',
+    lastTested: '2026-01-25',
+    activeTRFs: 0,
+    passRate: 92,
+    riskScore: 18,
+    specifications: {
+      material: '75% Nylon, 25% Spandex',
+      weight: '280 GSM',
+      dimensions: 'XS-2XL',
+      origin: 'China'
+    }
+  }
+];
