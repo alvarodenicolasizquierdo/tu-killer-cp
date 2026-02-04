@@ -42,6 +42,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { ComponentAreaValidator, ComponentAreaSummary, getComponentTestingRequirement } from '@/components/validation/ComponentAreaValidator';
 
 export default function StyleDetail() {
   const { id } = useParams<{ id: string }>();
@@ -517,6 +518,9 @@ export default function StyleDetail() {
             </TabsContent>
 
             <TabsContent value="components" className="space-y-4">
+              {/* Component Area Summary */}
+              <ComponentAreaSummary components={linkedComponents} />
+
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -543,30 +547,65 @@ export default function StyleDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {linkedComponents.map((component) => (
-                      <div 
-                        key={component.id}
-                        className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <Layers className="w-5 h-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{component.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {component.type} • {component.composition} • {component.areaPercentage}% area
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {component.riskAssessmentRequired && (
-                            <Badge variant="outline" className="text-xs">Full Testing</Badge>
+                    {linkedComponents.map((component) => {
+                      const requirement = getComponentTestingRequirement(component);
+                      const isOverThreshold = component.type !== 'Fabric' && component.areaPercentage > 10;
+                      
+                      return (
+                        <div 
+                          key={component.id}
+                          className={cn(
+                            "flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors",
+                            isOverThreshold && "border-warning/30 bg-warning/5"
                           )}
-                          <Badge variant="secondary">{component.supplierName}</Badge>
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center",
+                              isOverThreshold ? "bg-warning/10" : "bg-primary/10"
+                            )}>
+                              <Layers className={cn(
+                                "w-5 h-5",
+                                isOverThreshold ? "text-warning" : "text-primary"
+                              )} />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{component.name}</p>
+                                {isOverThreshold && (
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <AlertTriangle className="h-4 w-4 text-warning" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Exceeds 10% area threshold - requires full testing
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {component.type} • {component.composition} • {component.construction}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ComponentAreaValidator component={component} compact />
+                            {requirement.requiresFullTesting && (
+                              <Badge 
+                                variant={isOverThreshold ? "destructive" : "outline"} 
+                                className={cn(
+                                  "text-xs",
+                                  isOverThreshold && "bg-warning/10 text-warning border-warning/30 hover:bg-warning/20"
+                                )}
+                              >
+                                Full Testing
+                              </Badge>
+                            )}
+                            <Badge variant="secondary">{component.supplierName}</Badge>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
