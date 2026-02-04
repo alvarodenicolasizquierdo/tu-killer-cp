@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import sgsLogo from '@/assets/sgs-logo.png';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,9 +62,11 @@ export function Sidebar() {
       {/* Logo Section */}
       <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg ai-gradient flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-lg">C</span>
-          </div>
+          <img 
+            src={sgsLogo} 
+            alt="SGS Logo" 
+            className="h-8 w-auto shrink-0"
+          />
           <AnimatePresence>
             {!isCollapsed && (
               <motion.div
@@ -74,9 +77,6 @@ export function Sidebar() {
               >
                 <span className="text-sidebar-foreground font-semibold text-lg whitespace-nowrap">
                   CARLOS
-                </span>
-                <span className="text-sidebar-muted text-xs block -mt-0.5">
-                  by SGS
                 </span>
               </motion.div>
             )}
