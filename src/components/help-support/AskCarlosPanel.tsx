@@ -21,11 +21,12 @@ interface AskCarlosPanelProps {
 
 // Quick suggestions for common issues
 const quickSuggestions = [
-  { label: 'Create Audit', keywords: ['audit', 'factory', 'schedule'] },
-  { label: 'Workbook issue', keywords: ['workbook', 'create', 'new'] },
-  { label: 'Testing issue', keywords: ['trf', 'lab', 'test', 'submit', 'send'] },
-  { label: 'Missing tab', keywords: ['tab', 'missing', 'see', 'hidden', 'supplier'] },
-  { label: 'Excel problem', keywords: ['excel', 'export', 'missing', 'fields', 'download'] },
+  { label: 'Create Audit', query: "I can't create an audit" },
+  { label: 'Testing issue', query: "Send to Lab button is disabled" },
+  { label: 'Care label wrong', query: "My care label content is wrong" },
+  { label: 'Fitlog photos', query: "Fitlog photos aren't showing up" },
+  { label: 'Care code issue', query: "Care code changes aren't applying" },
+  { label: 'Missing tab', query: "Supplier can't see Product Development tabs" },
 ];
 
 // Intent matching keywords - includes tags for semantic matching
@@ -146,16 +147,8 @@ export function AskCarlosPanel({ onResolutionMatch }: AskCarlosPanelProps) {
     }
   };
 
-  const handleQuickSuggestion = (label: string) => {
-    const suggestionQueries: Record<string, string> = {
-      'Create Audit': "I can't create an audit",
-      'Workbook issue': "I can't create a workbook",
-      'Testing issue': "Send to Lab button is disabled",
-      'Missing tab': "Supplier can't see Product Development tabs",
-      'Excel problem': "Excel export is missing fields",
-    };
-    
-    handleSend(suggestionQueries[label] || label);
+  const handleQuickSuggestion = (suggestion: typeof quickSuggestions[number]) => {
+    handleSend(suggestion.query);
   };
 
   return (
@@ -284,7 +277,7 @@ export function AskCarlosPanel({ onResolutionMatch }: AskCarlosPanelProps) {
               variant="outline"
               size="sm"
               className="text-xs h-7 px-2.5 bg-muted/50 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
-              onClick={() => handleQuickSuggestion(suggestion.label)}
+              onClick={() => handleQuickSuggestion(suggestion)}
             >
               {suggestion.label}
             </Button>
