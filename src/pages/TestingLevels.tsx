@@ -10,7 +10,10 @@ import {
   FileText,
   ChevronRight,
   BarChart3,
-  TrendingUp
+  TrendingUp,
+  Beaker,
+  FlaskConical,
+  Zap
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,10 +22,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIAssistPanel } from '@/components/ai/AIAssistPanel';
-import { mockCollections } from '@/data/stylesData';
+import { mockCollections, mockComponents } from '@/data/stylesData';
 import { cn } from '@/lib/utils';
 import { AIAssistSuggestion, TestingLevel as TLevel, ProductCollection } from '@/types/styles';
 import { Link } from 'react-router-dom';
+import { generateAISuggestionsForTesting, generateTestPlanSuggestions } from '@/lib/aiTestPlanSuggestions';
 
 export default function TestingLevels() {
   const [activeLevel, setActiveLevel] = useState<TLevel>('Base');
@@ -62,9 +66,10 @@ export default function TestingLevels() {
     return { baseApproved, bulkApproved, garmentApproved, blocked, total: mockCollections.length };
   }, []);
 
-  // AI suggestions
+  // AI suggestions based on active level and collections
   const aiSuggestions: AIAssistSuggestion[] = useMemo(() => {
     const suggestions: AIAssistSuggestion[] = [];
+    const collectionsAtLevel = collectionsByLevel[activeLevel];
 
     // Check for blocked collections
     const blockedByBase = mockCollections.filter(c => 
@@ -85,6 +90,71 @@ export default function TestingLevels() {
       });
     }
 
+    // Generate test plan suggestions for collections at current level
+    if (collectionsAtLevel.length > 0) {
+      const firstCollection = collectionsAtLevel[0];
+      const components = mockComponents.filter(c => firstCollection.componentIds.includes(c.id));
+      const { tests, labs, confidence } = generateTestPlanSuggestions(firstCollection, activeLevel, components);
+      
+      if (tests.length > 0) {
+        const requiredTests = tests.filter(t => t.priority === 'required');
+        const fabricTests = tests.filter(t => t.testName.toLowerCase().includes('color') || t.testName.toLowerCase().includes('fiber'));
+        const physicalTests = tests.filter(t => t.testName.toLowerCase().includes('strength') || t.testName.toLowerCase().includes('stability'));
+        
+        suggestions.push({
+          id: `prefill-tests-${activeLevel}`,
+          type: 'test_plan',
+          title: `Pre-fill ${activeLevel} test plan`,
+          description: `${requiredTests.length} required tests based on component analysis`,
+          confidence,
+          reasoning: [
+            `${components.length} components analyzed (${components.filter(c => c.type === 'Fabric').length} fabrics, ${components.filter(c => c.type === 'Trim').length} trims)`,
+            fabricTests.length > 0 ? `${fabricTests.length} colorfastness/fiber tests recommended` : 'Standard color tests included',
+            physicalTests.length > 0 ? `${physicalTests.length} physical performance tests required` : 'Basic physical testing included',
+            `Estimated completion: ${Math.max(...tests.map(t => t.estimatedDays))} days`
+          ],
+          suggestedValues: {
+            tests: tests.slice(0, 8).map(t => t.testName),
+            lab: labs[0]?.labName
+          },
+          action: { label: 'Apply to TRF', type: 'apply' }
+        });
+
+        // Lab recommendation
+        if (labs.length > 0) {
+          suggestions.push({
+            id: `lab-recommend-${activeLevel}`,
+            type: 'test_plan',
+            title: `Route to ${labs[0].labName}`,
+            description: `${labs[0].matchScore}% capability match for these tests`,
+            confidence: labs[0].matchScore,
+            reasoning: [
+              `Capabilities: ${labs[0].capabilities.join(', ')}`,
+              `Turnaround: ${labs[0].turnaround}`,
+              'Prior success rate: 94% with similar component types',
+              'Current capacity: Available for expedited processing'
+            ],
+            action: { label: 'Assign Lab', type: 'apply' }
+          });
+        }
+      }
+
+      // Check for high-area non-fabric components
+      const highAreaNonFabric = components.filter(c => c.areaPercentage > 10 && c.type !== 'Fabric');
+      if (highAreaNonFabric.length > 0) {
+        suggestions.push({
+          id: 'high-area-warning',
+          type: 'approval_block',
+          title: `${highAreaNonFabric.length} high-area component(s) need full testing`,
+          description: 'Non-fabric components exceeding 10% area require additional tests',
+          confidence: 100,
+          reasoning: highAreaNonFabric.map(c => 
+            `${c.name} (${c.type}): ${c.areaPercentage}% area exceeds 10% threshold`
+          )
+        });
+      }
+    }
+
     // SLA warnings
     const pendingApproval = mockCollections.filter(c => c.baseTesting.status === 'passed');
     if (pendingApproval.length > 0) {
@@ -103,8 +173,32 @@ export default function TestingLevels() {
       });
     }
 
+    // Department-specific safety warnings for kids/infant
+    const kidsCollections = collectionsAtLevel.filter(c => 
+      c.department.includes('Kids') || c.department.includes('Infant')
+    );
+    if (kidsCollections.length > 0) {
+      suggestions.push({
+        id: 'kids-safety',
+        type: 'test_plan',
+        title: 'Add child safety tests',
+        description: `${kidsCollections.length} collection(s) require enhanced chemical testing`,
+        confidence: 95,
+        reasoning: [
+          'Formaldehyde limits are stricter for children\'s apparel',
+          'pH value testing is mandatory per EU regulations',
+          'Lead content testing required for trims/buttons',
+          'Historical data: 12% failure rate without pre-screening'
+        ],
+        suggestedValues: {
+          additionalTests: ['Formaldehyde', 'pH Value', 'Lead Content', 'Phthalates']
+        },
+        action: { label: 'Add Tests', type: 'apply' }
+      });
+    }
+
     return suggestions;
-  }, []);
+  }, [activeLevel, collectionsByLevel]);
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
