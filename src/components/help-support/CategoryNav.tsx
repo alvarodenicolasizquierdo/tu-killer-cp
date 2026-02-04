@@ -2,15 +2,34 @@ import { cn } from '@/lib/utils';
 import { HelpCategory } from '@/pages/HelpSupport';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, TrendingUp } from 'lucide-react';
+import { helpKnowledgeBase, getArticleById } from '@/data/helpKnowledgeBase';
 
 interface CategoryNavProps {
   categories: HelpCategory[];
   selectedCategory: string | null;
   onSelectCategory: (categoryId: string) => void;
+  onArticleClick?: (articleId: string) => void;
 }
 
-export function CategoryNav({ categories, selectedCategory, onSelectCategory }: CategoryNavProps) {
+// Popular topics - curated list of most common issues
+const popularTopicIds = [
+  'a_cannot_submit_trf_topsheet',
+  'a_care_label_wrong',
+  'a_send_to_lab_disabled',
+  'a_fitlog_photos_missing',
+];
+
+export function CategoryNav({ 
+  categories, 
+  selectedCategory, 
+  onSelectCategory,
+  onArticleClick 
+}: CategoryNavProps) {
+  const popularTopics = popularTopicIds
+    .map(id => getArticleById(id))
+    .filter(Boolean);
+
   return (
     <div className="h-full flex flex-col">
       <div className="mb-3">
@@ -57,6 +76,32 @@ export function CategoryNav({ categories, selectedCategory, onSelectCategory }: 
           })}
         </div>
       </ScrollArea>
+
+      {/* Popular Topics Section */}
+      {popularTopics.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="flex items-center gap-1.5 mb-3">
+            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Popular
+            </h3>
+          </div>
+          <div className="space-y-1">
+            {popularTopics.map((topic, index) => (
+              <motion.button
+                key={topic!.id}
+                onClick={() => onArticleClick?.(topic!.id)}
+                className="w-full text-left px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors line-clamp-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 + index * 0.05 }}
+              >
+                {topic!.title.length > 35 ? topic!.title.slice(0, 35) + '...' : topic!.title}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

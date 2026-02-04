@@ -196,6 +196,7 @@ export default function HelpSupport() {
             categories={categories}
             selectedCategory={selectedCategory}
             onSelectCategory={handleCategoryClick}
+            onArticleClick={handleIntentClick}
           />
         </div>
 
