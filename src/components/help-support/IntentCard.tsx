@@ -1,6 +1,5 @@
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export interface IntentCardData {
@@ -30,85 +29,57 @@ export function IntentCard({
   const isCompact = variant === 'compact';
   
   return (
-    <motion.div
+    <motion.button
+      onClick={onClick}
       className={cn(
-        "group relative rounded-2xl border text-left transition-all overflow-hidden",
-        "bg-card hover:shadow-lg",
+        "group relative w-full text-left transition-all",
+        "bg-card hover:bg-muted/50 border rounded-lg",
         isActive 
-          ? "border-primary shadow-md ring-2 ring-primary/20" 
-          : "border-border hover:border-primary/40",
-        isCompact ? "p-4" : "p-6"
+          ? "border-primary bg-primary/5 shadow-sm" 
+          : "border-border/60 hover:border-border",
+        isCompact ? "p-3" : "p-4"
       )}
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      {/* Background gradient effect */}
-      <div className={cn(
-        "absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 transition-opacity duration-300",
-        "group-hover:opacity-100",
-        isActive && "opacity-100"
-      )} />
-      
-      {/* Decorative corner accent */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <div className="relative flex flex-col h-full">
-        {/* Icon */}
+      <div className="flex items-start gap-3">
+        {/* Icon - Linear style minimal container */}
         <div className={cn(
-          "rounded-xl flex items-center justify-center transition-all duration-300 shrink-0",
-          isCompact ? "w-12 h-12 mb-3" : "w-14 h-14 mb-4",
+          "rounded-lg flex items-center justify-center shrink-0 transition-colors",
+          isCompact ? "w-8 h-8" : "w-10 h-10",
           isActive 
-            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" 
-            : "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/25"
+            ? "bg-primary text-primary-foreground" 
+            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
         )}>
-          <Icon className={cn(isCompact ? "w-5 h-5" : "w-6 h-6")} strokeWidth={1.75} />
+          <Icon className={cn(isCompact ? "w-4 h-4" : "w-5 h-5")} strokeWidth={1.5} />
         </div>
         
         {/* Content */}
-        <div className="flex-1 mb-4">
-          <h4 className={cn(
-            "font-semibold transition-colors mb-2",
-            isCompact ? "text-base" : "text-lg",
-            isActive ? "text-primary" : "text-foreground"
-          )}>
-            {title}
-          </h4>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className={cn(
+              "font-medium truncate transition-colors",
+              isCompact ? "text-sm" : "text-[15px]",
+              isActive ? "text-primary" : "text-foreground"
+            )}>
+              {title}
+            </h4>
+            <ArrowRight className={cn(
+              "w-4 h-4 shrink-0 transition-all",
+              "text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5",
+              isActive && "text-primary"
+            )} />
+          </div>
           
-          <p className={cn(
-            "text-muted-foreground leading-relaxed",
-            isCompact ? "text-xs line-clamp-2" : "text-sm line-clamp-3"
-          )}>
-            {description}
-          </p>
-        </div>
-        
-        {/* Resolve Button */}
-        <Button
-          onClick={onClick}
-          variant={isActive ? "default" : "outline"}
-          className={cn(
-            "w-full justify-between group/btn transition-all",
-            isActive 
-              ? "bg-primary hover:bg-primary/90" 
-              : "border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          {!isCompact && (
+            <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
+              {description}
+            </p>
           )}
-          size={isCompact ? "sm" : "default"}
-        >
-          <span className="font-medium">Resolve this</span>
-          <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-        </Button>
+        </div>
       </div>
-      
-      {/* Active state glow */}
-      {isActive && (
-        <motion.div
-          layoutId="intent-active-glow"
-          className="absolute inset-0 rounded-2xl ring-2 ring-primary/30 pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        />
-      )}
-    </motion.div>
+    </motion.button>
   );
 }
 

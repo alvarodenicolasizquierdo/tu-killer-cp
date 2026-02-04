@@ -451,39 +451,48 @@ export default function HelpSupport() {
     : intents;
 
   return (
-    <AppLayout title="Help & Support" subtitle="AI-assisted operational guidance">
-      {/* Top Search Section */}
-      <div className="mb-8">
-        <div className="relative max-w-2xl mx-auto mb-6">
+    <AppLayout title="Help & Support" subtitle="Get unstuck fast">
+      {/* Hero Search - Notion/Linear style */}
+      <div className="mb-10">
+        <div className="max-w-2xl mx-auto text-center mb-6">
+          <h1 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
+            What do you need help with?
+          </h1>
+          <p className="text-muted-foreground">
+            Describe what you're trying to do and we'll guide you through it
+          </p>
+        </div>
+        
+        <div className="relative max-w-xl mx-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="What are you trying to do?"
+            placeholder="e.g. I can't submit to lab..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 text-lg bg-card border-2 border-muted focus:border-primary rounded-xl shadow-sm"
+            className="pl-12 h-12 text-base bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg"
           />
-        </div>
-
-        {/* Intent Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {filteredIntents.map(intent => (
-            <IntentCard
-              key={intent.id}
-              icon={intent.icon}
-              title={intent.label}
-              description={intent.description}
-              onClick={() => handleIntentClick(intent.id)}
-              isActive={selectedArticle?.intentId === intent.id}
-            />
-          ))}
         </div>
       </div>
 
-      {/* Three-Panel Layout */}
-      <div className="grid grid-cols-12 gap-6 min-h-[600px]">
+      {/* Intent Cards Grid - Linear style list */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-10">
+        {filteredIntents.map(intent => (
+          <IntentCard
+            key={intent.id}
+            icon={intent.icon}
+            title={intent.label}
+            description={intent.description}
+            onClick={() => handleIntentClick(intent.id)}
+            isActive={selectedArticle?.intentId === intent.id}
+          />
+        ))}
+      </div>
+
+      {/* Three-Panel Layout - Clean Stripe/Linear style */}
+      <div className="grid grid-cols-12 gap-8 min-h-[500px]">
         {/* LEFT: Categories Navigation */}
-        <div className="col-span-3">
+        <div className="col-span-2 border-r border-border pr-6">
           <CategoryNav
             categories={categories}
             selectedCategory={selectedCategory}
@@ -492,9 +501,9 @@ export default function HelpSupport() {
         </div>
 
         {/* CENTER: Dynamic Article / Guided Resolution / Category Intents */}
-        <div className="col-span-5">
+        <div className="col-span-6">
           {activeResolution ? (
-            <div className="bg-card rounded-xl border border-border shadow-sm h-full">
+            <div className="bg-card rounded-lg border border-border h-full">
               <GuidedResolution
                 data={activeResolution}
                 onEscalate={() => {
@@ -503,11 +512,11 @@ export default function HelpSupport() {
               />
             </div>
           ) : selectedCategory && !selectedArticle ? (
-            <div className="bg-card rounded-xl border border-border shadow-sm h-full p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground mb-4 tracking-tight">
                 {categories.find(c => c.id === selectedCategory)?.label}
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
                 {intents
                   .filter(intent => intent.categoryId === selectedCategory)
                   .map(intent => (
@@ -528,18 +537,20 @@ export default function HelpSupport() {
               )}
             </div>
           ) : (
-            <ArticlePanel
-              article={selectedArticle}
-              articles={articles}
-              onSelectRelated={(articleId) => {
-                const related = articles.find(a => a.id === articleId);
-                if (related) {
-                  setSelectedArticle(related);
-                  setActiveResolution(null);
-                  setSelectedCategory(related.categoryId);
-                }
-              }}
-            />
+            <div className="bg-card rounded-lg border border-border h-full">
+              <ArticlePanel
+                article={selectedArticle}
+                articles={articles}
+                onSelectRelated={(articleId) => {
+                  const related = articles.find(a => a.id === articleId);
+                  if (related) {
+                    setSelectedArticle(related);
+                    setActiveResolution(null);
+                    setSelectedCategory(related.categoryId);
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
 
