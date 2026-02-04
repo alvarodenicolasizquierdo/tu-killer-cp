@@ -1,34 +1,74 @@
 import { useState, useRef, useEffect } from 'react';
-import { HelpArticle } from '@/pages/HelpSupport';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, Bot, User, Zap } from 'lucide-react';
+import { Send, Sparkles, Bot, User, Zap, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { GuidedResolutionData } from './GuidedResolution';
+import { guidedResolutions } from '@/data/guidedResolutions';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  matchedResolution?: GuidedResolutionData;
 }
 
 interface AskCarlosPanelProps {
-  messages: Message[];
-  onSendMessage: (message: string) => void;
-  currentArticle: HelpArticle | null;
+  onResolutionMatch?: (resolution: GuidedResolutionData) => void;
 }
 
-const quickPrompts = [
-  "What's the fastest way?",
-  "I'm getting an error",
-  "Explain step 2",
-  "Show alternatives",
+// Quick suggestions for common issues
+const quickSuggestions = [
+  { label: 'Create Audit', keywords: ['audit', 'factory', 'schedule'] },
+  { label: 'Workbook issue', keywords: ['workbook', 'create', 'new'] },
+  { label: 'Testing issue', keywords: ['trf', 'lab', 'test', 'submit', 'send'] },
+  { label: 'Missing tab', keywords: ['tab', 'missing', 'see', 'hidden', 'supplier'] },
+  { label: 'Excel problem', keywords: ['excel', 'export', 'missing', 'fields', 'download'] },
 ];
 
-export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskCarlosPanelProps) {
+// Intent matching keywords
+const intentMatchers: { id: string; keywords: string[]; resolution: string }[] = [
+  { id: 'create-audit', keywords: ['create audit', 'new audit', 'schedule audit', 'factory audit', 'can\'t create audit', 'cannot create audit'], resolution: 'create-audit' },
+  { id: 'create-workbook', keywords: ['workbook', 'create workbook', 'new workbook', 'can\'t create workbook', 'cannot create workbook'], resolution: 'create-workbook' },
+  { id: 'submit-trf', keywords: ['trf', 'top sheet', 'submit trf', 'can\'t submit', 'cannot submit', 'submit to lab'], resolution: 'submit-trf' },
+  { id: 'send-to-lab', keywords: ['send to lab', 'lab disabled', 'send lab button', 'lab button grey', 'lab button disabled'], resolution: 'send-to-lab' },
+  { id: 'fabric-no-test-link', keywords: ['fabric linked', 'test link', 'no test', 'fabric test', 'linked but'], resolution: 'fabric-no-test-link' },
+  { id: 'excel-missing-fields', keywords: ['excel', 'export missing', 'missing fields', 'missing columns', 'excel export'], resolution: 'excel-missing-fields' },
+  { id: 'upload-photos-phone', keywords: ['upload photos', 'photos phone', 'can\'t upload', 'cannot upload', 'mobile upload', 'phone photos'], resolution: 'upload-photos-phone' },
+  { id: 'supplier-no-pd-tabs', keywords: ['supplier', 'product development', 'pd tabs', 'can\'t see tabs', 'supplier tabs', 'missing tabs'], resolution: 'supplier-no-pd-tabs' },
+];
+
+function matchIntent(message: string): GuidedResolutionData | null {
+  const lowerMessage = message.toLowerCase();
+  
+  for (const matcher of intentMatchers) {
+    for (const keyword of matcher.keywords) {
+      if (lowerMessage.includes(keyword)) {
+        return guidedResolutions[matcher.resolution] || null;
+      }
+    }
+  }
+  
+  return null;
+}
+
+function generateConversationalResponse(resolution: GuidedResolutionData): string {
+  const causesSummary = resolution.causes.slice(0, 2).join(' or ');
+  
+  return `I see what's happening. **${resolution.title.replace("I can't", "You're trying to").replace("I can't", "You want to")}**
+
+This usually happens when ${causesSummary.toLowerCase()}.
+
+Here's the quick fix — I've loaded the step-by-step guide for you. Just follow the numbered steps and you should be sorted in about 60 seconds.
+
+If that doesn't work, you can always escalate to the SGS support team.`;
+}
+
+export function AskCarlosPanel({ onResolutionMatch }: AskCarlosPanelProps) {
   const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -38,14 +78,41 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
     }
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    onSendMessage(input.trim());
+  const handleSend = (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text) return;
+    
+    // Add user message
+    const userMessage: Message = { role: 'user', content: text };
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    // Simulate typing indicator
+    // Simulate typing
     setIsTyping(true);
-    setTimeout(() => setIsTyping(false), 1500);
+    
+    setTimeout(() => {
+      // Try to match intent
+      const matchedResolution = matchIntent(text);
+      
+      let assistantMessage: Message;
+      
+      if (matchedResolution) {
+        assistantMessage = {
+          role: 'assistant',
+          content: generateConversationalResponse(matchedResolution),
+          matchedResolution
+        };
+        onResolutionMatch?.(matchedResolution);
+      } else {
+        assistantMessage = {
+          role: 'assistant',
+          content: `I'm looking into that for you. Could you tell me a bit more about what you're trying to do?\n\nFor example:\n• Are you creating something new?\n• Is a button disabled or missing?\n• Are you seeing an error message?\n\nThe more details you share, the faster I can help!`
+        };
+      }
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsTyping(false);
+    }, 1200);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -55,14 +122,26 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
     }
   };
 
+  const handleQuickSuggestion = (label: string) => {
+    const suggestionQueries: Record<string, string> = {
+      'Create Audit': "I can't create an audit",
+      'Workbook issue': "I can't create a workbook",
+      'Testing issue': "Send to Lab button is disabled",
+      'Missing tab': "Supplier can't see Product Development tabs",
+      'Excel problem': "Excel export is missing fields",
+    };
+    
+    handleSend(suggestionQueries[label] || label);
+  };
+
   return (
     <div className="bg-gradient-to-b from-card to-card/95 rounded-xl border border-border shadow-sm h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-ai-primary/5">
+      <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar className="w-10 h-10 border-2 border-primary/20">
-              <AvatarFallback className="bg-gradient-to-br from-primary to-ai-primary text-white font-bold">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white font-bold">
                 <Bot className="w-5 h-5" />
               </AvatarFallback>
             </Avatar>
@@ -71,50 +150,25 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
           <div>
             <h3 className="font-semibold text-foreground flex items-center gap-2">
               Ask Carlos
-              <Sparkles className="w-4 h-4 text-ai-primary" />
+              <Sparkles className="w-4 h-4 text-primary" />
             </h3>
-            <p className="text-xs text-muted-foreground">AI-powered support assistant</p>
+            <p className="text-xs text-muted-foreground">Connected to Help knowledge</p>
           </div>
         </div>
-        
-        {currentArticle && (
-          <div className="mt-3 p-2 bg-primary/5 rounded-lg">
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Context:</span> {currentArticle.title}
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-ai-primary/20 flex items-center justify-center">
-                <Zap className="w-8 h-8 text-primary" />
+            <div className="text-center py-6">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                <Zap className="w-7 h-7 text-primary" />
               </div>
-              <h4 className="font-medium text-foreground mb-2">How can I help?</h4>
-              <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
-                Ask me anything about the platform. I can explain steps, troubleshoot issues, or suggest shortcuts.
+              <h4 className="font-medium text-foreground mb-1">What's the problem?</h4>
+              <p className="text-sm text-muted-foreground mb-4 max-w-[240px] mx-auto">
+                Describe what you're stuck on and I'll find the fix.
               </p>
-              
-              {/* Quick prompts */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                {quickPrompts.map((prompt) => (
-                  <Button
-                    key={prompt}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7"
-                    onClick={() => {
-                      setInput(prompt);
-                    }}
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
             </div>
           ) : (
             <AnimatePresence>
@@ -128,22 +182,46 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
                     message.role === 'user' ? "flex-row-reverse" : ""
                   )}
                 >
-                  <Avatar className="w-8 h-8 shrink-0">
+                  <Avatar className="w-7 h-7 shrink-0">
                     <AvatarFallback className={cn(
+                      "text-xs",
                       message.role === 'user' 
                         ? "bg-muted text-muted-foreground" 
-                        : "bg-gradient-to-br from-primary to-ai-primary text-white"
+                        : "bg-gradient-to-br from-primary to-primary/80 text-white"
                     )}>
-                      {message.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      {message.role === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                     </AvatarFallback>
                   </Avatar>
                   <div className={cn(
-                    "max-w-[85%] rounded-xl px-4 py-3",
+                    "max-w-[85%] rounded-xl px-3 py-2.5",
                     message.role === 'user' 
                       ? "bg-primary text-primary-foreground" 
                       : "bg-muted"
                   )}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                      {message.content.split('**').map((part, i) => 
+                        i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+                      )}
+                    </p>
+                    
+                    {/* Show resolution link if matched */}
+                    {message.matchedResolution && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="mt-3 pt-3 border-t border-border/50"
+                      >
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="w-full justify-between text-xs h-8"
+                          onClick={() => onResolutionMatch?.(message.matchedResolution!)}
+                        >
+                          <span>View step-by-step guide</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </motion.div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -154,16 +232,16 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
                   animate={{ opacity: 1 }}
                   className="flex gap-3"
                 >
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-ai-primary text-white">
-                      <Bot className="w-4 h-4" />
+                  <Avatar className="w-7 h-7">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-xs">
+                      <Bot className="w-3.5 h-3.5" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-muted rounded-xl px-4 py-3">
+                  <div className="bg-muted rounded-xl px-3 py-2.5">
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </motion.div>
@@ -173,28 +251,43 @@ export function AskCarlosPanel({ messages, onSendMessage, currentArticle }: AskC
         </div>
       </ScrollArea>
 
+      {/* Quick Suggestions */}
+      <div className="px-4 pb-2">
+        <div className="flex flex-wrap gap-1.5">
+          {quickSuggestions.map((suggestion) => (
+            <Button
+              key={suggestion.label}
+              variant="outline"
+              size="sm"
+              className="text-xs h-7 px-2.5 bg-muted/50 hover:bg-primary/10 hover:text-primary hover:border-primary/30"
+              onClick={() => handleQuickSuggestion(suggestion.label)}
+            >
+              {suggestion.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       {/* Input */}
-      <div className="p-4 border-t border-border bg-card/50">
+      <div className="p-3 border-t border-border bg-card/50">
         <div className="flex gap-2">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Carlos anything..."
-            className="min-h-[44px] max-h-32 resize-none"
+            placeholder="Describe your problem..."
+            className="min-h-[40px] max-h-24 resize-none text-sm"
             rows={1}
           />
           <Button 
-            onClick={handleSend} 
+            onClick={() => handleSend()} 
             disabled={!input.trim()}
-            className="shrink-0 w-11 h-11"
+            className="shrink-0 w-10 h-10"
+            size="icon"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Press Enter to send • Shift+Enter for new line
-        </p>
       </div>
     </div>
   );

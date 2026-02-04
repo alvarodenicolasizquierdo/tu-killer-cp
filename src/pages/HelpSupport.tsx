@@ -4,6 +4,8 @@ import { CategoryNav } from '@/components/help-support/CategoryNav';
 import { ArticlePanel } from '@/components/help-support/ArticlePanel';
 import { AskCarlosPanel } from '@/components/help-support/AskCarlosPanel';
 import { IntentCard } from '@/components/help-support/IntentCard';
+import { GuidedResolution, GuidedResolutionData } from '@/components/help-support/GuidedResolution';
+import { guidedResolutions } from '@/data/guidedResolutions';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { 
@@ -308,18 +310,38 @@ export default function HelpSupport() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<HelpArticle | null>(null);
-  const [chatMessages, setChatMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [activeResolution, setActiveResolution] = useState<GuidedResolutionData | null>(null);
 
   const handleIntentClick = (intentId: string) => {
-    const article = articles.find(a => a.intentId === intentId);
-    if (article) {
-      setSelectedArticle(article);
-      setSelectedCategory(article.categoryId);
+    // First try to find a guided resolution
+    const resolutionMap: Record<string, string> = {
+      'create-audit': 'create-audit',
+      'create-workbook': 'create-workbook',
+      'submit-lab': 'submit-trf',
+      'link-fabric': 'fabric-no-test-link',
+      'export-excel': 'excel-missing-fields',
+      'upload-photos': 'upload-photos-phone',
+      'fix-tab': 'supplier-no-pd-tabs',
+      'care-issue': 'submit-trf',
+    };
+    
+    const resolutionId = resolutionMap[intentId];
+    if (resolutionId && guidedResolutions[resolutionId]) {
+      setActiveResolution(guidedResolutions[resolutionId]);
+      setSelectedArticle(null);
+    } else {
+      const article = articles.find(a => a.intentId === intentId);
+      if (article) {
+        setSelectedArticle(article);
+        setActiveResolution(null);
+        setSelectedCategory(article.categoryId);
+      }
     }
   };
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    setActiveResolution(null);
     // Show first article in category
     const categoryArticle = articles.find(a => a.categoryId === categoryId);
     if (categoryArticle) {
@@ -327,12 +349,9 @@ export default function HelpSupport() {
     }
   };
 
-  const handleAskCarlos = (message: string) => {
-    setChatMessages(prev => [
-      ...prev,
-      { role: 'user', content: message },
-      { role: 'assistant', content: `I understand you're asking about "${message}". Let me help you with that.\n\nBased on your question, here are some suggestions:\n\n1. Check the relevant article in the center panel\n2. Follow the step-by-step guide\n3. If you need more help, describe your specific situation\n\nWould you like me to explain any of these steps in more detail?` }
-    ]);
+  const handleResolutionMatch = (resolution: GuidedResolutionData) => {
+    setActiveResolution(resolution);
+    setSelectedArticle(null);
   };
 
   const filteredIntents = intents.filter(intent =>
@@ -383,25 +402,36 @@ export default function HelpSupport() {
 
         {/* CENTER: Dynamic Article / Guided Resolution */}
         <div className="col-span-5">
-          <ArticlePanel
-            article={selectedArticle}
-            articles={articles}
-            onSelectRelated={(articleId) => {
-              const related = articles.find(a => a.id === articleId);
-              if (related) {
-                setSelectedArticle(related);
-                setSelectedCategory(related.categoryId);
-              }
-            }}
-          />
+          {activeResolution ? (
+            <div className="bg-card rounded-xl border border-border shadow-sm h-full">
+              <GuidedResolution
+                data={activeResolution}
+                onEscalate={() => {
+                  // Could open a support ticket modal
+                  console.log('Escalating to SGS support');
+                }}
+              />
+            </div>
+          ) : (
+            <ArticlePanel
+              article={selectedArticle}
+              articles={articles}
+              onSelectRelated={(articleId) => {
+                const related = articles.find(a => a.id === articleId);
+                if (related) {
+                  setSelectedArticle(related);
+                  setActiveResolution(null);
+                  setSelectedCategory(related.categoryId);
+                }
+              }}
+            />
+          )}
         </div>
 
         {/* RIGHT: Ask Carlos AI Panel */}
         <div className="col-span-4">
           <AskCarlosPanel
-            messages={chatMessages}
-            onSendMessage={handleAskCarlos}
-            currentArticle={selectedArticle}
+            onResolutionMatch={handleResolutionMatch}
           />
         </div>
       </div>
