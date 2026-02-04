@@ -46,8 +46,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock data for unanswered questions
 const unansweredQuestions = [
@@ -173,6 +175,26 @@ export default function HelpAdmin() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [selectedQuestion, setSelectedQuestion] = useState<typeof unansweredQuestions[0] | null>(null);
   const [answerDraft, setAnswerDraft] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleSaveAsDraft = () => {
+    toast({
+      title: "Draft saved",
+      description: "Your answer has been saved as a draft.",
+    });
+    setDialogOpen(false);
+    setAnswerDraft('');
+  };
+
+  const handleAddToKnowledgeBase = () => {
+    toast({
+      title: "Answer added to knowledge base",
+      description: "The AI will now use this answer for similar questions.",
+    });
+    setDialogOpen(false);
+    setAnswerDraft('');
+  };
 
   const filteredQuestions = unansweredQuestions.filter(q => {
     const matchesSearch = q.question.toLowerCase().includes(searchQuery.toLowerCase());
@@ -336,11 +358,13 @@ export default function HelpAdmin() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Dialog>
+                      <Dialog open={dialogOpen && selectedQuestion?.id === question.id} onOpenChange={(open) => {
+                        setDialogOpen(open);
+                        if (open) setSelectedQuestion(question);
+                      }}>
                         <DialogTrigger asChild>
                           <button
                             className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                            onClick={() => setSelectedQuestion(question)}
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 space-y-2">
@@ -414,8 +438,8 @@ export default function HelpAdmin() {
                             </div>
                           </div>
                           <DialogFooter>
-                            <Button variant="outline">Save as Draft</Button>
-                            <Button className="ai-gradient border-0">
+                            <Button variant="outline" onClick={handleSaveAsDraft}>Save as Draft</Button>
+                            <Button className="ai-gradient border-0" onClick={handleAddToKnowledgeBase}>
                               <Sparkles className="h-4 w-4 mr-2" />
                               Add to Knowledge Base
                             </Button>
