@@ -37,14 +37,17 @@ export function TourSpotlight({ selector, padding = 12 }: TourSpotlightProps) {
       }
     };
 
-    // Initial calculation
-    updateRect();
+    // Delay initial calculation to account for smooth scroll animation
+    const initialTimer = setTimeout(() => {
+      updateRect();
+    }, 350);
 
     // Recalculate on scroll/resize
     window.addEventListener('scroll', updateRect, true);
     window.addEventListener('resize', updateRect);
 
     return () => {
+      clearTimeout(initialTimer);
       window.removeEventListener('scroll', updateRect, true);
       window.removeEventListener('resize', updateRect);
     };

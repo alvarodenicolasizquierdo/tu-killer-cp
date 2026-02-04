@@ -23,6 +23,32 @@ export function PlatformTour() {
     }
   }, []);
 
+  // Scroll highlighted elements into view when step changes
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const step = tourSteps[currentStep];
+    if (!step.selector) return;
+    
+    const element = document.querySelector(step.selector);
+    if (!element) return;
+    
+    // Check if element is fully visible in viewport
+    const rect = element.getBoundingClientRect();
+    const isVisible = (
+      rect.top >= 0 &&
+      rect.bottom <= window.innerHeight
+    );
+    
+    if (!isVisible) {
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+  }, [currentStep, isOpen]);
+
   const handleNext = useCallback(() => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(prev => prev + 1);
