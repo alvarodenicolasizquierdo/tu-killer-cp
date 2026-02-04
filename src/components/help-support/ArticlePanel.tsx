@@ -1,12 +1,26 @@
-import { HelpArticle } from '@/pages/HelpSupport';
+import { HelpArticle } from '@/data/helpKnowledgeBase';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Legacy article format for backward compatibility
+interface LegacyArticle {
+  id: string;
+  title: string;
+  categoryId: string;
+  intentId?: string;
+  steps: {
+    title: string;
+    content: string;
+    tip?: string;
+  }[];
+  relatedArticles?: string[];
+}
+
 interface ArticlePanelProps {
-  article: HelpArticle | null;
-  articles: HelpArticle[];
+  article: LegacyArticle | null;
+  articles: LegacyArticle[];
   onSelectRelated: (articleId: string) => void;
 }
 
@@ -29,7 +43,7 @@ export function ArticlePanel({ article, articles, onSelectRelated }: ArticlePane
 
   const relatedArticles = article.relatedArticles
     ?.map(id => articles.find(a => a.id === id))
-    .filter(Boolean) as HelpArticle[];
+    .filter(Boolean) as LegacyArticle[];
 
   return (
     <ScrollArea className="h-full">
