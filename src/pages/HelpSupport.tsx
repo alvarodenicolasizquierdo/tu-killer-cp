@@ -356,10 +356,99 @@ export default function HelpSupport() {
     setSelectedArticle(null);
   };
 
-  const filteredIntents = intents.filter(intent =>
-    intent.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    intent.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Intent similarity matching - maps natural language queries to intents
+  const intentSimilarityMap: { intentIds: string[]; phrases: string[] }[] = [
+    {
+      intentIds: ['submit-lab', 'send-to-lab'],
+      phrases: [
+        'testing', 'test', 'lab', 'send to lab', 'submit', 'topsheet', 'top sheet', 
+        'trf', 'can\'t test', 'cannot test', 'can\'t do testing', 'submit trf',
+        'send samples', 'lab submission', 'testing issue', 'test request'
+      ]
+    },
+    {
+      intentIds: ['create-audit'],
+      phrases: [
+        'audit', 'factory audit', 'create audit', 'schedule audit', 'new audit',
+        'inspection', 'can\'t audit', 'cannot audit', 'start audit'
+      ]
+    },
+    {
+      intentIds: ['create-workbook'],
+      phrases: [
+        'workbook', 'test workbook', 'create workbook', 'new workbook',
+        'can\'t create workbook', 'cannot create workbook', 'workbook issue'
+      ]
+    },
+    {
+      intentIds: ['link-fabric', 'fabric-test-link'],
+      phrases: [
+        'fabric', 'link fabric', 'component', 'material', 'fabric test',
+        'fabric linked', 'no test', 'fabric issue', 'add fabric'
+      ]
+    },
+    {
+      intentIds: ['export-excel', 'excel-missing'],
+      phrases: [
+        'excel', 'export', 'download', 'spreadsheet', 'missing fields',
+        'missing columns', 'excel problem', 'can\'t export', 'cannot export'
+      ]
+    },
+    {
+      intentIds: ['upload-photos', 'phone-upload'],
+      phrases: [
+        'photo', 'photos', 'upload', 'image', 'picture', 'mobile', 'phone',
+        'can\'t upload', 'cannot upload', 'upload issue', 'add photo'
+      ]
+    },
+    {
+      intentIds: ['fix-tab', 'supplier-tabs'],
+      phrases: [
+        'tab', 'tabs', 'missing tab', 'hidden', 'can\'t see', 'cannot see',
+        'not visible', 'supplier tab', 'pd tab', 'product development'
+      ]
+    },
+    {
+      intentIds: ['care-issue', 'label-generation'],
+      phrases: [
+        'care', 'label', 'care code', 'care label', 'compliance',
+        'generate label', 'label issue', 'care issue'
+      ]
+    }
+  ];
+
+  const matchIntentsBySimilarity = (query: string): string[] => {
+    if (!query.trim()) return [];
+    
+    const lowerQuery = query.toLowerCase();
+    const matchedIntentIds: Set<string> = new Set();
+    
+    for (const mapping of intentSimilarityMap) {
+      for (const phrase of mapping.phrases) {
+        // Check if query contains any matching phrase or vice versa
+        if (lowerQuery.includes(phrase) || phrase.includes(lowerQuery)) {
+          mapping.intentIds.forEach(id => matchedIntentIds.add(id));
+          break;
+        }
+        // Also check word overlap for multi-word queries
+        const queryWords = lowerQuery.split(/\s+/);
+        const phraseWords = phrase.split(/\s+/);
+        const overlap = queryWords.filter(w => phraseWords.some(pw => pw.includes(w) || w.includes(pw)));
+        if (overlap.length >= 1 && queryWords.length >= 2) {
+          mapping.intentIds.forEach(id => matchedIntentIds.add(id));
+          break;
+        }
+      }
+    }
+    
+    return Array.from(matchedIntentIds);
+  };
+
+  const matchedIntentIds = matchIntentsBySimilarity(searchQuery);
+  
+  const filteredIntents = searchQuery.trim()
+    ? intents.filter(intent => matchedIntentIds.includes(intent.id))
+    : intents;
 
   return (
     <AppLayout title="Help & Support" subtitle="AI-assisted operational guidance">
