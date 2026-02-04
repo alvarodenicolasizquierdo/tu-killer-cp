@@ -92,14 +92,25 @@ const Inspections = () => {
     }
   };
 
-  // Stats
+  // Stats based on filtered inspections
   const stats = useMemo(() => {
     const upcoming = mockInspections.filter(i => i.status === 'scheduled').length;
     const inProgress = mockInspections.filter(i => i.status === 'in_progress').length;
     const completed = mockInspections.filter(i => i.status === 'completed').length;
+    const cancelled = mockInspections.filter(i => i.status === 'cancelled').length;
+    const postponed = mockInspections.filter(i => i.status === 'postponed').length;
     const critical = mockInspections.filter(i => i.priority === 'critical' && i.status !== 'completed').length;
-    return { upcoming, inProgress, completed, critical };
+    return { upcoming, inProgress, completed, cancelled, postponed, critical };
   }, []);
+
+  // Filtered counts for tabs
+  const tabCounts = useMemo(() => ({
+    upcoming: filteredInspections.filter(i => i.status === 'scheduled').length,
+    inProgress: filteredInspections.filter(i => i.status === 'in_progress').length,
+    completed: filteredInspections.filter(i => i.status === 'completed').length,
+    cancelled: filteredInspections.filter(i => i.status === 'cancelled' || i.status === 'postponed').length,
+    all: filteredInspections.length,
+  }), [filteredInspections]);
 
   return (
     <AppLayout>
@@ -361,49 +372,141 @@ const Inspections = () => {
               exit={{ opacity: 0 }}
             >
               <Tabs defaultValue="upcoming" className="w-full">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                  <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-                  <TabsTrigger value="completed">Completed</TabsTrigger>
-                  <TabsTrigger value="all">All</TabsTrigger>
+                <TabsList className="mb-4 flex-wrap h-auto gap-1">
+                  <TabsTrigger value="upcoming" className="gap-2">
+                    Upcoming
+                    {tabCounts.upcoming > 0 && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-xs">{tabCounts.upcoming}</Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="in_progress" className="gap-2">
+                    In Progress
+                    {tabCounts.inProgress > 0 && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-amber-100 text-amber-700">{tabCounts.inProgress}</Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="completed" className="gap-2">
+                    Completed
+                    {tabCounts.completed > 0 && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-emerald-100 text-emerald-700">{tabCounts.completed}</Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="cancelled" className="gap-2">
+                    Cancelled/Postponed
+                    {tabCounts.cancelled > 0 && (
+                      <Badge variant="secondary" className="h-5 px-1.5 text-xs">{tabCounts.cancelled}</Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="all" className="gap-2">
+                    All
+                    <Badge variant="outline" className="h-5 px-1.5 text-xs">{tabCounts.all}</Badge>
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="upcoming">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredInspections
-                      .filter(i => i.status === 'scheduled')
-                      .map(insp => (
-                        <InspectionCard key={insp.id} inspection={insp} />
-                      ))}
-                  </div>
+                  {tabCounts.upcoming > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredInspections
+                        .filter(i => i.status === 'scheduled')
+                        .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
+                        .map(insp => (
+                          <InspectionCard key={insp.id} inspection={insp} />
+                        ))}
+                    </div>
+                  ) : (
+                    <Card className="py-12">
+                      <div className="text-center text-muted-foreground">
+                        <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No upcoming inspections</p>
+                        <p className="text-sm mt-1">Schedule a new inspection to get started</p>
+                        <Button variant="outline" className="mt-4" onClick={() => setIsFormOpen(true)}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Schedule Inspection
+                        </Button>
+                      </div>
+                    </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="in_progress">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredInspections
-                      .filter(i => i.status === 'in_progress')
-                      .map(insp => (
-                        <InspectionCard key={insp.id} inspection={insp} />
-                      ))}
-                  </div>
+                  {tabCounts.inProgress > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredInspections
+                        .filter(i => i.status === 'in_progress')
+                        .map(insp => (
+                          <InspectionCard key={insp.id} inspection={insp} />
+                        ))}
+                    </div>
+                  ) : (
+                    <Card className="py-12">
+                      <div className="text-center text-muted-foreground">
+                        <Loader2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No inspections in progress</p>
+                        <p className="text-sm mt-1">Inspections will appear here once they begin</p>
+                      </div>
+                    </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="completed">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredInspections
-                      .filter(i => i.status === 'completed')
-                      .map(insp => (
-                        <InspectionCard key={insp.id} inspection={insp} />
-                      ))}
-                  </div>
+                  {tabCounts.completed > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredInspections
+                        .filter(i => i.status === 'completed')
+                        .sort((a, b) => new Date(b.completedAt || b.scheduledDate).getTime() - new Date(a.completedAt || a.scheduledDate).getTime())
+                        .map(insp => (
+                          <InspectionCard key={insp.id} inspection={insp} />
+                        ))}
+                    </div>
+                  ) : (
+                    <Card className="py-12">
+                      <div className="text-center text-muted-foreground">
+                        <CheckCircle2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No completed inspections</p>
+                        <p className="text-sm mt-1">Completed inspections will appear here</p>
+                      </div>
+                    </Card>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="cancelled">
+                  {tabCounts.cancelled > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredInspections
+                        .filter(i => i.status === 'cancelled' || i.status === 'postponed')
+                        .map(insp => (
+                          <InspectionCard key={insp.id} inspection={insp} />
+                        ))}
+                    </div>
+                  ) : (
+                    <Card className="py-12">
+                      <div className="text-center text-muted-foreground">
+                        <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No cancelled or postponed inspections</p>
+                        <p className="text-sm mt-1">That's great news!</p>
+                      </div>
+                    </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="all">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredInspections.map(insp => (
-                      <InspectionCard key={insp.id} inspection={insp} />
-                    ))}
-                  </div>
+                  {tabCounts.all > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredInspections
+                        .sort((a, b) => new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime())
+                        .map(insp => (
+                          <InspectionCard key={insp.id} inspection={insp} />
+                        ))}
+                    </div>
+                  ) : (
+                    <Card className="py-12">
+                      <div className="text-center text-muted-foreground">
+                        <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No inspections found</p>
+                        <p className="text-sm mt-1">Try adjusting your filters</p>
+                      </div>
+                    </Card>
+                  )}
                 </TabsContent>
               </Tabs>
             </motion.div>
