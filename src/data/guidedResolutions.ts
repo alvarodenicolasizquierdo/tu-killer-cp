@@ -1,0 +1,324 @@
+import { GuidedResolutionData } from '@/components/help-support/GuidedResolution';
+
+export const guidedResolutions: Record<string, GuidedResolutionData> = {
+  'create-audit': {
+    id: 'create-audit',
+    title: "I can't create an Audit",
+    intent: "You want to schedule a new factory audit, but the 'Create Audit' button is disabled or missing.",
+    causes: [
+      "Your account doesn't have Audit Manager permissions",
+      "The supplier you're trying to audit hasn't been fully onboarded yet",
+      "There's already a pending audit for this supplier within the cooling-off period",
+      "The factory location is missing required compliance documents"
+    ],
+    steps: [
+      {
+        action: "Check your role permissions",
+        detail: "Go to Settings → My Profile and confirm you have 'Audit Manager' or 'QA Lead' role"
+      },
+      {
+        action: "Verify the supplier is fully onboarded",
+        detail: "Open the Supplier page and check all required fields are complete (address, contact, certifications)"
+      },
+      {
+        action: "Check for existing pending audits",
+        detail: "Look in Inspections → Calendar for any scheduled audits for this supplier"
+      },
+      {
+        action: "Review factory compliance status",
+        detail: "Ensure the factory has uploaded required documents (business license, fire safety cert)"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['permissions', 'supplier-onboarding', 'audit-cooldown', 'compliance-docs'],
+      confidence: 0.89,
+      relatedIssues: ['supplier-missing-docs', 'audit-scheduling-conflict']
+    }
+  },
+
+  'create-workbook': {
+    id: 'create-workbook',
+    title: "I can't create a Workbook",
+    intent: "You want to start a new product workbook, but you're unable to create one or the option isn't available.",
+    causes: [
+      "The season or collection you're working in is locked",
+      "You've reached the maximum workbook limit for your account tier",
+      "The parent style doesn't exist or was archived",
+      "Your role is set to 'View Only' for this brand or division"
+    ],
+    steps: [
+      {
+        action: "Check if the season is still open",
+        detail: "Go to Styles → Seasons and verify your target season shows 'Active' status"
+      },
+      {
+        action: "Confirm you have editing rights",
+        detail: "Check Settings → My Profile → Brand Access for your permission level"
+      },
+      {
+        action: "Verify the parent style exists",
+        detail: "Search for the style in Styles and ensure it's not archived"
+      },
+      {
+        action: "Check your workbook quota",
+        detail: "Contact your admin if you see a 'Limit Reached' message"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['season-locked', 'quota-limit', 'style-archived', 'view-only-role'],
+      confidence: 0.87,
+      relatedIssues: ['season-management', 'workbook-templates']
+    }
+  },
+
+  'submit-trf': {
+    id: 'submit-trf',
+    title: "I can't submit a TRF / Top Sheet",
+    intent: "You want to submit a Test Request Form to the lab, but the submit button is disabled or you're getting errors.",
+    causes: [
+      "Required fields on the TRF are incomplete (sample info, test methods, etc.)",
+      "The style doesn't have a Testing Level assigned yet",
+      "Lab samples haven't been marked as 'Received' in the system",
+      "There's a pending approval blocking the submission"
+    ],
+    steps: [
+      {
+        action: "Review all required fields",
+        detail: "Look for red asterisks (*) on the TRF form and fill in any missing information"
+      },
+      {
+        action: "Check Testing Level assignment",
+        detail: "Go to the Style → Testing tab and ensure a level is selected"
+      },
+      {
+        action: "Confirm samples are logged",
+        detail: "Check Lab → Sample Tracking to verify samples show 'Received' status"
+      },
+      {
+        action: "Look for pending approvals",
+        detail: "Check your Notifications for any approval requests that need action"
+      },
+      {
+        action: "Validate test method selection",
+        detail: "Ensure at least one test method is selected for each component"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['incomplete-fields', 'testing-level', 'sample-status', 'pending-approval'],
+      confidence: 0.94,
+      relatedIssues: ['sample-tracking', 'test-method-selection', 'approval-workflow']
+    }
+  },
+
+  'send-to-lab': {
+    id: 'send-to-lab',
+    title: "'Send to Lab' button is disabled",
+    intent: "You want to send test requests to the lab, but the 'Send to Lab' button is greyed out and won't click.",
+    causes: [
+      "No test items have been selected for submission",
+      "The selected lab doesn't support the chosen test methods",
+      "Your account isn't linked to any active lab partnerships",
+      "There's a billing hold on your lab account"
+    ],
+    steps: [
+      {
+        action: "Select items to send",
+        detail: "Use the checkboxes to select at least one TRF or test request"
+      },
+      {
+        action: "Verify lab compatibility",
+        detail: "Check that your selected lab is certified for the test methods you need"
+      },
+      {
+        action: "Confirm lab partnership is active",
+        detail: "Go to Settings → Lab Connections and check your linked labs"
+      },
+      {
+        action: "Check for account holds",
+        detail: "Contact your finance team if you see a 'Billing Hold' notification"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['no-selection', 'lab-compatibility', 'lab-partnership', 'billing-hold'],
+      confidence: 0.91,
+      relatedIssues: ['lab-setup', 'test-method-mapping', 'billing-issues']
+    }
+  },
+
+  'fabric-no-test-link': {
+    id: 'fabric-no-test-link',
+    title: "Fabric is linked but no Test Link appears",
+    intent: "You've linked a fabric to a style, but when you go to testing, the fabric doesn't show up as a testable component.",
+    causes: [
+      "The fabric was linked after the TRF was created",
+      "The fabric's component type isn't mapped to any test methods",
+      "The fabric record is missing required specifications (weight, content)",
+      "There's a sync delay between the fabric and testing modules"
+    ],
+    steps: [
+      {
+        action: "Refresh the Testing tab",
+        detail: "Close and reopen the style, or press Ctrl+Shift+R to force refresh"
+      },
+      {
+        action: "Check fabric specifications",
+        detail: "Open the fabric record and verify weight, content %, and construction are filled in"
+      },
+      {
+        action: "Verify component mapping",
+        detail: "Go to Settings → Testing Levels and check fabric test method assignments"
+      },
+      {
+        action: "Re-link the fabric if needed",
+        detail: "Remove and re-add the fabric link to trigger a fresh sync"
+      },
+      {
+        action: "Wait 2 minutes and check again",
+        detail: "Sometimes the system needs a moment to update across modules"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['timing-issue', 'component-mapping', 'missing-specs', 'sync-delay'],
+      confidence: 0.86,
+      relatedIssues: ['fabric-linking', 'component-testing', 'test-method-config']
+    }
+  },
+
+  'excel-missing-fields': {
+    id: 'excel-missing-fields',
+    title: "Excel export is missing fields",
+    intent: "You exported data to Excel, but some columns or information you expected aren't showing up in the file.",
+    causes: [
+      "The export template doesn't include those fields by default",
+      "You don't have permission to view certain data fields",
+      "The fields are empty in the system, so they appear blank in Excel",
+      "You selected a filtered view that excluded some records"
+    ],
+    steps: [
+      {
+        action: "Check your export template",
+        detail: "Go to Reports → Export Templates and review which fields are included"
+      },
+      {
+        action: "Remove any active filters",
+        detail: "Clear all filters before exporting to get complete data"
+      },
+      {
+        action: "Verify field permissions",
+        detail: "Some fields may be hidden based on your role — check with your admin"
+      },
+      {
+        action: "Try 'Export All Fields' option",
+        detail: "Look for an advanced export option that includes all available columns"
+      },
+      {
+        action: "Check the source data",
+        detail: "Open a few records manually to confirm the data exists in the system"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['export-template', 'field-permissions', 'empty-data', 'filtered-view'],
+      confidence: 0.88,
+      relatedIssues: ['export-configuration', 'report-builder', 'data-visibility']
+    }
+  },
+
+  'upload-photos-phone': {
+    id: 'upload-photos-phone',
+    title: "I can't upload photos from my phone",
+    intent: "You're trying to upload inspection photos or product images from your mobile device, but the upload isn't working.",
+    causes: [
+      "Your browser doesn't have permission to access your camera or photo library",
+      "The photo file is too large (over 10MB)",
+      "You're on a slow mobile connection and the upload is timing out",
+      "The mobile browser isn't fully supported"
+    ],
+    steps: [
+      {
+        action: "Grant camera/photo permissions",
+        detail: "Check your phone's Settings → Browser → Permissions and enable camera access"
+      },
+      {
+        action: "Reduce photo size",
+        detail: "Try taking a new photo at lower resolution, or use your phone's photo editor to compress"
+      },
+      {
+        action: "Switch to WiFi",
+        detail: "Mobile data can be unreliable — connect to WiFi for better upload stability"
+      },
+      {
+        action: "Try a different browser",
+        detail: "Use Chrome or Safari for best compatibility with photo uploads"
+      },
+      {
+        action: "Upload one photo at a time",
+        detail: "If batch upload fails, try uploading photos individually"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['browser-permissions', 'file-size', 'connection-timeout', 'browser-compatibility'],
+      confidence: 0.90,
+      relatedIssues: ['mobile-experience', 'photo-compression', 'network-issues']
+    }
+  },
+
+  'supplier-no-pd-tabs': {
+    id: 'supplier-no-pd-tabs',
+    title: "Supplier can't see Product Development tabs",
+    intent: "Your supplier partner has logged in but they can't see the Product Development section or related tabs.",
+    causes: [
+      "The supplier account was created with 'Production Only' access",
+      "Product Development sharing hasn't been enabled for this supplier",
+      "The supplier is linked to the wrong brand or division",
+      "Their account invitation hasn't been fully activated"
+    ],
+    steps: [
+      {
+        action: "Check supplier access level",
+        detail: "Go to Suppliers → [Supplier Name] → Access Settings and review their permissions"
+      },
+      {
+        action: "Enable PD sharing",
+        detail: "Toggle on 'Product Development Access' in the supplier's settings"
+      },
+      {
+        action: "Verify brand assignment",
+        detail: "Confirm the supplier is linked to the correct brands under 'Brand Access'"
+      },
+      {
+        action: "Resend the invitation",
+        detail: "If they never completed setup, send a fresh activation email"
+      },
+      {
+        action: "Ask them to log out and back in",
+        detail: "Permission changes require a fresh login to take effect"
+      }
+    ],
+    aiNotes: {
+      rootCauseTags: ['access-level', 'pd-sharing', 'brand-assignment', 'activation-incomplete'],
+      confidence: 0.93,
+      relatedIssues: ['supplier-onboarding', 'permission-management', 'brand-access']
+    }
+  }
+};
+
+// Map intent IDs to resolution IDs
+export const intentToResolutionMap: Record<string, string> = {
+  'create-audit': 'create-audit',
+  'create-workbook': 'create-workbook',
+  'submit-lab': 'submit-trf',
+  'link-fabric': 'fabric-no-test-link',
+  'export-excel': 'excel-missing-fields',
+  'upload-photos': 'upload-photos-phone',
+  'missing-tab': 'supplier-no-pd-tabs',
+  'care-label': 'submit-trf' // Fallback for now
+};
+
+export function getResolutionById(id: string): GuidedResolutionData | undefined {
+  return guidedResolutions[id];
+}
+
+export function getResolutionForIntent(intentId: string): GuidedResolutionData | undefined {
+  const resolutionId = intentToResolutionMap[intentId];
+  return resolutionId ? guidedResolutions[resolutionId] : undefined;
+}
