@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import sgsLogo from '@/assets/sgs-logo.png';
 import {
   DropdownMenu,
@@ -190,6 +190,7 @@ export function Sidebar() {
               isCollapsed && "justify-center"
             )}>
               <Avatar className="w-8 h-8 shrink-0">
+                <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                 <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-sm">
                   {currentUser.avatar}
                 </AvatarFallback>
@@ -226,6 +227,7 @@ export function Sidebar() {
                 )}
               >
                 <Avatar className="w-6 h-6 mr-2">
+                  <AvatarImage src={user.avatarUrl} alt={user.name} />
                   <AvatarFallback className="text-xs bg-primary text-primary-foreground">
                     {user.avatar}
                   </AvatarFallback>

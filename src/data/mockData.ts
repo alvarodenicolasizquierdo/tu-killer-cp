@@ -1,5 +1,13 @@
 import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument, Product, ProductImage, Inspection } from '@/types';
 
+// Import avatar images
+import karukaAvatar from '@/assets/avatars/karuka.jpg';
+import alvaroAvatar from '@/assets/avatars/alvaro.jpg';
+import ammAvatar from '@/assets/avatars/amm.jpg';
+import saritaAvatar from '@/assets/avatars/sarita.jpg';
+import markAvatar from '@/assets/avatars/mark.png';
+import hajraAvatar from '@/assets/avatars/hajra.png';
+
 // Demo users for role switching
 export const demoUsers: User[] = [
   {
@@ -8,6 +16,7 @@ export const demoUsers: User[] = [
     email: 'sarah.chen@retailco.com',
     role: 'buyer',
     avatar: 'SC',
+    avatarUrl: karukaAvatar,
     company: 'RetailCo',
     department: 'Quality Assurance'
   },
@@ -17,33 +26,37 @@ export const demoUsers: User[] = [
     email: 'marcus@textilesupplier.com',
     role: 'supplier',
     avatar: 'MW',
+    avatarUrl: alvaroAvatar,
     company: 'Textile Supplier Ltd',
     department: 'Operations'
   },
   {
     id: 'user-3',
-    name: 'Dr. Elena Martinez',
+    name: 'Dr. Amm Martinez',
     email: 'e.martinez@sgs.com',
     role: 'lab_technician',
-    avatar: 'EM',
+    avatar: 'AM',
+    avatarUrl: ammAvatar,
     company: 'SGS',
     department: 'Chemical Testing'
   },
   {
     id: 'user-4',
-    name: 'James Richardson',
+    name: 'Mark Richardson',
     email: 'j.richardson@retailco.com',
     role: 'manager',
-    avatar: 'JR',
+    avatar: 'MR',
+    avatarUrl: markAvatar,
     company: 'RetailCo',
     department: 'Global Sourcing'
   },
   {
     id: 'user-5',
-    name: 'Admin User',
-    email: 'admin@sgs.com',
+    name: 'Hajra Khan',
+    email: 'hajra@sgs.com',
     role: 'admin',
-    avatar: 'AU',
+    avatar: 'HK',
+    avatarUrl: hajraAvatar,
     company: 'SGS',
     department: 'Platform Admin'
   }
