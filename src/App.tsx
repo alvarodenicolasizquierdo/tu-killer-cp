@@ -12,6 +12,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Suppliers from "./pages/Suppliers";
 import Lab from "./pages/Lab";
 import Inspections from "./pages/Inspections";
+import InspectionDetail from "./pages/InspectionDetail";
 import Analytics from "./pages/Analytics";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/lab" element={<Lab />} />
             <Route path="/inspections" element={<Inspections />} />
+            <Route path="/inspections/:id" element={<InspectionDetail />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/notifications" element={<Dashboard />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />

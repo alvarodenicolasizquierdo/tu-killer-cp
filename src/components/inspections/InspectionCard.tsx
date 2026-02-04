@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { MapPin, Clock, User, Building2, CheckCircle2, AlertTriangle, Loader2, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -12,6 +13,11 @@ interface InspectionCardProps {
 }
 
 const InspectionCard = ({ inspection, compact = false }: InspectionCardProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/inspections/${inspection.id}`);
+  };
   const getTypeColor = (type: InspectionType) => {
     switch (type) {
       case 'factory_audit': return 'bg-blue-500/10 text-blue-600 border-blue-200';
@@ -60,6 +66,7 @@ const InspectionCard = ({ inspection, compact = false }: InspectionCardProps) =>
     return (
       <motion.div
         whileHover={{ x: 2 }}
+        onClick={handleClick}
         className={`p-3 rounded-lg border bg-card hover:shadow-md transition-all cursor-pointer ${getPriorityBorder(inspection.priority)}`}
       >
         <div className="flex items-start justify-between gap-2 mb-2">
@@ -84,6 +91,7 @@ const InspectionCard = ({ inspection, compact = false }: InspectionCardProps) =>
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
+      onClick={handleClick}
     >
       <Card className={`h-full hover:shadow-lg transition-all cursor-pointer ${getPriorityBorder(inspection.priority)}`}>
         <CardHeader className="pb-3">
