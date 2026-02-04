@@ -60,19 +60,15 @@ export function PlatformTour() {
 
   const step = tourSteps[currentStep];
 
-  if (hasSeenTour && !isOpen) {
-    return null;
-  }
-
   return (
     <>
-      {/* Restart Tour Button - shown after completion */}
-      {hasSeenTour && (
+      {/* Restart Tour Button - shown after tour completion when not viewing tour */}
+      {hasSeenTour && !isOpen && (
         <Button
           variant="outline"
           size="sm"
           onClick={handleRestart}
-          className="fixed bottom-4 right-4 z-40 gap-2 shadow-lg"
+          className="fixed bottom-4 right-4 z-40 gap-2 shadow-lg bg-background"
         >
           <Rocket className="h-4 w-4" />
           Restart Tour
