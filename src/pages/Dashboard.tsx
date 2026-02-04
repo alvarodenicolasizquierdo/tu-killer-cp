@@ -1,13 +1,16 @@
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useUser } from '@/contexts/UserContext';
+import { useUser, getRoleDisplayName, getRoleGreeting } from '@/contexts/UserContext';
 import { useAIContext } from '@/hooks/useAIContext';
 import { AITaskCard } from '@/components/ai/AITaskCard';
 import { ReadinessGauge } from '@/components/ai/ReadinessGauge';
 import { ScenarioSimulator } from '@/components/ai/ScenarioSimulator';
+import { LabQueueWidget } from '@/components/dashboard/LabQueueWidget';
+import { ConfidenceDashboardWidget } from '@/components/dashboard/ConfidenceDashboardWidget';
+import { SupplierDashboardWidget } from '@/components/dashboard/SupplierDashboardWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Brain, Target, AlertTriangle, Clock, Sparkles } from 'lucide-react';
+import { Brain, Target, AlertTriangle, Clock, Sparkles, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -20,13 +23,27 @@ export default function Dashboard() {
     scenarioState, 
     setScenarioState, 
     scenarioImpact,
+    layoutConfig,
     isComputing 
   } = useAIContext();
 
-  // Only show critical and at-risk tasks - AI has already prioritized
-  const prioritizedTasks = computedTasks.filter(t => 
-    t.priority === 'critical' || t.priority === 'at-risk'
-  );
+  // Filter tasks based on role relevance
+  const prioritizedTasks = computedTasks.filter(t => {
+    // Always include critical/at-risk
+    if (t.priority !== 'critical' && t.priority !== 'at-risk') return false;
+    
+    // Role-specific filtering
+    switch (currentUser.role) {
+      case 'lab_technician':
+        return t.objectType === 'trf';
+      case 'supplier':
+        return t.objectType === 'certificate' || t.objectType === 'supplier';
+      case 'manager':
+        return true; // Managers see everything
+      default:
+        return true;
+    }
+  });
 
   const hasActiveScenario = scenarioState.dppEnforced || scenarioState.regulationThreshold > 0;
 
@@ -47,9 +64,30 @@ export default function Dashboard() {
     );
   }
 
+  // Get role-specific greeting
+  const roleGreeting = getRoleGreeting(currentUser.role);
+
+  // Render primary widget based on layoutConfig
+  const renderPrimaryWidget = () => {
+    switch (layoutConfig.primaryWidget) {
+      case 'lab_queue':
+        return <LabQueueWidget />;
+      case 'confidence_dashboard':
+        return <ConfidenceDashboardWidget />;
+      default:
+        return null; // Tasks widget is rendered separately
+    }
+  };
+
+  // Check if we should show the default tasks widget
+  const showTasksWidget = layoutConfig.primaryWidget === 'tasks';
+
+  // For supplier role, show supplier-specific dashboard
+  const isSupplier = currentUser.role === 'supplier';
+
   return (
     <AppLayout>
-      {/* Context Header - AI-computed reality statement */}
+      {/* Context Header - Role-adaptive greeting */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,11 +95,17 @@ export default function Dashboard() {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="outline" className="gap-1.5 bg-ai-primary/5 border-ai-primary/20 text-ai-primary">
+                <User className="w-3 h-3" />
+                {getRoleDisplayName(currentUser.role)}
+              </Badge>
+            </div>
             <h1 className="text-2xl font-bold text-foreground mb-1">
-              Your operational reality right now
+              {roleGreeting.split('!')[0]}!
             </h1>
             <p className="text-muted-foreground">
-              AI has analyzed your role, responsibilities, and risk exposure to prioritize what matters.
+              {roleGreeting.split('!')[1]?.trim() || 'AI has analyzed your context to prioritize what matters.'}
             </p>
           </div>
           
@@ -109,62 +153,80 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Main Grid - AI assembles based on context */}
+      {/* Main Grid - AI assembles based on role context */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Primary: Prioritized Actions */}
+        {/* Primary Column - Role-specific content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* What AI thinks matters today */}
-          <Card className="border-2 border-ai-primary/20">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ai-primary to-ai-secondary flex items-center justify-center">
-                    <Target className="w-5 h-5 text-white" />
+          {/* Supplier-specific dashboard */}
+          {isSupplier && <SupplierDashboardWidget />}
+          
+          {/* Role-specific primary widget (Lab Queue or Confidence Dashboard) */}
+          {!isSupplier && renderPrimaryWidget()}
+          
+          {/* Tasks widget - shown for buyer/admin or as secondary for other roles */}
+          {(showTasksWidget || (!isSupplier && layoutConfig.primaryWidget !== 'tasks')) && (
+            <Card className="border-2 border-ai-primary/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ai-primary to-ai-secondary flex items-center justify-center">
+                      <Target className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">
+                        {currentUser.role === 'lab_technician' 
+                          ? 'Your Testing Priorities' 
+                          : currentUser.role === 'manager' 
+                            ? 'Executive Action Items'
+                            : 'What Matters Today'}
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        {prioritizedTasks.length} actions ranked by impact if ignored
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">What Matters Today</CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      {prioritizedTasks.length} actions ranked by impact if ignored
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="gap-1 text-xs bg-ai-primary/5 border-ai-primary/20 text-ai-primary">
+                      <Brain className="w-3 h-3" />
+                      AI Prioritized
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {prioritizedTasks.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-12"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                      <Sparkles className="w-8 h-8 text-emerald-600" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1">All clear</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {isSupplier 
+                        ? 'No pending actions required from you right now.'
+                        : 'No critical or at-risk items require your attention right now.'}
                     </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="gap-1 text-xs bg-ai-primary/5 border-ai-primary/20 text-ai-primary">
-                    <Brain className="w-3 h-3" />
-                    AI Prioritized
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {prioritizedTasks.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
-                >
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="w-8 h-8 text-emerald-600" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-1">All clear</h3>
-                  <p className="text-sm text-muted-foreground">
-                    No critical or at-risk items require your attention right now.
-                  </p>
-                </motion.div>
-              ) : (
-                prioritizedTasks.map((task, index) => (
-                  <AITaskCard key={task.id} task={task} index={index} />
-                ))
-              )}
-            </CardContent>
-          </Card>
+                  </motion.div>
+                ) : (
+                  prioritizedTasks.map((task, index) => (
+                    <AITaskCard key={task.id} task={task} index={index} />
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Scenario Simulator */}
-          <ScenarioSimulator
-            scenarioState={scenarioState}
-            onScenarioChange={setScenarioState}
-            impact={scenarioImpact}
-          />
+          {/* Scenario Simulator - hide for suppliers */}
+          {!isSupplier && (
+            <ScenarioSimulator
+              scenarioState={scenarioState}
+              onScenarioChange={setScenarioState}
+              impact={scenarioImpact}
+            />
+          )}
         </div>
 
         {/* Right Column - Readiness & Context */}
@@ -174,10 +236,14 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Readiness Overview</CardTitle>
+                <CardTitle className="text-lg">
+                  {isSupplier ? 'Your Compliance Status' : 'Readiness Overview'}
+                </CardTitle>
               </div>
               <p className="text-xs text-muted-foreground">
-                AI-computed compliance readiness
+                {isSupplier 
+                  ? 'Your current compliance score and gaps'
+                  : 'AI-computed compliance readiness'}
               </p>
             </CardHeader>
             <CardContent>
@@ -203,6 +269,10 @@ export default function Dashboard() {
                   <span className="text-foreground">{context.role}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">primary_widget:</span>
+                  <span className="text-foreground">{layoutConfig.primaryWidget}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">critical_items:</span>
                   <span className={cn(
                     context.criticalItems > 0 ? "text-red-600" : "text-emerald-600"
@@ -222,8 +292,8 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">confidence_gap:</span>
-                  <span className="text-amber-600">{context.confidenceGap}</span>
+                  <span className="text-muted-foreground">emphasis_areas:</span>
+                  <span className="text-foreground">{layoutConfig.emphasisAreas.join(', ')}</span>
                 </div>
               </div>
             </CardContent>
