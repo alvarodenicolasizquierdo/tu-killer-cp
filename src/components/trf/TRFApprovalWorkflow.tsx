@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { DisabledButtonHelp } from '@/components/help/InlineHelpTooltip';
 
 interface TRFApprovalWorkflowProps {
   trf: TRF;
@@ -164,44 +165,81 @@ export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
           className="flex flex-col gap-2"
         >
           <div className="flex gap-2">
-            <Button 
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-              onClick={handleApprove}
-              disabled={isSubmitting}
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Approve TRF
-            </Button>
-            <Button 
-              variant="destructive" 
-              className="flex-1"
-              onClick={handleReject}
-              disabled={isSubmitting}
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Reject
-            </Button>
+            {isSubmitting ? (
+              <DisabledButtonHelp
+                reason="Your action is being processed. Please wait for it to complete."
+              >
+                <Button className="flex-1 bg-emerald-600" disabled>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Approve TRF
+                </Button>
+              </DisabledButtonHelp>
+            ) : (
+              <Button 
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                onClick={handleApprove}
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Approve TRF
+              </Button>
+            )}
+            {isSubmitting ? (
+              <DisabledButtonHelp
+                reason="Your action is being processed. Please wait for it to complete."
+              >
+                <Button variant="destructive" className="flex-1" disabled>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Reject
+                </Button>
+              </DisabledButtonHelp>
+            ) : (
+              <Button 
+                variant="destructive" 
+                className="flex-1"
+                onClick={handleReject}
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                Reject
+              </Button>
+            )}
           </div>
           
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={handleRequestRetest}
-            disabled={isSubmitting}
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Request Retest
-          </Button>
+          {isSubmitting ? (
+            <DisabledButtonHelp
+              reason="Your action is being processed. Please wait for it to complete."
+            >
+              <Button variant="outline" className="w-full" disabled>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Request Retest
+              </Button>
+            </DisabledButtonHelp>
+          ) : (
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={handleRequestRetest}
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Request Retest
+            </Button>
+          )}
 
           {comment && (
-            <Button 
-              variant="secondary"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              <Send className="w-4 h-4 mr-2" />
-              Add Comment Only
-            </Button>
+            isSubmitting ? (
+              <DisabledButtonHelp
+                reason="Your action is being processed. Please wait for it to complete."
+              >
+                <Button variant="secondary" className="w-full" disabled>
+                  <Send className="w-4 h-4 mr-2" />
+                  Add Comment Only
+                </Button>
+              </DisabledButtonHelp>
+            ) : (
+              <Button variant="secondary" className="w-full">
+                <Send className="w-4 h-4 mr-2" />
+                Add Comment Only
+              </Button>
+            )
           )}
         </motion.div>
       )}
