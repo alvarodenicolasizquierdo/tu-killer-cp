@@ -109,6 +109,8 @@ export interface Task {
 export interface Supplier {
   id: string;
   name: string;
+  email: string;
+  contactPerson: string;
   country: string;
   factoryCount: number;
   status: 'active' | 'at-risk' | 'inactive';

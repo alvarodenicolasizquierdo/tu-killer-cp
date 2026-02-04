@@ -1,5 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { mockSuppliers } from '@/data/mockData';
+import { Supplier } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,12 +19,15 @@ import {
   TrendingUp,
   TrendingDown,
   ExternalLink,
-  ClipboardList
+  ClipboardList,
+  Mail,
+  Send
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { toast } from '@/hooks/use-toast';
 
-function SupplierCard({ supplier, index }: { supplier: typeof mockSuppliers[0]; index: number }) {
+function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }) {
   const statusConfig = {
     active: { label: 'Active', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle },
     'at-risk': { label: 'At Risk', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: AlertTriangle },
@@ -37,6 +41,23 @@ function SupplierCard({ supplier, index }: { supplier: typeof mockSuppliers[0]; 
     if (score >= 90) return 'text-emerald-600';
     if (score >= 75) return 'text-amber-600';
     return 'text-red-600';
+  };
+
+  const handleInviteToQuestionnaire = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Mock email sending simulation
+    toast({
+      title: "Invitation Sent",
+      description: (
+        <div className="flex flex-col gap-1">
+          <span>Questionnaire invitation sent to <strong>{supplier.contactPerson}</strong></span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Mail className="w-3 h-3" />
+            {supplier.email}
+          </span>
+        </div>
+      ),
+    });
   };
 
   return (
@@ -98,7 +119,7 @@ function SupplierCard({ supplier, index }: { supplier: typeof mockSuppliers[0]; 
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats & Actions */}
           <div className="flex items-center justify-between text-sm pt-3 border-t border-border">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
@@ -112,13 +133,22 @@ function SupplierCard({ supplier, index }: { supplier: typeof mockSuppliers[0]; 
                 </div>
               )}
             </div>
-            {supplier.lastAudit && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Calendar className="w-3 h-3" />
-                Last audit: {new Date(supplier.lastAudit).toLocaleDateString()}
-              </div>
-            )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1.5 text-xs h-7"
+              onClick={handleInviteToQuestionnaire}
+            >
+              <Send className="w-3 h-3" />
+              Invite to Questionnaire
+            </Button>
           </div>
+          {supplier.lastAudit && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
+              <Calendar className="w-3 h-3" />
+              Last audit: {new Date(supplier.lastAudit).toLocaleDateString()}
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
