@@ -30,7 +30,9 @@ import {
   BookOpen,
   ArrowUpRight,
   RefreshCw,
+  FileEdit,
 } from 'lucide-react';
+import { DraftsTabContent } from '@/components/help/DraftsTabContent';
 import {
   Select,
   SelectContent,
@@ -301,6 +303,11 @@ export default function HelpAdmin() {
             Unanswered Questions
             <Badge variant="secondary" className="ml-1">{unansweredQuestions.length}</Badge>
           </TabsTrigger>
+          <TabsTrigger value="drafts" className="gap-2">
+            <FileEdit className="h-4 w-4" />
+            Drafts
+            <Badge variant="secondary" className="ml-1">4</Badge>
+          </TabsTrigger>
           <TabsTrigger value="overrides" className="gap-2">
             <AlertTriangle className="h-4 w-4" />
             AI Overrides
@@ -452,6 +459,11 @@ export default function HelpAdmin() {
               </ScrollArea>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Drafts Tab */}
+        <TabsContent value="drafts" className="space-y-4">
+          <DraftsTabContent />
         </TabsContent>
 
         {/* AI Overrides Tab */}
