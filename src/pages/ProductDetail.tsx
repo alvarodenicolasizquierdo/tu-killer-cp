@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { mockProducts, mockTRFs, mockSuppliers } from '@/data/mockData';
 import { Product } from '@/types';
 import ProductImageGallery from '@/components/products/ProductImageGallery';
-
+import { AIAssessmentStrip } from '@/components/ai/AIAssessmentStrip';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -110,6 +110,31 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* AI Assessment Strip */}
+        <AIAssessmentStrip
+          assessment={{
+            objectType: 'product',
+            objectId: product.id,
+            readiness: product.passRate,
+            readinessTrend: product.passRate >= 90 ? 'up' : product.passRate >= 70 ? 'stable' : 'down',
+            confidence: product.riskScore < 40 ? 'high' : product.riskScore < 70 ? 'medium' : 'low',
+            primaryRisk: product.complianceStatus === 'non_compliant' 
+              ? 'Product fails compliance requirements'
+              : product.riskScore >= 70 
+                ? 'High risk score detected'
+                : product.complianceStatus === 'pending_review'
+                  ? 'Awaiting compliance review'
+                  : 'No major risks identified',
+            recommendation: product.complianceStatus === 'non_compliant'
+              ? 'Initiate corrective action with supplier immediately'
+              : product.riskScore >= 70
+                ? 'Schedule additional testing and supplier audit'
+                : product.activeTRFs > 0
+                  ? `Review ${product.activeTRFs} active TRF(s) for completion status`
+                  : 'Product is in good standing',
+          }}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
