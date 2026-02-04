@@ -28,16 +28,25 @@ const quickSuggestions = [
   { label: 'Excel problem', keywords: ['excel', 'export', 'missing', 'fields', 'download'] },
 ];
 
-// Intent matching keywords
+// Intent matching keywords - includes tags for semantic matching
 const intentMatchers: { id: string; keywords: string[]; resolution: string }[] = [
   { id: 'create-audit', keywords: ['create audit', 'new audit', 'schedule audit', 'factory audit', 'can\'t create audit', 'cannot create audit'], resolution: 'create-audit' },
   { id: 'create-workbook', keywords: ['workbook', 'create workbook', 'new workbook', 'can\'t create workbook', 'cannot create workbook'], resolution: 'create-workbook' },
-  { id: 'submit-trf', keywords: ['trf', 'top sheet', 'submit trf', 'can\'t submit', 'cannot submit', 'submit to lab'], resolution: 'submit-trf' },
+  { id: 'submit-trf', keywords: ['trf', 'top sheet', 'submit trf', 'can\'t submit', 'cannot submit', 'submit to lab', 'topsheet'], resolution: 'submit-trf' },
   { id: 'send-to-lab', keywords: ['send to lab', 'lab disabled', 'send lab button', 'lab button grey', 'lab button disabled'], resolution: 'send-to-lab' },
   { id: 'fabric-no-test-link', keywords: ['fabric linked', 'test link', 'no test', 'fabric test', 'linked but'], resolution: 'fabric-no-test-link' },
   { id: 'excel-missing-fields', keywords: ['excel', 'export missing', 'missing fields', 'missing columns', 'excel export'], resolution: 'excel-missing-fields' },
   { id: 'upload-photos-phone', keywords: ['upload photos', 'photos phone', 'can\'t upload', 'cannot upload', 'mobile upload', 'phone photos'], resolution: 'upload-photos-phone' },
   { id: 'supplier-no-pd-tabs', keywords: ['supplier', 'product development', 'pd tabs', 'can\'t see tabs', 'supplier tabs', 'missing tabs'], resolution: 'supplier-no-pd-tabs' },
+  // Care label resolutions
+  { id: 'care-label-wrong', keywords: ['care label wrong', 'care label incorrect', 'wrong symbols', 'wash symbols', 'care instructions wrong', 'label content'], resolution: 'care-label-wrong' },
+  { id: 'care-label-missing', keywords: ['generate care label', 'can\'t generate label', 'cannot generate label', 'care label disabled', 'no care label'], resolution: 'care-label-missing' },
+  // Fitlog resolutions
+  { id: 'fitlog-photos-missing', keywords: ['fitlog photos', 'fit photos missing', 'photos not showing', 'fitlog images', 'fit session photos'], resolution: 'fitlog-photos-missing' },
+  { id: 'fitlog-cant-create', keywords: ['create fitlog', 'new fitlog', 'can\'t create fit', 'cannot create fit', 'fit session disabled', 'add fit session'], resolution: 'fitlog-cant-create' },
+  { id: 'fitlog-measurements-wrong', keywords: ['fitlog measurements', 'measurements wrong', 'measurements don\'t match', 'spec mismatch', 'tolerance'], resolution: 'fitlog-measurements-wrong' },
+  // Care code resolutions
+  { id: 'carecode-not-applying', keywords: ['care code', 'carecode', 'code not applying', 'care code changes', 'label not updating', 'care code update'], resolution: 'carecode-not-applying' },
 ];
 
 function matchIntent(message: string): GuidedResolutionData | null {

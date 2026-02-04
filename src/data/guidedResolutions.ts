@@ -307,6 +307,246 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
       confidence: 0.93,
       relatedIssues: ['supplier-onboarding', 'permission-management', 'brand-access']
     }
+  },
+
+  'care-label-wrong': {
+    id: 'care-label-wrong',
+    title: "Care label content is wrong or incomplete",
+    intent: "You've generated a care label but the symbols, instructions, or content don't match what you expected.",
+    causes: [
+      "The fabric composition wasn't entered correctly on the style",
+      "The care rules engine is using outdated or default mappings",
+      "A custom care instruction override was applied but not saved",
+      "The destination market/region isn't set correctly"
+    ],
+    steps: [
+      {
+        action: "Verify fabric composition",
+        detail: "Go to Style → Components and check that fabric content percentages add up to 100%"
+      },
+      {
+        action: "Check care rule mappings",
+        detail: "Go to Settings → Care Labelling → Rules and verify the fiber-to-symbol mappings"
+      },
+      {
+        action: "Review any manual overrides",
+        detail: "Look for a yellow 'Override' badge on the care label preview indicating manual changes"
+      },
+      {
+        action: "Set the correct destination market",
+        detail: "Update the Region field (US, EU, APAC) to get market-specific symbols"
+      },
+      {
+        action: "Regenerate the label",
+        detail: "Click 'Refresh Care Label' to recalculate based on current component data"
+      }
+    ],
+    tags: ['carecode', 'carelabel', 'label', 'symbols', 'wash', 'fabric', 'composition', 'instructions'],
+    aiNotes: {
+      rootCauseTags: ['composition-error', 'rule-mapping', 'override-applied', 'market-setting'],
+      confidence: 0.91,
+      relatedIssues: ['fabric-entry', 'care-rules-config', 'label-generation']
+    }
+  },
+
+  'care-label-missing': {
+    id: 'care-label-missing',
+    title: "I can't generate a care label",
+    intent: "You want to create a care label for a style, but the generate button is disabled or nothing happens when you click it.",
+    causes: [
+      "The style doesn't have any fabric components linked",
+      "Fabric composition is incomplete or missing fiber content",
+      "The care labelling module isn't enabled for your account",
+      "There's a validation error blocking label generation"
+    ],
+    steps: [
+      {
+        action: "Link fabric components first",
+        detail: "Go to Style → Components and add at least one fabric with composition data"
+      },
+      {
+        action: "Complete fabric specifications",
+        detail: "Each fabric needs fiber type and percentage (e.g., 100% Cotton or 60% Poly/40% Cotton)"
+      },
+      {
+        action: "Check module access",
+        detail: "Verify Care Labelling appears in your navigation — contact admin if missing"
+      },
+      {
+        action: "Look for validation errors",
+        detail: "Check for red warning banners at the top of the style page"
+      },
+      {
+        action: "Try a different style",
+        detail: "Test with another style to confirm it's not a system-wide issue"
+      }
+    ],
+    tags: ['carecode', 'carelabel', 'label', 'generate', 'disabled', 'fabric', 'component'],
+    aiNotes: {
+      rootCauseTags: ['no-fabric-linked', 'incomplete-composition', 'module-disabled', 'validation-block'],
+      confidence: 0.88,
+      relatedIssues: ['fabric-linking', 'care-module-setup', 'style-completion']
+    }
+  },
+
+  'fitlog-photos-missing': {
+    id: 'fitlog-photos-missing',
+    title: "Fitlog photos aren't showing up",
+    intent: "You uploaded photos to a fitlog entry, but they're not appearing in the gallery or timeline.",
+    causes: [
+      "The photos are still uploading in the background",
+      "The file format isn't supported (needs to be JPG, PNG, or HEIC)",
+      "There's a browser cache issue preventing display",
+      "The photos were uploaded to a different fitlog version"
+    ],
+    steps: [
+      {
+        action: "Wait 30 seconds and refresh",
+        detail: "Large photos can take time to process — give the system a moment"
+      },
+      {
+        action: "Check the upload queue",
+        detail: "Look for a progress indicator in the bottom-right showing pending uploads"
+      },
+      {
+        action: "Verify file format",
+        detail: "Ensure your photos are JPG, PNG, or HEIC (PDF and other formats aren't supported)"
+      },
+      {
+        action: "Clear browser cache",
+        detail: "Press Ctrl+Shift+R (or Cmd+Shift+R on Mac) to force a hard refresh"
+      },
+      {
+        action: "Check fitlog version",
+        detail: "Make sure you're viewing the correct fit session version (v1, v2, etc.)"
+      }
+    ],
+    tags: ['fitlog', 'photos', 'images', 'upload', 'gallery', 'fit', 'session', 'missing'],
+    aiNotes: {
+      rootCauseTags: ['upload-pending', 'file-format', 'cache-issue', 'version-mismatch'],
+      confidence: 0.85,
+      relatedIssues: ['photo-upload', 'fitlog-versions', 'browser-cache']
+    }
+  },
+
+  'fitlog-cant-create': {
+    id: 'fitlog-cant-create',
+    title: "I can't create a new Fitlog entry",
+    intent: "You want to log a new fit session, but the create button is missing or disabled.",
+    causes: [
+      "The style doesn't have a sample linked yet",
+      "You don't have Fit Technician or Design permissions",
+      "The style is in an archived or locked state",
+      "Maximum fitlog entries limit has been reached for this sample"
+    ],
+    steps: [
+      {
+        action: "Link a sample first",
+        detail: "Go to Style → Samples and ensure at least one sample is created and linked"
+      },
+      {
+        action: "Check your role",
+        detail: "Go to Settings → My Profile and verify you have 'Fit Tech' or 'Designer' access"
+      },
+      {
+        action: "Verify style status",
+        detail: "Confirm the style shows 'Active' status, not 'Archived' or 'Cancelled'"
+      },
+      {
+        action: "Review existing fitlogs",
+        detail: "Check if there are already multiple fit sessions — you may need to update an existing one"
+      },
+      {
+        action: "Try creating from the sample view",
+        detail: "Navigate to the specific sample and click 'Add Fit Session' from there"
+      }
+    ],
+    tags: ['fitlog', 'fit', 'session', 'create', 'sample', 'roles', 'disabled'],
+    aiNotes: {
+      rootCauseTags: ['no-sample', 'role-permissions', 'style-locked', 'entry-limit'],
+      confidence: 0.87,
+      relatedIssues: ['sample-creation', 'fitlog-workflow', 'style-lifecycle']
+    }
+  },
+
+  'carecode-not-applying': {
+    id: 'carecode-not-applying',
+    title: "Care code changes aren't being applied",
+    intent: "You updated care codes or instructions, but the changes don't appear on the label preview or exports.",
+    causes: [
+      "Changes were made but not saved",
+      "There's a cached version of the label being displayed",
+      "An override at the style level is blocking the care code update",
+      "The care code library update is pending approval"
+    ],
+    steps: [
+      {
+        action: "Save your changes",
+        detail: "Click the 'Save' button after making care code edits — check for unsaved changes indicator"
+      },
+      {
+        action: "Force refresh the preview",
+        detail: "Click 'Regenerate Label' or refresh the page to see updated content"
+      },
+      {
+        action: "Check for style-level overrides",
+        detail: "Go to Style → Care Label and look for any manual override toggles that are enabled"
+      },
+      {
+        action: "Verify library sync status",
+        detail: "Go to Settings → Care Codes and check if updates are in 'Pending' state"
+      },
+      {
+        action: "Clear the label cache",
+        detail: "Go to Care Labelling → Actions → Clear Cache for this style"
+      }
+    ],
+    tags: ['carecode', 'carelabel', 'update', 'save', 'apply', 'changes', 'refresh', 'cache'],
+    aiNotes: {
+      rootCauseTags: ['unsaved-changes', 'cache-stale', 'override-blocking', 'pending-approval'],
+      confidence: 0.89,
+      relatedIssues: ['care-code-library', 'label-caching', 'override-management']
+    }
+  },
+
+  'fitlog-measurements-wrong': {
+    id: 'fitlog-measurements-wrong',
+    title: "Fitlog measurements don't match the spec",
+    intent: "The measurements recorded in the fitlog differ from what's expected in the tech pack or spec sheet.",
+    causes: [
+      "The spec sheet was updated after the fit session was recorded",
+      "Measurements were entered in the wrong unit (cm vs inches)",
+      "Tolerance calculations aren't being applied correctly",
+      "The wrong size is being used as the reference"
+    ],
+    steps: [
+      {
+        action: "Compare spec versions",
+        detail: "Check if the tech pack was updated — look for version history in the Documents tab"
+      },
+      {
+        action: "Verify measurement units",
+        detail: "Confirm both the fitlog and spec are using the same unit (check Settings → Preferences)"
+      },
+      {
+        action: "Review tolerance settings",
+        detail: "Go to Style → Specs → Tolerances and verify the acceptable ranges are correct"
+      },
+      {
+        action: "Check the reference size",
+        detail: "Ensure you're comparing to the correct base size (e.g., M for grading)"
+      },
+      {
+        action: "Re-measure if needed",
+        detail: "Create a new fit session with fresh measurements if data entry errors are suspected"
+      }
+    ],
+    tags: ['fitlog', 'measurements', 'specs', 'tolerance', 'techpack', 'fit', 'grading', 'size'],
+    aiNotes: {
+      rootCauseTags: ['spec-version-mismatch', 'unit-mismatch', 'tolerance-config', 'size-reference'],
+      confidence: 0.84,
+      relatedIssues: ['spec-management', 'measurement-entry', 'tolerance-setup']
+    }
   }
 };
 
@@ -319,7 +559,12 @@ export const intentToResolutionMap: Record<string, string> = {
   'export-excel': 'excel-missing-fields',
   'upload-photos': 'upload-photos-phone',
   'missing-tab': 'supplier-no-pd-tabs',
-  'care-label': 'submit-trf' // Fallback for now
+  'care-label': 'care-label-wrong',
+  'care-label-missing': 'care-label-missing',
+  'fitlog': 'fitlog-photos-missing',
+  'fitlog-create': 'fitlog-cant-create',
+  'carecode': 'carecode-not-applying',
+  'fitlog-measurements': 'fitlog-measurements-wrong'
 };
 
 export function getResolutionById(id: string): GuidedResolutionData | undefined {
