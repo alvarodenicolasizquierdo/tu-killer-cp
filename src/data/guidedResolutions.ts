@@ -29,6 +29,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Ensure the factory has uploaded required documents (business license, fire safety cert)"
       }
     ],
+    tags: ['audit', 'inspection', 'factory', 'supplier', 'compliance', 'schedule', 'qa', 'roles'],
     aiNotes: {
       rootCauseTags: ['permissions', 'supplier-onboarding', 'audit-cooldown', 'compliance-docs'],
       confidence: 0.89,
@@ -64,6 +65,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Contact your admin if you see a 'Limit Reached' message"
       }
     ],
+    tags: ['workbook', 'style', 'season', 'collection', 'product', 'roles', 'tabs'],
     aiNotes: {
       rootCauseTags: ['season-locked', 'quota-limit', 'style-archived', 'view-only-role'],
       confidence: 0.87,
@@ -103,6 +105,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Ensure at least one test method is selected for each component"
       }
     ],
+    tags: ['trf', 'testing', 'topsheet', 'lab', 'submit', 'approval', 'sample', 'notification'],
     aiNotes: {
       rootCauseTags: ['incomplete-fields', 'testing-level', 'sample-status', 'pending-approval'],
       confidence: 0.94,
@@ -138,6 +141,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Contact your finance team if you see a 'Billing Hold' notification"
       }
     ],
+    tags: ['lab', 'testing', 'trf', 'submit', 'button', 'disabled', 'greyed'],
     aiNotes: {
       rootCauseTags: ['no-selection', 'lab-compatibility', 'lab-partnership', 'billing-hold'],
       confidence: 0.91,
@@ -177,6 +181,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Sometimes the system needs a moment to update across modules"
       }
     ],
+    tags: ['fabric', 'testing', 'link', 'component', 'trf', 'tabs', 'sync'],
     aiNotes: {
       rootCauseTags: ['timing-issue', 'component-mapping', 'missing-specs', 'sync-delay'],
       confidence: 0.86,
@@ -216,6 +221,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Open a few records manually to confirm the data exists in the system"
       }
     ],
+    tags: ['excel', 'export', 'download', 'report', 'columns', 'fields', 'roles'],
     aiNotes: {
       rootCauseTags: ['export-template', 'field-permissions', 'empty-data', 'filtered-view'],
       confidence: 0.88,
@@ -255,6 +261,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "If batch upload fails, try uploading photos individually"
       }
     ],
+    tags: ['photos', 'upload', 'mobile', 'camera', 'images', 'inspection', 'fitlog'],
     aiNotes: {
       rootCauseTags: ['browser-permissions', 'file-size', 'connection-timeout', 'browser-compatibility'],
       confidence: 0.90,
@@ -294,6 +301,7 @@ export const guidedResolutions: Record<string, GuidedResolutionData> = {
         detail: "Permission changes require a fresh login to take effect"
       }
     ],
+    tags: ['supplier', 'tabs', 'roles', 'permissions', 'product', 'notification', 'access'],
     aiNotes: {
       rootCauseTags: ['access-level', 'pd-sharing', 'brand-assignment', 'activation-incomplete'],
       confidence: 0.93,
