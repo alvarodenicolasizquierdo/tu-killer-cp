@@ -1,18 +1,23 @@
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useUser, getRoleDisplayName, getRoleGreeting } from '@/contexts/UserContext';
 import { useAIContext } from '@/hooks/useAIContext';
+import { useWidgetConfig } from '@/hooks/useWidgetConfig';
 import { AITaskCard } from '@/components/ai/AITaskCard';
 import { ReadinessGauge } from '@/components/ai/ReadinessGauge';
 import { ScenarioSimulator } from '@/components/ai/ScenarioSimulator';
 import { LabQueueWidget } from '@/components/dashboard/LabQueueWidget';
 import { ConfidenceDashboardWidget } from '@/components/dashboard/ConfidenceDashboardWidget';
 import { SupplierDashboardWidget } from '@/components/dashboard/SupplierDashboardWidget';
+import { RegulatoryAlerts } from '@/components/dashboard/RegulatoryAlerts';
+import { WidgetCatalog } from '@/components/dashboard/WidgetCatalog';
+import { KPISummaryWidget } from '@/components/dashboard/KPISummaryWidget';
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Brain, Target, AlertTriangle, Clock, Sparkles, User } from 'lucide-react';
+import { Brain, Target, AlertTriangle, Sparkles, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { mockActivities } from '@/data/mockData';
 
 export default function Dashboard() {
   const { currentUser } = useUser();
@@ -26,6 +31,14 @@ export default function Dashboard() {
     layoutConfig,
     isComputing 
   } = useAIContext();
+
+  const {
+    widgets,
+    enabledWidgets,
+    toggleWidget,
+    reorderWidgets,
+    isWidgetEnabled,
+  } = useWidgetConfig();
 
   // Filter tasks based on role relevance
   const prioritizedTasks = computedTasks.filter(t => {
@@ -80,14 +93,37 @@ export default function Dashboard() {
   };
 
   // Check if we should show the default tasks widget
-  const showTasksWidget = layoutConfig.primaryWidget === 'tasks';
+  const showTasksWidget = layoutConfig.primaryWidget === 'tasks' || isWidgetEnabled('tasks');
 
   // For supplier role, show supplier-specific dashboard
   const isSupplier = currentUser.role === 'supplier';
 
+  // Render a widget by ID
+  const renderWidget = (widgetId: string) => {
+    switch (widgetId) {
+      case 'regulatory_alerts':
+        return <RegulatoryAlerts key={widgetId} />;
+      case 'kpis':
+        return <KPISummaryWidget key={widgetId} />;
+      case 'activity_feed':
+        return (
+          <Card key={widgetId}>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ActivityFeed activities={mockActivities} />
+            </CardContent>
+          </Card>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <AppLayout>
-      {/* Context Header - Role-adaptive greeting */}
+      {/* Context Header - Role-adaptive greeting with Widget Config */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -109,7 +145,7 @@ export default function Dashboard() {
             </p>
           </div>
           
-          {/* Context Summary Badges */}
+          {/* Context Summary Badges + Widget Config */}
           <div className="flex items-center gap-2 shrink-0">
             {context.criticalItems > 0 && (
               <Badge variant="destructive" className="gap-1.5 py-1">
@@ -123,9 +159,25 @@ export default function Dashboard() {
                 Downstream Blocked
               </Badge>
             )}
+            <WidgetCatalog 
+              widgets={widgets}
+              onToggleWidget={toggleWidget}
+              onReorderWidgets={reorderWidgets}
+            />
           </div>
         </div>
       </motion.div>
+
+      {/* Regulatory Alerts - Sticky at top if enabled */}
+      {isWidgetEnabled('regulatory_alerts') && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <RegulatoryAlerts />
+        </motion.div>
+      )}
 
       {/* Scenario Warning Banner */}
       <AnimatePresence>
@@ -152,6 +204,17 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* KPIs Widget - if enabled */}
+      {isWidgetEnabled('kpis') && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <KPISummaryWidget />
+        </motion.div>
+      )}
 
       {/* Main Grid - AI assembles based on role context */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -226,6 +289,18 @@ export default function Dashboard() {
               onScenarioChange={setScenarioState}
               impact={scenarioImpact}
             />
+          )}
+
+          {/* Activity Feed - if enabled */}
+          {isWidgetEnabled('activity_feed') && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ActivityFeed activities={mockActivities} />
+              </CardContent>
+            </Card>
           )}
         </div>
 
