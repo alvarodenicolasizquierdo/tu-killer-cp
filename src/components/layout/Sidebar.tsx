@@ -49,6 +49,7 @@ const navItems = [
 const bottomItems = [
   { icon: Sparkles, label: 'AI Assistant', path: '/ai-assistant' },
   { icon: BookOpen, label: 'Knowledge Hub', path: '/knowledge-hub' },
+  { icon: HelpCircle, label: 'Help & Support', path: '/help-support' },
   { icon: ShieldCheck, label: 'Help Admin', path: '/help-admin', adminOnly: true },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
