@@ -1,170 +1,231 @@
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useUser, getRoleGreeting } from '@/contexts/UserContext';
-import { KPICard } from '@/components/dashboard/KPICard';
-import { TaskCard } from '@/components/dashboard/TaskCard';
-import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
-import { DraftResumeWidget } from '@/components/dashboard/DraftResumeWidget';
-import { QuickActions } from '@/components/dashboard/QuickActions';
-import { RegulatoryAlerts } from '@/components/dashboard/RegulatoryAlerts';
-import { 
-  mockTasks, 
-  mockTRFs, 
-  mockActivities, 
-  buyerKPIs, 
-  labKPIs, 
-  managerKPIs 
-} from '@/data/mockData';
+import { useUser } from '@/contexts/UserContext';
+import { useAIContext } from '@/hooks/useAIContext';
+import { AITaskCard } from '@/components/ai/AITaskCard';
+import { ReadinessGauge } from '@/components/ai/ReadinessGauge';
+import { ScenarioSimulator } from '@/components/ai/ScenarioSimulator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Inbox, Clock, Activity } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Brain, Target, AlertTriangle, Clock, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
   const { currentUser } = useUser();
-  const greeting = getRoleGreeting(currentUser.role);
+  const { 
+    context, 
+    computedTasks, 
+    readiness, 
+    scenarioState, 
+    setScenarioState, 
+    scenarioImpact,
+    isComputing 
+  } = useAIContext();
 
-  // Get role-specific KPIs
-  const getKPIs = () => {
-    switch (currentUser.role) {
-      case 'lab_technician':
-        return labKPIs;
-      case 'manager':
-      case 'admin':
-        return managerKPIs;
-      default:
-        return buyerKPIs;
-    }
-  };
+  // Only show critical and at-risk tasks - AI has already prioritized
+  const prioritizedTasks = computedTasks.filter(t => 
+    t.priority === 'critical' || t.priority === 'at-risk'
+  );
 
-  const kpis = getKPIs();
+  const hasActiveScenario = scenarioState.dppEnforced || scenarioState.regulationThreshold > 0;
 
-  // Filter tasks based on role (in a real app, this would be server-side)
-  const relevantTasks = mockTasks.slice(0, 5);
-  const criticalTasks = relevantTasks.filter(t => t.priority === 'critical');
-  const atRiskTasks = relevantTasks.filter(t => t.priority === 'at-risk');
-  const onTrackTasks = relevantTasks.filter(t => t.priority === 'on-track' || t.priority === 'info');
-
-  const drafts = mockTRFs.filter(t => t.status === 'draft' || t.status === 'in_progress');
+  if (isComputing) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 rounded-full bg-gradient-to-r from-ai-primary to-ai-secondary flex items-center justify-center"
+          >
+            <Brain className="w-6 h-6 text-white" />
+          </motion.div>
+          <p className="text-muted-foreground">AI is analyzing your operational context...</p>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
-      {/* Greeting & Quick Actions */}
-      <div className="mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
+      {/* Context Header - AI-computed reality statement */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6"
+      >
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Welcome back, {currentUser.name.split(' ')[0]}
+            <h1 className="text-2xl font-bold text-foreground mb-1">
+              Your operational reality right now
             </h1>
-            <p className="text-muted-foreground mt-1">{greeting}</p>
+            <p className="text-muted-foreground">
+              AI has analyzed your role, responsibilities, and risk exposure to prioritize what matters.
+            </p>
           </div>
-          <QuickActions />
-        </motion.div>
-      </div>
+          
+          {/* Context Summary Badges */}
+          <div className="flex items-center gap-2 shrink-0">
+            {context.criticalItems > 0 && (
+              <Badge variant="destructive" className="gap-1.5 py-1">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                {context.criticalItems} Critical
+              </Badge>
+            )}
+            {context.blockedDownstream && (
+              <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200 gap-1.5 py-1">
+                <AlertTriangle className="w-3 h-3" />
+                Downstream Blocked
+              </Badge>
+            )}
+          </div>
+        </div>
+      </motion.div>
 
-      {/* Regulatory Alerts */}
-      <div className="mb-6">
-        <RegulatoryAlerts />
-      </div>
+      {/* Scenario Warning Banner */}
+      <AnimatePresence>
+        {hasActiveScenario && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6"
+          >
+            <div className="bg-amber-100 border border-amber-300 rounded-lg p-4 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-amber-800">
+                  Scenario Simulation Active: {scenarioState.dppEnforced ? 'DPP Enforced Tomorrow' : `+${scenarioState.regulationThreshold}% Stricter Thresholds`}
+                </p>
+                <p className="text-sm text-amber-700">
+                  The data below reflects projected impact. {scenarioImpact.affectedProducts} products would be affected.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {kpis.map((kpi, index) => (
-          <KPICard key={kpi.label} data={kpi} index={index} />
-        ))}
-      </div>
-
-      {/* Main Content Grid */}
+      {/* Main Grid - AI assembles based on context */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* AI-Prioritized Inbox */}
-        <div className="lg:col-span-2">
-          <Card className="h-full">
+        {/* Primary: Prioritized Actions */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* What AI thinks matters today */}
+          <Card className="border-2 border-ai-primary/20">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg ai-gradient flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ai-primary to-ai-secondary flex items-center justify-center">
+                    <Target className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">AI-Prioritized Inbox</CardTitle>
+                    <CardTitle className="text-lg">What Matters Today</CardTitle>
                     <p className="text-xs text-muted-foreground">
-                      Tasks ranked by urgency and impact
+                      {prioritizedTasks.length} actions ranked by impact if ignored
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="destructive" className="gap-1">
-                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                    {criticalTasks.length} Critical
-                  </Badge>
-                  <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">
-                    {atRiskTasks.length} At Risk
+                  <Badge variant="outline" className="gap-1 text-xs bg-ai-primary/5 border-ai-primary/20 text-ai-primary">
+                    <Brain className="w-3 h-3" />
+                    AI Prioritized
                   </Badge>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 max-h-[600px] overflow-y-auto scrollbar-thin">
-              {/* Critical Tasks */}
-              {criticalTasks.length > 0 && (
-                <div className="space-y-2">
-                  {criticalTasks.map((task, index) => (
-                    <TaskCard key={task.id} task={task} index={index} />
-                  ))}
-                </div>
-              )}
-
-              {/* At Risk Tasks */}
-              {atRiskTasks.length > 0 && (
-                <div className="space-y-2">
-                  {atRiskTasks.map((task, index) => (
-                    <TaskCard key={task.id} task={task} index={index + criticalTasks.length} />
-                  ))}
-                </div>
-              )}
-
-              {/* Other Tasks */}
-              {onTrackTasks.length > 0 && (
-                <div className="space-y-2">
-                  {onTrackTasks.map((task, index) => (
-                    <TaskCard key={task.id} task={task} index={index + criticalTasks.length + atRiskTasks.length} />
-                  ))}
-                </div>
+            <CardContent className="space-y-3">
+              {prioritizedTasks.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-12"
+                >
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-1">All clear</h3>
+                  <p className="text-sm text-muted-foreground">
+                    No critical or at-risk items require your attention right now.
+                  </p>
+                </motion.div>
+              ) : (
+                prioritizedTasks.map((task, index) => (
+                  <AITaskCard key={task.id} task={task} index={index} />
+                ))
               )}
             </CardContent>
           </Card>
+
+          {/* Scenario Simulator */}
+          <ScenarioSimulator
+            scenarioState={scenarioState}
+            onScenarioChange={setScenarioState}
+            impact={scenarioImpact}
+          />
         </div>
 
-        {/* Right Column */}
+        {/* Right Column - Readiness & Context */}
         <div className="space-y-6">
-          {/* Draft Resume Widget */}
+          {/* Readiness Gauge */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Resume Drafts</CardTitle>
+                <Target className="w-5 h-5 text-muted-foreground" />
+                <CardTitle className="text-lg">Readiness Overview</CardTitle>
               </div>
               <p className="text-xs text-muted-foreground">
-                Continue where you left off
+                AI-computed compliance readiness
               </p>
             </CardHeader>
             <CardContent>
-              <DraftResumeWidget drafts={drafts} />
+              <ReadinessGauge readiness={readiness} />
             </CardContent>
           </Card>
 
-          {/* Activity Feed */}
-          <Card>
-            <CardHeader className="pb-3">
+          {/* Context Object Display (for demo transparency) */}
+          <Card className="bg-muted/30 border-dashed">
+            <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-muted-foreground" />
-                <CardTitle className="text-lg">Recent Activity</CardTitle>
+                <Brain className="w-4 h-4 text-muted-foreground" />
+                <CardTitle className="text-sm text-muted-foreground">AI Context Object</CardTitle>
               </div>
+              <p className="text-xs text-muted-foreground">
+                UI is assembled from this context
+              </p>
             </CardHeader>
-            <CardContent className="max-h-[400px] overflow-y-auto scrollbar-thin">
-              <ActivityFeed activities={mockActivities} />
+            <CardContent>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">role:</span>
+                  <span className="text-foreground">{context.role}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">critical_items:</span>
+                  <span className={cn(
+                    context.criticalItems > 0 ? "text-red-600" : "text-emerald-600"
+                  )}>{context.criticalItems}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">regulatory_risk:</span>
+                  <span className={cn(
+                    context.upcomingRegulatoryRisk === 'high' || context.upcomingRegulatoryRisk === 'critical' 
+                      ? "text-red-600" : "text-amber-600"
+                  )}>{context.upcomingRegulatoryRisk}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">blocked_downstream:</span>
+                  <span className={context.blockedDownstream ? "text-red-600" : "text-emerald-600"}>
+                    {context.blockedDownstream ? 'true' : 'false'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">confidence_gap:</span>
+                  <span className="text-amber-600">{context.confidenceGap}</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
