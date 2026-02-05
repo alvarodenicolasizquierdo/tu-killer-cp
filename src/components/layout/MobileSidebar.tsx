@@ -75,8 +75,8 @@ export function MobileSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 px-3 overflow-y-auto max-h-[calc(100vh-180px)]">
-          <div className="space-y-1">
+        <nav className="flex-1 py-2 px-2 overflow-y-auto max-h-[calc(100vh-180px)]">
+          <div className="space-y-0.5">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
@@ -84,8 +84,11 @@ export function MobileSidebar() {
                   <Link
                     to={item.path}
                     className={cn(
-                      'sidebar-link',
-                      isActive && 'active'
+                      'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
+                      'active:scale-[0.98] touch-manipulation',
+                      isActive 
+                        ? 'bg-sidebar-primary text-sidebar-primary-foreground' 
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent'
                     )}
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
@@ -94,7 +97,7 @@ export function MobileSidebar() {
                       <Badge 
                         variant="secondary" 
                         className={cn(
-                          "ml-auto text-xs",
+                          "ml-auto text-xs px-2 py-0.5",
                           isActive 
                             ? "bg-white/20 text-white" 
                             : "bg-sidebar-accent text-sidebar-foreground"
@@ -110,7 +113,7 @@ export function MobileSidebar() {
           </div>
 
           {/* Bottom Items */}
-          <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
+          <div className="mt-6 pt-4 border-t border-sidebar-border space-y-0.5">
             {bottomItems.map((item) => {
               const isActive = location.pathname === item.path || 
                 (item.path === '/support-center' && location.pathname.startsWith('/support'));
@@ -119,8 +122,11 @@ export function MobileSidebar() {
                   <Link
                     to={item.path}
                     className={cn(
-                      'sidebar-link',
-                      isActive && 'active',
+                      'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
+                      'active:scale-[0.98] touch-manipulation',
+                      isActive 
+                        ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent',
                       item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
                     )}
                   >
@@ -141,11 +147,11 @@ export function MobileSidebar() {
         </nav>
 
         {/* User Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-sidebar-border bg-sidebar">
+        <div className="absolute bottom-0 left-0 right-0 p-2 border-t border-sidebar-border bg-sidebar">
           <DropdownMenu>
             <DropdownMenuTrigger className="w-full">
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer">
-                <Avatar className="w-8 h-8 shrink-0">
+              <div className="flex items-center gap-3 px-3 py-3 min-h-[56px] rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer active:scale-[0.98] touch-manipulation">
+                <Avatar className="w-10 h-10 shrink-0">
                   <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                   <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-sm">
                     {currentUser.avatar}
