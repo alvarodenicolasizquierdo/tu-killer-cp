@@ -2,9 +2,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Building2, Calendar, AlertTriangle, CheckCircle2, Loader2, Clock } from 'lucide-react';
+import { MapPin, Building2, Calendar, CheckCircle2, Loader2, Clock, ExternalLink } from 'lucide-react';
 import { Inspection } from '@/types';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface FactoryLocation {
   id: string;
@@ -24,9 +25,16 @@ interface FactoryDetailsModalProps {
 }
 
 const FactoryDetailsModal = ({ factory, inspections, open, onOpenChange }: FactoryDetailsModalProps) => {
+  const navigate = useNavigate();
+  
   if (!factory) return null;
 
   const factoryInspections = inspections.filter(insp => insp.factoryId === factory.id);
+
+  const handleInspectionClick = (inspectionId: string) => {
+    onOpenChange(false);
+    navigate(`/inspections/${inspectionId}`);
+  };
   
   const getStatusBadgeVariant = (status: 'active' | 'at-risk' | 'critical') => {
     switch (status) {
@@ -100,13 +108,17 @@ const FactoryDetailsModal = ({ factory, inspections, open, onOpenChange }: Facto
               <ScrollArea className="h-[300px] pr-4">
                 <div className="space-y-3">
                   {factoryInspections.map((inspection) => (
-                    <Card key={inspection.id} className="border-l-4 border-l-primary">
+                    <Card 
+                      key={inspection.id} 
+                      className="border-l-4 border-l-primary cursor-pointer hover:bg-muted/50 transition-colors group"
+                      onClick={() => handleInspectionClick(inspection.id)}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               {getInspectionStatusIcon(inspection.status)}
-                              <span className="font-medium text-sm truncate">
+                              <span className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                                 {inspection.title}
                               </span>
                             </div>
@@ -129,6 +141,7 @@ const FactoryDetailsModal = ({ factory, inspections, open, onOpenChange }: Facto
                             <Badge variant="outline" className="text-xs capitalize">
                               {inspection.status.replace('_', ' ')}
                             </Badge>
+                            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
                         </div>
                       </CardContent>
