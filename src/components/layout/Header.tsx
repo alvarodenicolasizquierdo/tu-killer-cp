@@ -60,17 +60,17 @@ export function Header({ title, subtitle }: HeaderProps) {
           </motion.div>
 
           {/* Mobile Search Button */}
-          <Button variant="ghost" size="icon" className="sm:hidden">
+          <Button variant="ghost" size="icon" className="sm:hidden min-h-[44px] min-w-[44px] touch-manipulation active:scale-95">
             <Search className="w-5 h-5" />
           </Button>
 
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative min-h-[44px] min-w-[44px] touch-manipulation active:scale-95">
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
                     {unreadCount}
                   </span>
                 )}
@@ -116,7 +116,7 @@ export function Header({ title, subtitle }: HeaderProps) {
           <Button 
             variant="ghost" 
             size="icon"
-            className="relative hover:bg-gradient-to-r hover:from-ai-primary/10 hover:to-ai-secondary/10"
+            className="relative min-h-[44px] min-w-[44px] touch-manipulation active:scale-95 hover:bg-gradient-to-r hover:from-ai-primary/10 hover:to-ai-secondary/10"
           >
             <MessageSquare className="w-5 h-5 text-ai-primary" />
           </Button>
