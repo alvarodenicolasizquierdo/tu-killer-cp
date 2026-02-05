@@ -27,9 +27,7 @@ import TestingLevels from "./pages/TestingLevels";
 import CareLabelling from "./pages/CareLabelling";
 import GSW from "./pages/GSW";
 import SelfApprovalLevels from "./pages/SelfApprovalLevels";
-import KnowledgeHub from "./pages/KnowledgeHub";
-import HelpAdmin from "./pages/HelpAdmin";
-import HelpSupport from "./pages/HelpSupport";
+import SupportCenter from "./pages/SupportCenter";
 
 const queryClient = new QueryClient();
 
@@ -60,10 +58,9 @@ const App = () => (
               <Route path="/inspections/:id" element={<InspectionDetail />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/notifications" element={<Dashboard />} />
-              <Route path="/ai-assistant" element={<AIAssistant />} />
-              <Route path="/knowledge-hub" element={<KnowledgeHub />} />
-              <Route path="/help-admin" element={<HelpAdmin />} />
-              <Route path="/help-support" element={<HelpSupport />} />
+              <Route path="/support-center" element={<SupportCenter />} />
+              <Route path="/ai-assistant" element={<SupportCenter />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
