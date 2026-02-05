@@ -49,6 +49,39 @@ export function PlatformTour() {
     }
   }, [currentStep, isOpen]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+          event.preventDefault();
+          if (currentStep < tourSteps.length - 1) {
+            setCurrentStep(prev => prev + 1);
+          } else {
+            handleComplete();
+          }
+          break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          event.preventDefault();
+          if (currentStep > 0) {
+            setCurrentStep(prev => prev - 1);
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          handleSkip();
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, currentStep]);
+
   const handleNext = useCallback(() => {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(prev => prev + 1);
