@@ -390,45 +390,48 @@ export default function StyleDetail() {
 
   return (
     <AppLayout>
+      {/* Back Button */}
+      <div className="mb-4">
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/styles" className="inline-flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Styles
+          </Link>
+        </Button>
+      </div>
+      
       {/* Header */}
-      <div className="mb-6">
-        <Link to="/styles" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Styles
-        </Link>
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+        <div className="flex items-start gap-4">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Package className="w-7 h-7 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-foreground">{collection.name}</h1>
+              <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>{collection.supplierName}</span>
+              <span>•</span>
+              <span>{collection.season}</span>
+              <span>•</span>
+              <span>{collection.department}</span>
+            </div>
+          </div>
+        </div>
         
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Package className="w-7 h-7 text-primary" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{collection.name}</h1>
-                <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>{collection.supplierName}</span>
-                <span>•</span>
-                <span>{collection.season}</span>
-                <span>•</span>
-                <span>{collection.department}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <ExternalLink className="w-4 h-4" />
-              Clone for Next Season
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2">
+            <ExternalLink className="w-4 h-4" />
+            Clone for Next Season
+          </Button>
+          {collection.status === 'gsw_pending' && (
+            <Button className="gap-2 bg-gradient-to-r from-ai-primary to-ai-secondary">
+              <Send className="w-4 h-4" />
+              Submit GSW
             </Button>
-            {collection.status === 'gsw_pending' && (
-              <Button className="gap-2 bg-gradient-to-r from-ai-primary to-ai-secondary">
-                <Send className="w-4 h-4" />
-                Submit GSW
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
