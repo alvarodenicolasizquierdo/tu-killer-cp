@@ -60,7 +60,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: isCollapsed ? 72 : 260 }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
-      className="fixed left-0 top-0 h-screen bg-sidebar flex flex-col z-50"
+      className="fixed left-0 top-0 h-screen bg-sidebar flex-col z-50 hidden md:flex"
     >
       {/* Logo Section */}
       <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
