@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,12 +15,13 @@ import { Inspection, InspectionType, InspectionStatus } from '@/types';
 import InspectionForm from '@/components/inspections/InspectionForm';
 import InspectionCard from '@/components/inspections/InspectionCard';
 import CalendarDayCell from '@/components/inspections/CalendarDayCell';
+import FactoryMapView from '@/components/inspections/FactoryMapView';
 import { useInspectionDragDrop } from '@/hooks/useInspectionDragDrop';
 
 const Inspections = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 1, 1)); // Feb 2026
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'map'>('calendar');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -266,6 +267,7 @@ const Inspections = () => {
                   variant={viewMode === 'calendar' ? 'default' : 'outline'}
                   size="icon"
                   onClick={() => setViewMode('calendar')}
+                  title="Calendar View"
                 >
                   <Grid3X3 className="h-4 w-4" />
                 </Button>
@@ -273,8 +275,17 @@ const Inspections = () => {
                   variant={viewMode === 'list' ? 'default' : 'outline'}
                   size="icon"
                   onClick={() => setViewMode('list')}
+                  title="List View"
                 >
                   <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'map' ? 'default' : 'outline'}
+                  size="icon"
+                  onClick={() => setViewMode('map')}
+                  title="Map View"
+                >
+                  <Globe className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -410,7 +421,7 @@ const Inspections = () => {
                 </CardContent>
               </Card>
             </motion.div>
-          ) : (
+          ) : viewMode === 'list' ? (
             <motion.div
               key="list"
               initial={{ opacity: 0 }}
@@ -556,7 +567,25 @@ const Inspections = () => {
                 </TabsContent>
               </Tabs>
             </motion.div>
-          )}
+          ) : viewMode === 'map' ? (
+            <motion.div
+              key="map"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <FactoryMapView 
+                inspections={filteredInspections}
+                onFactoryClick={(factoryId) => {
+                  // Filter to show only inspections for this factory
+                  const factoryInspections = filteredInspections.filter(i => i.factoryId === factoryId);
+                  if (factoryInspections.length > 0) {
+                    toast.info(`${factoryInspections.length} inspection(s) at this factory`);
+                  }
+                }}
+              />
+            </motion.div>
+          ) : null}
         </AnimatePresence>
       </div>
     </AppLayout>
