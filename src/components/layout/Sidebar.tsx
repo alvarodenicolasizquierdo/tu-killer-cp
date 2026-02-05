@@ -16,9 +16,7 @@ import {
   Sparkles,
   LogOut,
   User,
-  BookOpen,
   HelpCircle,
-  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
@@ -48,10 +46,7 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { icon: Sparkles, label: 'AI Assistant', path: '/ai-assistant' },
-  { icon: BookOpen, label: 'Knowledge Hub', path: '/knowledge-hub' },
-  { icon: HelpCircle, label: 'Help & Support', path: '/help-support' },
-  { icon: ShieldCheck, label: 'Help Admin', path: '/help-admin', adminOnly: true },
+  { icon: HelpCircle, label: 'Support Center', path: '/support-center' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
@@ -145,7 +140,8 @@ export function Sidebar() {
         {/* AI Assistant Section */}
         <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
           {bottomItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname === item.path || 
+              (item.path === '/support-center' && location.pathname.startsWith('/support'));
             return (
               <Link
                 key={item.path}
@@ -153,12 +149,12 @@ export function Sidebar() {
                 className={cn(
                   'sidebar-link',
                   isActive && 'active',
-                  item.path === '/ai-assistant' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
+                  item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
                 )}
               >
                 <item.icon className={cn(
                   "w-5 h-5 shrink-0",
-                  item.path === '/ai-assistant' && !isActive && 'text-ai-primary'
+                  item.path === '/support-center' && !isActive && 'text-ai-primary'
                 )} />
                 <AnimatePresence>
                   {!isCollapsed && (
@@ -168,7 +164,7 @@ export function Sidebar() {
                       exit={{ opacity: 0 }}
                       className={cn(
                         "whitespace-nowrap",
-                        item.path === '/ai-assistant' && !isActive && 'ai-gradient-text font-medium'
+                        item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
                       )}
                     >
                       {item.label}
