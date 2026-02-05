@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Building2, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,11 +11,23 @@ import FactoryDetailsModal from './FactoryDetailsModal';
 interface FactoryMapViewProps {
   inspections: Inspection[];
   onFactoryClick?: (factoryId: string) => void;
+  initialOpenFactoryId?: string;
 }
 
-const FactoryMapView = ({ inspections, onFactoryClick }: FactoryMapViewProps) => {
+const FactoryMapView = ({ inspections, onFactoryClick, initialOpenFactoryId }: FactoryMapViewProps) => {
   const [selectedFactory, setSelectedFactory] = useState<typeof factoryLocations[0] | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Handle initial factory selection from navigation state
+  useEffect(() => {
+    if (initialOpenFactoryId) {
+      const factory = factoryLocations.find(f => f.id === initialOpenFactoryId);
+      if (factory) {
+        setSelectedFactory(factory);
+        setModalOpen(true);
+      }
+    }
+  }, [initialOpenFactoryId]);
 
   const handleFactoryClick = (factoryId: string) => {
     const factory = factoryLocations.find(f => f.id === factoryId);

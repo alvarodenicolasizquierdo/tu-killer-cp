@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import {
   ArrowLeft, MapPin, Clock, User, Building2, Calendar, Users, 
@@ -25,9 +25,16 @@ import { getInspectionDetail, mockInspectionDetails } from '@/data/inspectionDet
 import { mockInspections } from '@/data/mockData';
 import { InspectionFinding, CorrectiveAction, InspectionChecklist } from '@/types/inspection';
 
+interface LocationState {
+  fromFactoryId?: string;
+  fromFactoryName?: string;
+}
+
 const InspectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedChecklists, setExpandedChecklists] = useState<Set<string>>(new Set());
 
@@ -197,15 +204,30 @@ const InspectionDetail = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/inspections')}
-            className="w-fit"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Inspections
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/inspections')}
+              className="w-fit"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Inspections
+            </Button>
+            {locationState?.fromFactoryId && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/inspections', { 
+                  state: { openFactoryId: locationState.fromFactoryId } 
+                })}
+                className="w-fit"
+              >
+                <Building2 className="h-4 w-4 mr-2" />
+                Back to {locationState.fromFactoryName || 'Factory'}
+              </Button>
+            )}
+          </div>
 
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
             <div className="space-y-2">

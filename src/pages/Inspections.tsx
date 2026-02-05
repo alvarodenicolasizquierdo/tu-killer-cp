@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,14 +19,33 @@ import CalendarDayCell from '@/components/inspections/CalendarDayCell';
 import FactoryMapView from '@/components/inspections/FactoryMapView';
 import { useInspectionDragDrop } from '@/hooks/useInspectionDragDrop';
 
+interface LocationState {
+  openFactoryId?: string;
+}
+
 const Inspections = () => {
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+  
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 1, 1)); // Feb 2026
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'map'>('calendar');
+  const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'map'>(() => 
+    locationState?.openFactoryId ? 'map' : 'calendar'
+  );
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [inspections, setInspections] = useState<Inspection[]>(initialInspections);
+  const [initialFactoryId, setInitialFactoryId] = useState<string | undefined>(locationState?.openFactoryId);
+
+  // Clear the initial factory ID after it's been used
+  useEffect(() => {
+    if (locationState?.openFactoryId) {
+      // Clear state after modal opens to prevent reopening on re-render
+      const timer = setTimeout(() => setInitialFactoryId(undefined), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [locationState?.openFactoryId]);
 
   const {
     dragState,
@@ -576,6 +596,7 @@ const Inspections = () => {
             >
               <FactoryMapView 
                 inspections={filteredInspections}
+                initialOpenFactoryId={initialFactoryId}
                 onFactoryClick={(factoryId) => {
                   // Filter to show only inspections for this factory
                   const factoryInspections = filteredInspections.filter(i => i.factoryId === factoryId);
