@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Building2, MapPin, FileText, AlertTriangle, CheckCircle2, Clock, ExternalLink, ChevronRight } from 'lucide-react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Package, Building2, MapPin, FileText, AlertTriangle, CheckCircle2, Clock, ExternalLink, ChevronRight, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,6 +11,14 @@ import { mockProducts, mockTRFs, mockSuppliers } from '@/data/mockData';
 import { Product } from '@/types';
 import ProductImageGallery from '@/components/products/ProductImageGallery';
 import { AIAssessmentStrip } from '@/components/ai/AIAssessmentStrip';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -88,8 +96,32 @@ const ProductDetail = () => {
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="flex items-center gap-1">
+                  <Home className="h-3.5 w-3.5" />
+                  Dashboard
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/products">Products</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{product.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Back Button */}
-        <Button variant="ghost" size="sm" onClick={() => navigate('/products')} className="mb-4">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/products')} className="-mt-2">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Products
         </Button>

@@ -5,8 +5,17 @@ import {
   ArrowLeft, MapPin, Clock, User, Building2, Calendar, Users, 
   CheckCircle2, AlertTriangle, XCircle, Loader2, Camera, FileText,
   ClipboardCheck, AlertCircle, Shield, Leaf, Package, ChevronDown,
-  ChevronRight, Plus, Image as ImageIcon
+  ChevronRight, Plus, Image as ImageIcon, Home
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -202,6 +211,45 @@ const InspectionDetail = () => {
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/" className="flex items-center gap-1">
+                  <Home className="h-3.5 w-3.5" />
+                  Dashboard
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/inspections">Inspections</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {locationState?.fromFactoryName && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    className="cursor-pointer"
+                    onClick={() => navigate('/inspections', { 
+                      state: { openFactoryId: locationState.fromFactoryId } 
+                    })}
+                  >
+                    {locationState.fromFactoryName}
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{inspection.title}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Header */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
