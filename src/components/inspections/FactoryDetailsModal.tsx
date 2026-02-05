@@ -33,7 +33,9 @@ const FactoryDetailsModal = ({ factory, inspections, open, onOpenChange }: Facto
 
   const handleInspectionClick = (inspectionId: string) => {
     onOpenChange(false);
-    navigate(`/inspections/${inspectionId}`);
+    navigate(`/inspections/${inspectionId}`, { 
+      state: { fromFactoryId: factory.id, fromFactoryName: factory.name } 
+    });
   };
   
   const getStatusBadgeVariant = (status: 'active' | 'at-risk' | 'critical') => {
