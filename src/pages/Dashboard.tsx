@@ -127,35 +127,35 @@ export default function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6"
+        className="mb-4 md:mb-6"
         data-tour="ai-context"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="gap-1.5 bg-ai-primary/5 border-ai-primary/20 text-ai-primary">
+              <Badge variant="outline" className="gap-1.5 bg-ai-primary/5 border-ai-primary/20 text-ai-primary text-xs">
                 <User className="w-3 h-3" />
                 {getRoleDisplayName(currentUser.role)}
               </Badge>
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-1">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground mb-1">
               {roleGreeting.split('!')[0]}!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               {roleGreeting.split('!')[1]?.trim() || 'AI has analyzed your context to prioritize what matters.'}
             </p>
           </div>
           
           {/* Context Summary Badges + Widget Config */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:shrink-0">
             {context.criticalItems > 0 && (
-              <Badge variant="destructive" className="gap-1.5 py-1">
+              <Badge variant="destructive" className="gap-1.5 py-1 text-xs">
                 <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 {context.criticalItems} Critical
               </Badge>
             )}
             {context.blockedDownstream && (
-              <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200 gap-1.5 py-1">
+              <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200 gap-1.5 py-1 text-xs hidden sm:flex">
                 <AlertTriangle className="w-3 h-3" />
                 Downstream Blocked
               </Badge>
@@ -218,9 +218,9 @@ export default function Dashboard() {
       )}
 
       {/* Main Grid - AI assembles based on role context */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Primary Column - Role-specific content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 md:space-y-6">
           {/* Supplier-specific dashboard */}
           {isSupplier && <SupplierDashboardWidget />}
           
@@ -308,7 +308,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right Column - Readiness & Context */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Readiness Gauge */}
           <Card data-tour="readiness-gauge">
             <CardHeader className="pb-3">
