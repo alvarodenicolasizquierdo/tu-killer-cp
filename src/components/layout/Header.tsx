@@ -25,39 +25,44 @@ export function Header({ title, subtitle }: HeaderProps) {
   const unreadCount = mockNotifications.filter(n => !n.isRead).length;
 
   return (
-    <header className="h-16 bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-40">
-      <div className="h-full flex items-center justify-between px-6">
+    <header className="h-14 md:h-16 bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-40 hidden md:block">
+      <div className="h-full flex items-center justify-between px-4 md:px-6">
         {/* Left - Title */}
-        <div>
+        <div className="min-w-0 flex-1 mr-4">
           {title && (
-            <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+            <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">{title}</h1>
           )}
           {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-xs md:text-sm text-muted-foreground truncate">{subtitle}</p>
           )}
         </div>
 
         {/* Right - Search & Actions */}
-        <div className="flex items-center gap-3">
-          {/* AI Search */}
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          {/* AI Search - Hidden on small mobile, compact on tablet */}
           <motion.div
             animate={{ width: searchFocused ? 400 : 280 }}
-            className="relative"
+            className="relative hidden sm:block"
           >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Ask CARLOS anything..."
               className={cn(
-                "pl-10 pr-12 h-10 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/30",
+                "pl-10 pr-12 h-9 md:h-10 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/30",
                 searchFocused && "bg-background shadow-lg border border-border"
               )}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
             />
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden md:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
               <Command className="w-3 h-3" />K
             </kbd>
           </motion.div>
+
+          {/* Mobile Search Button */}
+          <Button variant="ghost" size="icon" className="sm:hidden">
+            <Search className="w-5 h-5" />
+          </Button>
 
           {/* Notifications */}
           <DropdownMenu>
@@ -71,7 +76,7 @@ export function Header({ title, subtitle }: HeaderProps) {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-72 md:w-80">
               <DropdownMenuLabel className="flex items-center justify-between">
                 Notifications
                 <Badge variant="secondary">{unreadCount} new</Badge>
@@ -88,7 +93,7 @@ export function Header({ title, subtitle }: HeaderProps) {
                       notification.type === 'info' && "bg-priority-info"
                     )} />
                     <span className={cn(
-                      "text-sm font-medium flex-1",
+                      "text-sm font-medium flex-1 truncate",
                       !notification.isRead && "text-foreground",
                       notification.isRead && "text-muted-foreground"
                     )}>
