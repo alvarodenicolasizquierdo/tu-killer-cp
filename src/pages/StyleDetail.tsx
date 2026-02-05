@@ -22,7 +22,8 @@ import {
   Info,
   Beaker,
   FlaskConical,
-  Zap
+  Zap,
+  Home
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -44,6 +45,14 @@ import {
 } from '@/components/ui/tooltip';
 import { ComponentAreaValidator, ComponentAreaSummary, getComponentTestingRequirement } from '@/components/validation/ComponentAreaValidator';
 import { DisabledButtonHelp } from '@/components/help/InlineHelpTooltip';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default function StyleDetail() {
   const { id } = useParams<{ id: string }>();
@@ -390,6 +399,30 @@ export default function StyleDetail() {
 
   return (
     <AppLayout>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-3.5 w-3.5" />
+                Dashboard
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/styles">Styles</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{collection.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Back Button */}
       <div className="mb-4">
         <Button variant="ghost" size="sm" asChild>

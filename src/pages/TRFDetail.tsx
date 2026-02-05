@@ -33,8 +33,18 @@ import {
   User,
   ExternalLink,
   Printer,
-  Share2
+  Share2,
+  Home
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -136,6 +146,30 @@ export default function TRFDetail() {
       title={trf.reference}
       subtitle={trf.productName}
     >
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="mb-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-3.5 w-3.5" />
+                Dashboard
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/trfs">TRFs</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{trf.reference}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Back button and actions */}
       <div className="flex items-center justify-between mb-6">
         <Button variant="ghost" size="sm" onClick={() => navigate('/trfs')}>
