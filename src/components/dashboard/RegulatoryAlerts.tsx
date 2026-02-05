@@ -37,7 +37,7 @@ export function RegulatoryAlerts() {
   if (visibleAlerts.length === 0) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 md:space-y-2">
       {visibleAlerts.map((alert, index) => (
         <motion.div
           key={alert.id}
@@ -45,23 +45,23 @@ export function RegulatoryAlerts() {
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           className={cn(
-            "p-3 rounded-lg flex items-start gap-3",
+            "p-2 md:p-3 rounded-lg flex items-start gap-2 md:gap-3",
             alert.type === 'critical' && "bg-red-50 border border-red-200",
             alert.type === 'warning' && "bg-amber-50 border border-amber-200",
             alert.type === 'info' && "bg-blue-50 border border-blue-200"
           )}
         >
           <div className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+            "w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0",
             alert.type === 'critical' && "bg-red-100",
             alert.type === 'warning' && "bg-amber-100",
             alert.type === 'info' && "bg-blue-100"
           )}>
             {alert.type === 'info' ? (
-              <Info className="w-4 h-4 text-blue-600" />
+              <Info className="w-3 md:w-4 h-3 md:h-4 text-blue-600" />
             ) : (
               <AlertTriangle className={cn(
-                "w-4 h-4",
+                "w-3 md:w-4 h-3 md:h-4",
                 alert.type === 'critical' && "text-red-600",
                 alert.type === 'warning' && "text-amber-600"
               )} />
@@ -69,7 +69,7 @@ export function RegulatoryAlerts() {
           </div>
           <div className="flex-1 min-w-0">
             <h4 className={cn(
-              "font-medium text-sm",
+              "font-medium text-xs md:text-sm",
               alert.type === 'critical' && "text-red-800",
               alert.type === 'warning' && "text-amber-800",
               alert.type === 'info' && "text-blue-800"
@@ -77,7 +77,7 @@ export function RegulatoryAlerts() {
               {alert.title}
             </h4>
             <p className={cn(
-              "text-xs mt-0.5",
+              "text-[10px] md:text-xs mt-0.5 line-clamp-2",
               alert.type === 'critical' && "text-red-700",
               alert.type === 'warning' && "text-amber-700",
               alert.type === 'info' && "text-blue-700"
@@ -88,10 +88,10 @@ export function RegulatoryAlerts() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 shrink-0"
+            className="h-6 w-6 md:h-7 md:w-7 shrink-0"
             onClick={() => setDismissedIds([...dismissedIds, alert.id])}
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 md:w-4 h-3.5 md:h-4" />
           </Button>
         </motion.div>
       ))}
