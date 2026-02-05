@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Building2, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { factoryLocations } from '@/data/mockData';
 import { Inspection } from '@/types';
+import FactoryDetailsModal from './FactoryDetailsModal';
 
 interface FactoryMapViewProps {
   inspections: Inspection[];
@@ -13,6 +14,17 @@ interface FactoryMapViewProps {
 }
 
 const FactoryMapView = ({ inspections, onFactoryClick }: FactoryMapViewProps) => {
+  const [selectedFactory, setSelectedFactory] = useState<typeof factoryLocations[0] | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleFactoryClick = (factoryId: string) => {
+    const factory = factoryLocations.find(f => f.id === factoryId);
+    if (factory) {
+      setSelectedFactory(factory);
+      setModalOpen(true);
+    }
+    onFactoryClick?.(factoryId);
+  };
   // Group inspections by factory
   const factoryInspectionData = useMemo(() => {
     const grouped: Record<string, { 
@@ -171,7 +183,7 @@ const FactoryMapView = ({ inspections, onFactoryClick }: FactoryMapViewProps) =>
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: index * 0.1 }}
                       style={{ cursor: 'pointer' }}
-                      onClick={() => onFactoryClick?.(factory.id)}
+                      onClick={() => handleFactoryClick(factory.id)}
                     >
                       <circle
                         cx={pos.x}
@@ -243,11 +255,11 @@ const FactoryMapView = ({ inspections, onFactoryClick }: FactoryMapViewProps) =>
               >
                 <Card 
                   className={`cursor-pointer hover:shadow-md transition-all border-l-4 ${
-                    factory.status === 'critical' ? 'border-l-red-500' :
+                    factory.status === 'critical' ? 'border-l-destructive' :
                     factory.status === 'at-risk' ? 'border-l-amber-500' :
                     'border-l-emerald-500'
                   }`}
-                  onClick={() => onFactoryClick?.(factory.id)}
+                  onClick={() => handleFactoryClick(factory.id)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -325,6 +337,13 @@ const FactoryMapView = ({ inspections, onFactoryClick }: FactoryMapViewProps) =>
           })}
         </TooltipProvider>
       </div>
+
+      <FactoryDetailsModal
+        factory={selectedFactory}
+        inspections={inspections}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </div>
   );
 };
