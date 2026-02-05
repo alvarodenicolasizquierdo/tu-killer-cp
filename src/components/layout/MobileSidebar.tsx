@@ -55,7 +55,7 @@ export function MobileSidebar() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden min-h-[48px] min-w-[48px] h-12 w-12 touch-manipulation active:scale-95">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle menu</span>
         </Button>
@@ -68,7 +68,7 @@ export function MobileSidebar() {
             <span className="text-sidebar-foreground font-semibold text-lg">CARLOS</span>
           </Link>
           <SheetClose asChild>
-            <Button variant="ghost" size="icon" className="text-sidebar-muted hover:text-sidebar-foreground">
+            <Button variant="ghost" size="icon" className="text-sidebar-muted hover:text-sidebar-foreground min-h-[44px] min-w-[44px] touch-manipulation active:scale-95">
               <X className="h-5 w-5" />
             </Button>
           </SheetClose>
