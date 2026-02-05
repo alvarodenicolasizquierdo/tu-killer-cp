@@ -212,17 +212,17 @@ const InspectionDetail = () => {
     <AppLayout>
       <div className="space-y-6">
         {/* Breadcrumb Navigation */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
+        <Breadcrumb className="overflow-x-auto">
+          <BreadcrumbList className="flex-nowrap">
+            <BreadcrumbItem className="hidden sm:inline-flex">
               <BreadcrumbLink asChild>
                 <Link to="/" className="flex items-center gap-1">
                   <Home className="h-3.5 w-3.5" />
-                  Dashboard
+                  <span className="hidden md:inline">Dashboard</span>
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
+            <BreadcrumbSeparator className="hidden sm:block" />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link to="/inspections">Inspections</Link>
@@ -231,9 +231,9 @@ const InspectionDetail = () => {
             {locationState?.fromFactoryName && (
               <>
                 <BreadcrumbSeparator />
-                <BreadcrumbItem>
+                <BreadcrumbItem className="hidden md:inline-flex">
                   <BreadcrumbLink 
-                    className="cursor-pointer"
+                    className="cursor-pointer truncate max-w-[150px]"
                     onClick={() => navigate('/inspections', { 
                       state: { openFactoryId: locationState.fromFactoryId } 
                     })}
