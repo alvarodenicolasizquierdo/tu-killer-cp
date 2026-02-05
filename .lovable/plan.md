@@ -1,109 +1,62 @@
 
-
-# Add Smooth Scroll to Platform Tour
+# Add Keyboard Navigation to Platform Tour
 
 ## Overview
-When users navigate through the tour, elements like the Scenario Simulator may be below the fold and not visible. This enhancement will automatically scroll highlighted elements into view with smooth animation before the spotlight appears.
+Add keyboard navigation support to the Platform Tour for improved accessibility. Users will be able to navigate through tour steps using arrow keys and dismiss the tour with the Escape key.
 
-## Implementation Approach
+## Keyboard Controls
+| Key | Action |
+|-----|--------|
+| Right Arrow / Down Arrow | Go to next step |
+| Left Arrow / Up Arrow | Go to previous step |
+| Escape | Skip/close the tour |
+| Enter / Space | Activate focused button (native behavior) |
 
-The scroll behavior will be added to `PlatformTour.tsx` as a side effect that triggers whenever the current step changes. The scroll will happen before the spotlight and card render, ensuring a smooth visual experience.
+## Implementation
 
-### Key Behavior
-- When a step has a `selector`, find the target element
-- Check if the element is fully visible in the viewport
-- If not visible, smoothly scroll it into view with padding for the tour card
-- Wait for scroll to complete before the spotlight animates in
+### File to Modify: `src/components/tour/PlatformTour.tsx`
 
-## Files to Modify
-
-### 1. `src/components/tour/PlatformTour.tsx`
-Add a `useEffect` that runs when `currentStep` changes:
-
-```text
-+-------------------------------------------+
-|  Step Changes                             |
-|       ↓                                   |
-|  Find element via selector                |
-|       ↓                                   |
-|  Check if element is in viewport          |
-|       ↓                                   |
-|  If off-screen → scrollIntoView()         |
-|       ↓                                   |
-|  Spotlight & Card render                  |
-+-------------------------------------------+
-```
+Add a new `useEffect` hook that listens for keyboard events when the tour is open:
 
 **Changes:**
-- Add new `useEffect` hook triggered by `currentStep` and `isOpen`
-- Use `element.scrollIntoView({ behavior: 'smooth', block: 'center' })` for native smooth scrolling
-- Add small delay after scroll to allow spotlight to recalculate position
+1. Add a `useEffect` that attaches a `keydown` event listener to the document
+2. Handle arrow keys (Left/Right and Up/Down for accessibility) to navigate steps
+3. Handle Escape key to skip the tour
+4. Only listen when `isOpen` is true
+5. Clean up the event listener on unmount or when tour closes
 
-### 2. `src/components/tour/TourSpotlight.tsx` (minor adjustment)
-- Add a small delay before initial rect calculation to account for scroll animation
-- Use `requestAnimationFrame` or a short timeout to ensure scroll completes first
-
-## Technical Details
-
-### Scroll Logic in PlatformTour.tsx
-```typescript
-useEffect(() => {
-  if (!isOpen) return;
-  
-  const step = tourSteps[currentStep];
-  if (!step.selector) return;
-  
-  const element = document.querySelector(step.selector);
-  if (!element) return;
-  
-  // Check if element is in viewport
-  const rect = element.getBoundingClientRect();
-  const isVisible = (
-    rect.top >= 0 &&
-    rect.bottom <= window.innerHeight
-  );
-  
-  if (!isVisible) {
-    element.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'center',
-      inline: 'nearest'
-    });
-  }
-}, [currentStep, isOpen]);
+### Code Logic
+```text
++----------------------------------+
+|  Tour Opens (isOpen = true)      |
+|         |                        |
+|         v                        |
+|  Attach keydown listener         |
+|         |                        |
+|         v                        |
+|  User presses key:               |
+|  - ArrowRight/ArrowDown → Next   |
+|  - ArrowLeft/ArrowUp → Previous  |
+|  - Escape → Skip tour            |
+|         |                        |
+|         v                        |
+|  Tour closes (isOpen = false)    |
+|         |                        |
+|         v                        |
+|  Remove keydown listener         |
++----------------------------------+
 ```
 
-### Viewport Detection
-Uses `getBoundingClientRect()` to determine if the element is within the visible viewport area, accounting for:
-- Element being above the fold (top < 0)
-- Element being below the fold (bottom > window.innerHeight)
-
-### Scroll Options
-- `behavior: 'smooth'` - Enables native CSS smooth scrolling
-- `block: 'center'` - Centers the element vertically, leaving room for the tour card
-- `inline: 'nearest'` - Minimal horizontal scrolling if needed
-
-## User Experience Flow
-
-1. User clicks "Next" to advance to a step targeting an off-screen element
-2. Page smoothly scrolls to center the target element
-3. After scroll completes (~300-500ms), spotlight animates in with the element visible
-4. Tour card positions itself relative to the now-visible element
-
-## Edge Cases Handled
-
-| Scenario | Behavior |
-|----------|----------|
-| Element already visible | No scroll, spotlight appears immediately |
-| No selector (center steps) | No scroll needed, card appears centered |
-| Element doesn't exist | Falls back to centered overlay |
-| Rapid step navigation | Each step triggers its own scroll |
+### Accessibility Considerations
+- Both horizontal (Left/Right) and vertical (Up/Down) arrow keys are supported for flexibility
+- Escape key follows standard modal dismissal patterns
+- Event handler uses `useCallback` for stable reference
+- Prevents default browser behavior only for handled keys to avoid interfering with other functionality
 
 ## Testing Checklist
-
-- Verify scroll works for `[data-tour="scenario-simulator"]` (typically below fold)
-- Confirm no scroll happens for already-visible elements
-- Test rapid clicking through steps
-- Verify spotlight animates correctly after scroll completes
-- Test on different viewport sizes
-
+- Verify Right Arrow advances to the next step
+- Verify Left Arrow goes to the previous step
+- Verify Up/Down arrows also work for navigation
+- Verify Escape closes the tour and saves to localStorage
+- Verify keyboard navigation doesn't work when tour is closed
+- Verify no interference with other keyboard interactions on the page
