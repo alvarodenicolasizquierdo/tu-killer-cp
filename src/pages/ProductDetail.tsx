@@ -88,11 +88,14 @@ const ProductDetail = () => {
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Back Button */}
+        <Button variant="ghost" size="sm" onClick={() => navigate('/products')} className="mb-4">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Products
+        </Button>
+
         {/* Header */}
         <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/products')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold">{product.name}</h1>

@@ -138,7 +138,7 @@ export default function TRFDetail() {
     >
       {/* Back button and actions */}
       <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" onClick={() => navigate('/trfs')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/trfs')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to TRFs
         </Button>
