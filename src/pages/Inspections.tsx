@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, parseISO } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical, Globe } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Plus, List, Grid3X3, MapPin, Clock, User, Building2, Filter, CheckCircle2, AlertTriangle, Loader2, GripVertical, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,7 +18,7 @@ import InspectionCard from '@/components/inspections/InspectionCard';
 import CalendarDayCell from '@/components/inspections/CalendarDayCell';
 import FactoryMapView from '@/components/inspections/FactoryMapView';
 import { useInspectionDragDrop } from '@/hooks/useInspectionDragDrop';
-
+import { useFeatureFlag } from '@/config/featureFlags';
 interface LocationState {
   openFactoryId?: string;
 }
@@ -37,6 +37,8 @@ const Inspections = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [inspections, setInspections] = useState<Inspection[]>(initialInspections);
   const [initialFactoryId, setInitialFactoryId] = useState<string | undefined>(locationState?.openFactoryId);
+  const [showAllInspections, setShowAllInspections] = useState(false);
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
 
   // Clear the initial factory ID after it's been used
   useEffect(() => {
@@ -482,14 +484,49 @@ const Inspections = () => {
 
                 <TabsContent value="upcoming">
                   {tabCounts.upcoming > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredInspections
-                        .filter(i => i.status === 'scheduled')
-                        .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
-                        .map(insp => (
-                          <InspectionCard key={insp.id} inspection={insp} />
-                        ))}
-                    </div>
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(() => {
+                          const upcomingInspections = filteredInspections
+                            .filter(i => i.status === 'scheduled')
+                            .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime());
+                          const displayCount = 6;
+                          const hasMore = upcomingInspections.length > displayCount;
+                          const displayed = (newNavEnabled && !showAllInspections && hasMore)
+                            ? upcomingInspections.slice(0, displayCount)
+                            : upcomingInspections;
+                          return displayed.map(insp => (
+                            <InspectionCard key={insp.id} inspection={insp} />
+                          ));
+                        })()}
+                      </div>
+                      {newNavEnabled && (() => {
+                        const upcomingInspections = filteredInspections.filter(i => i.status === 'scheduled');
+                        const displayCount = 6;
+                        const hasMore = upcomingInspections.length > displayCount;
+                        const hiddenCount = upcomingInspections.length - displayCount;
+                        return hasMore ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAllInspections(!showAllInspections)}
+                            className="w-full mt-4 text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/30"
+                          >
+                            {showAllInspections ? (
+                              <>
+                                <ChevronUp className="w-4 h-4 mr-1" />
+                                Show fewer inspections
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="w-4 h-4 mr-1" />
+                                Show more inspections ({hiddenCount} more)
+                              </>
+                            )}
+                          </Button>
+                        ) : null;
+                      })()}
+                    </>
                   ) : (
                     <Card className="py-12">
                       <div className="text-center text-muted-foreground">
@@ -568,13 +605,48 @@ const Inspections = () => {
 
                 <TabsContent value="all">
                   {tabCounts.all > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredInspections
-                        .sort((a, b) => new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime())
-                        .map(insp => (
-                          <InspectionCard key={insp.id} inspection={insp} />
-                        ))}
-                    </div>
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(() => {
+                          const allInspections = filteredInspections
+                            .sort((a, b) => new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime());
+                          const displayCount = 6;
+                          const hasMore = allInspections.length > displayCount;
+                          const displayed = (newNavEnabled && !showAllInspections && hasMore)
+                            ? allInspections.slice(0, displayCount)
+                            : allInspections;
+                          return displayed.map(insp => (
+                            <InspectionCard key={insp.id} inspection={insp} />
+                          ));
+                        })()}
+                      </div>
+                      {newNavEnabled && (() => {
+                        const allInspections = filteredInspections;
+                        const displayCount = 6;
+                        const hasMore = allInspections.length > displayCount;
+                        const hiddenCount = allInspections.length - displayCount;
+                        return hasMore ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAllInspections(!showAllInspections)}
+                            className="w-full mt-4 text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/30"
+                          >
+                            {showAllInspections ? (
+                              <>
+                                <ChevronUp className="w-4 h-4 mr-1" />
+                                Show fewer inspections
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="w-4 h-4 mr-1" />
+                                Show more inspections ({hiddenCount} more)
+                              </>
+                            )}
+                          </Button>
+                        ) : null;
+                      })()}
+                    </>
                   ) : (
                     <Card className="py-12">
                       <div className="text-center text-muted-foreground">
