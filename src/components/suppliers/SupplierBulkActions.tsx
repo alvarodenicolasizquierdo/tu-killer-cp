@@ -26,7 +26,8 @@ export function SupplierBulkActions({
   };
 
   const handleSendQuestionnaire = () => {
-    toast.success(`Questionnaire invitation sent to ${selectedSuppliers.length} supplier(s)`, {
+    window.open('https://suppllier-uki-questionnaire.manus.space/', '_blank');
+    toast.success(`Opening questionnaire for ${selectedSuppliers.length} supplier(s)`, {
       description: selectedSuppliers.map(s => s.name).join(', '),
     });
   };
