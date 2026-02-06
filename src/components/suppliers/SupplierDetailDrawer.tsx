@@ -27,7 +27,6 @@ import { useNavigate } from 'react-router-dom';
 import { SupplierTierBadge } from './SupplierTierBadge';
 import { SupplierComplianceBadge } from './SupplierComplianceBadge';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 import { getSupplierTasks } from '@/data/mockSuppliers';
 import type { RichSupplier } from '@/types/supplier';
 
