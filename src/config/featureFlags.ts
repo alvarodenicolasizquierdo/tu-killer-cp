@@ -15,7 +15,7 @@ interface FeatureFlags {
 }
 
 const defaultFlags: FeatureFlags = {
-  NEW_IA_NAV_AND_HOME: false,
+  NEW_IA_NAV_AND_HOME: true,
 };
 
 /**
