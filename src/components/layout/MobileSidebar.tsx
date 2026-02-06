@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   X,
+  BookMarked,
 } from 'lucide-react';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ const navItems = [
 
 const bottomItems = [
   { icon: HelpCircle, label: 'Support Center', path: '/support-center' },
+  { icon: BookMarked, label: 'Documentation', path: '/documentation', adminOnly: true },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
@@ -127,6 +129,9 @@ export function MobileSidebar() {
           {/* Bottom Items */}
           <div className="mt-6 pt-4 border-t border-sidebar-border space-y-0.5">
             {bottomItems.map((item) => {
+              // Hide admin-only items from non-admins
+              if (item.adminOnly && currentUser.role !== 'admin') return null;
+              
               const isActive = location.pathname === item.path || 
                 (item.path === '/support-center' && location.pathname.startsWith('/support'));
               return (
