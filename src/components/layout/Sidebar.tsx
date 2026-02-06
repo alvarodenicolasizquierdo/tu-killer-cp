@@ -17,6 +17,7 @@ import {
   LogOut,
   User,
   HelpCircle,
+  BookMarked,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
@@ -47,6 +48,7 @@ const navItems = [
 
 const bottomItems = [
   { icon: HelpCircle, label: 'Support Center', path: '/support-center' },
+  { icon: BookMarked, label: 'Documentation', path: '/documentation', adminOnly: true },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
@@ -137,9 +139,12 @@ export function Sidebar() {
           })}
         </div>
 
-        {/* AI Assistant Section */}
+        {/* Bottom Section */}
         <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
           {bottomItems.map((item) => {
+            // Hide admin-only items from non-admins
+            if (item.adminOnly && currentUser.role !== 'admin') return null;
+            
             const isActive = location.pathname === item.path || 
               (item.path === '/support-center' && location.pathname.startsWith('/support'));
             return (
