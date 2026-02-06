@@ -15,6 +15,7 @@ import ProductDetail from "./pages/ProductDetail";
 import SuppliersEnhanced from "./pages/SuppliersEnhanced";
 import SupplierCreate from "./pages/SupplierCreate";
 import SupplierInbox from "./pages/SupplierInbox";
+import SupplierDetail from "./pages/SupplierDetail";
 import Lab from "./pages/Lab";
 import Inspections from "./pages/Inspections";
 import InspectionDetail from "./pages/InspectionDetail";
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/suppliers" element={<SuppliersEnhanced />} />
               <Route path="/suppliers/new" element={<SupplierCreate />} />
               <Route path="/suppliers/inbox" element={<SupplierInbox />} />
+              <Route path="/suppliers/:id" element={<SupplierDetail />} />
               <Route path="/lab" element={<Lab />} />
               {/* Enhanced inspections module with table/kanban views */}
               <Route path="/inspections" element={<InspectionsEnhanced />} />

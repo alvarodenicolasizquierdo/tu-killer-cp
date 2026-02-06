@@ -3,9 +3,9 @@
  * Steps: Company Info → Contacts → Tier/Compliance → Certifications → Specializations → Review
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, Building2, Users, Shield, Award, Tag, ClipboardCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Building2, Users, Shield, Award, Tag, ClipboardCheck, Upload, File, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -23,7 +23,8 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { SupplierTier, SupplierComplianceStatus } from '@/types/supplier';
+import type { SupplierTier, SupplierComplianceStatus, RichSupplier, SupplierSpecialization } from '@/types/supplier';
+import { addSupplier, generateSupplierId, generateSupplierCode } from '@/data/mockSuppliers';
 
 const steps = [
   { id: 1, title: 'Company Info', icon: Building2 },
@@ -75,7 +76,9 @@ interface FormData {
 
 const SupplierCreate = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<FormData>({
     companyName: '',
     companyCode: '',
@@ -97,6 +100,24 @@ const SupplierCreate = () => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const handleFileUpload = (certification: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // In a real app, this would upload to a server
+      // For mock purposes, we just store the filename
+      setUploadedFiles(prev => ({ ...prev, [certification]: file.name }));
+      toast.success('File uploaded', { description: `${file.name} attached to ${certification}` });
+    }
+  };
+
+  const removeFile = (certification: string) => {
+    setUploadedFiles(prev => {
+      const newFiles = { ...prev };
+      delete newFiles[certification];
+      return newFiles;
+    });
+  };
+
   const handleNext = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
@@ -112,8 +133,62 @@ const SupplierCreate = () => {
   };
 
   const handleSubmit = () => {
-    // In a real app, this would add to the database
-    // For now, we just show a success message
+    // Create a new supplier object and persist to localStorage
+    const newSupplier: RichSupplier = {
+      id: generateSupplierId(),
+      code: formData.companyCode || generateSupplierCode(formData.companyName),
+      name: formData.companyName,
+      country: formData.country,
+      city: formData.city || undefined,
+      factoryCount: parseInt(formData.factoryCount) || 1,
+      status: 'active',
+      tier: (formData.tier as SupplierTier) || 'approved',
+      complianceStatus: (formData.complianceStatus as SupplierComplianceStatus) || 'pending_audit',
+      overallScore: 75,
+      complianceScore: 70,
+      qualityScore: 80,
+      deliveryScore: 75,
+      contacts: formData.contactName ? [{
+        id: `con-${Date.now()}`,
+        name: formData.contactName,
+        role: formData.contactRole || 'Primary Contact',
+        email: formData.contactEmail,
+        phone: formData.contactPhone || undefined,
+        isPrimary: true,
+      }] : [],
+      primaryContact: formData.contactName ? {
+        id: `con-${Date.now()}`,
+        name: formData.contactName,
+        role: formData.contactRole || 'Primary Contact',
+        email: formData.contactEmail,
+        phone: formData.contactPhone || undefined,
+        isPrimary: true,
+      } : undefined,
+      certifications: formData.certifications.map((cert, idx) => ({
+        id: `cert-new-${idx}`,
+        name: cert,
+        issuer: 'Pending Verification',
+        issuedDate: new Date().toISOString().split('T')[0],
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        status: 'valid' as const,
+        documentUrl: uploadedFiles[cert] || undefined,
+      })),
+      certificatesExpiring: 0,
+      specializations: formData.specializations.map(specId => {
+        const spec = specializations.find(s => s.id === specId);
+        return spec ? { id: spec.id, name: spec.name, category: spec.category } : null;
+      }).filter(Boolean) as SupplierSpecialization[],
+      openTRFs: 0,
+      activeStyles: 0,
+      passRate: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      onboardedAt: new Date().toISOString(),
+    };
+
+    // Persist to localStorage
+    addSupplier(newSupplier);
+
     toast.success('Supplier created successfully!', {
       description: `${formData.companyName} has been added to your supplier directory.`,
     });
@@ -306,22 +381,71 @@ const SupplierCreate = () => {
         return (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Select all certifications the supplier currently holds. You can upload documents later.
+              Select all certifications the supplier currently holds and upload supporting documents.
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               {certificationOptions.map((cert) => (
                 <div
                   key={cert}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors',
+                    'p-3 rounded-lg border transition-colors',
                     formData.certifications.includes(cert)
                       ? 'bg-primary/10 border-primary'
                       : 'hover:bg-muted/50'
                   )}
-                  onClick={() => toggleCertification(cert)}
                 >
-                  <Checkbox checked={formData.certifications.includes(cert)} />
-                  <span className="text-sm">{cert}</span>
+                  <div 
+                    className="flex items-center gap-3 cursor-pointer"
+                    onClick={() => toggleCertification(cert)}
+                  >
+                    <Checkbox checked={formData.certifications.includes(cert)} />
+                    <span className="text-sm font-medium flex-1">{cert}</span>
+                  </div>
+                  
+                  {/* File upload section - only show for selected certifications */}
+                  {formData.certifications.includes(cert) && (
+                    <div className="mt-3 ml-6 pl-3 border-l-2 border-muted">
+                      {uploadedFiles[cert] ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <File className="w-4 h-4 text-emerald-600" />
+                          <span className="text-muted-foreground flex-1 truncate">{uploadedFiles[cert]}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={(e) => { e.stopPropagation(); removeFile(cert); }}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="file"
+                            id={`file-${cert.replace(/\s/g, '-')}`}
+                            className="hidden"
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileUpload(cert, e)}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="gap-1 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              document.getElementById(`file-${cert.replace(/\s/g, '-')}`)?.click();
+                            }}
+                          >
+                            <Upload className="w-3 h-3" />
+                            Upload Certificate
+                          </Button>
+                          <span className="text-xs text-muted-foreground">PDF, DOC, or image</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

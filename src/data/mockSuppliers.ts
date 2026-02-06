@@ -1,6 +1,7 @@
 /**
  * Mock Suppliers Data
  * Rich supplier data for the enhanced Suppliers module
+ * Supports localStorage persistence for created suppliers
  */
 
 import type { 
@@ -11,6 +12,43 @@ import type {
   SupplierContact,
   SupplierSpecialization 
 } from '@/types/supplier';
+
+// LocalStorage key for persisted suppliers
+const SUPPLIERS_STORAGE_KEY = 'suppliers_data';
+const SUPPLIER_STYLE_LINKS_KEY = 'supplier_style_links';
+
+// Linked style type (lightweight mock)
+export interface LinkedStyle {
+  id: string;
+  name: string;
+  season: string;
+  brand: string;
+  status: string;
+}
+
+// Supplier-Style link mapping
+export interface SupplierStyleLink {
+  supplierId: string;
+  styleIds: string[];
+}
+
+// Mock linked styles data (corresponds to mockCollections in stylesData.ts)
+const mockLinkedStyles: Record<string, LinkedStyle[]> = {
+  'sup-001': [
+    { id: 'coll-001', name: 'Essential Cotton Tees SS26', season: 'SS26', brand: 'RetailCo Basics', status: 'bulk_testing' },
+    { id: 'coll-006', name: 'Winter Outerwear Collection FW26', season: 'FW26', brand: 'RetailCo Premium', status: 'gsw_pending' },
+  ],
+  'sup-002': [
+    { id: 'coll-002', name: 'Kids Denim Collection FW26', season: 'FW26', brand: 'RetailCo Kids', status: 'base_testing' },
+  ],
+  'sup-003': [
+    { id: 'coll-004', name: 'Organic Baby Essentials SS26', season: 'SS26', brand: 'RetailCo Baby', status: 'approved' },
+  ],
+  'sup-004': [
+    { id: 'coll-003', name: 'Eco Fleece Hoodies AW26', season: 'AW26', brand: 'RetailCo Active', status: 'components_pending' },
+    { id: 'coll-005', name: 'Performance Sports Bras SS26', season: 'SS26', brand: 'RetailCo Active', status: 'care_labelling' },
+  ],
+};
 
 // Certification templates
 const certifications: Record<string, SupplierCertification[]> = {
@@ -493,4 +531,69 @@ export function downloadCSV(csvContent: string, filename: string): void {
 // Get countries list from suppliers
 export function getSupplierCountries(suppliers: RichSupplier[]): string[] {
   return [...new Set(suppliers.map(s => s.country))].sort();
+}
+
+// Get all suppliers (includes localStorage persisted ones)
+export function getAllSuppliers(): RichSupplier[] {
+  try {
+    const stored = localStorage.getItem(SUPPLIERS_STORAGE_KEY);
+    if (stored) {
+      const customSuppliers: RichSupplier[] = JSON.parse(stored);
+      return [...richSuppliers, ...customSuppliers];
+    }
+  } catch (e) {
+    console.error('Error loading suppliers from localStorage:', e);
+  }
+  return richSuppliers;
+}
+
+// Add a new supplier (persists to localStorage)
+export function addSupplier(supplier: RichSupplier): void {
+  try {
+    const stored = localStorage.getItem(SUPPLIERS_STORAGE_KEY);
+    const customSuppliers: RichSupplier[] = stored ? JSON.parse(stored) : [];
+    customSuppliers.push(supplier);
+    localStorage.setItem(SUPPLIERS_STORAGE_KEY, JSON.stringify(customSuppliers));
+  } catch (e) {
+    console.error('Error saving supplier to localStorage:', e);
+  }
+}
+
+// Get supplier by ID
+export function getSupplierById(id: string): RichSupplier | undefined {
+  const allSuppliers = getAllSuppliers();
+  return allSuppliers.find(s => s.id === id);
+}
+
+// Get tasks for a specific supplier
+export function getSupplierTasks(supplierId: string): SupplierTask[] {
+  return supplierTasks.filter(t => t.supplierId === supplierId);
+}
+
+// Get linked styles for a supplier
+export function getLinkedStyles(supplierId: string): LinkedStyle[] {
+  return mockLinkedStyles[supplierId] || [];
+}
+
+// Get supplier IDs linked to a style
+export function getSuppliersForStyle(styleId: string): string[] {
+  const supplierIds: string[] = [];
+  Object.entries(mockLinkedStyles).forEach(([supplierId, styles]) => {
+    if (styles.some(s => s.id === styleId)) {
+      supplierIds.push(supplierId);
+    }
+  });
+  return supplierIds;
+}
+
+// Generate a unique supplier ID
+export function generateSupplierId(): string {
+  return `sup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Generate a unique supplier code
+export function generateSupplierCode(name: string): string {
+  const prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'X');
+  const num = Math.floor(Math.random() * 900) + 100;
+  return `${prefix}-${num}`;
 }
