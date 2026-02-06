@@ -163,7 +163,9 @@ export function SupplierTable({
                         <DropdownMenuItem onClick={() => onViewDetails(supplier)}>
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Send Questionnaire</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open('https://suppllier-uki-questionnaire.manus.space/', '_blank')}>
+                          Send Questionnaire
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Request Documents</DropdownMenuItem>
                         <DropdownMenuItem>Schedule Audit</DropdownMenuItem>
                       </DropdownMenuContent>
