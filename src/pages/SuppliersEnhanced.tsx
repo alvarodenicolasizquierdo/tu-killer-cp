@@ -21,7 +21,7 @@ import {
   type SupplierFiltersState,
 } from '@/components/suppliers';
 import {
-  richSuppliers,
+  getAllSuppliers,
   calculateSupplierStats,
   getSupplierCountries,
   exportSuppliersToCSV,
@@ -34,8 +34,8 @@ type ViewMode = 'list' | 'trends';
 const SuppliersEnhanced = () => {
   const navigate = useNavigate();
 
-  // State
-  const [suppliers] = useState<RichSupplier[]>(richSuppliers);
+  // State - load suppliers from localStorage + mock data
+  const [suppliers] = useState<RichSupplier[]>(() => getAllSuppliers());
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedSupplier, setSelectedSupplier] = useState<RichSupplier | null>(null);

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -18,12 +19,16 @@ import {
   Package, 
   FileText,
   Send,
-  ExternalLink 
+  ExternalLink,
+  Tag,
+  Clock 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { SupplierTierBadge } from './SupplierTierBadge';
 import { SupplierComplianceBadge } from './SupplierComplianceBadge';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { getSupplierTasks } from '@/data/mockSuppliers';
 import type { RichSupplier } from '@/types/supplier';
 
 interface SupplierDetailDrawerProps {
@@ -33,6 +38,14 @@ interface SupplierDetailDrawerProps {
 }
 
 export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetailDrawerProps) {
+  const navigate = useNavigate();
+  
+  // Get tasks for this supplier
+  const recentTasks = useMemo(() => {
+    if (!supplier) return [];
+    return getSupplierTasks(supplier.id).slice(0, 3);
+  }, [supplier]);
+
   if (!supplier) return null;
 
   const getScoreColor = (score: number) => {
@@ -45,6 +58,11 @@ export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetail
     toast.success('Questionnaire invitation sent', {
       description: `Sent to ${supplier.primaryContact?.email}`,
     });
+  };
+
+  const handleViewFullProfile = () => {
+    onClose();
+    navigate(`/suppliers/${supplier.id}`);
   };
 
   return (
@@ -210,6 +228,66 @@ export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetail
 
           <Separator />
 
+          {/* Specializations */}
+          {supplier.specializations.length > 0 && (
+            <>
+              <div>
+                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  Specializations ({supplier.specializations.length})
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {supplier.specializations.map((spec) => (
+                    <Badge key={spec.id} variant="secondary">
+                      {spec.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
+          {/* Recent Tasks Summary */}
+          {recentTasks.length > 0 && (
+            <>
+              <div>
+                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Recent Tasks ({recentTasks.length})
+                </h4>
+                <div className="space-y-2">
+                  {recentTasks.map((task) => (
+                    <div 
+                      key={task.id} 
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{task.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Due {new Date(task.dueDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          'text-xs ml-2',
+                          task.status === 'pending' && 'bg-slate-100 text-slate-700',
+                          task.status === 'in_progress' && 'bg-blue-100 text-blue-700',
+                          task.status === 'completed' && 'bg-emerald-100 text-emerald-700',
+                          task.status === 'overdue' && 'bg-red-100 text-red-700',
+                        )}
+                      >
+                        {task.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Audit Info */}
           <div>
             <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
@@ -238,7 +316,7 @@ export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetail
               <Send className="w-4 h-4" />
               Send Questionnaire
             </Button>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={handleViewFullProfile}>
               <ExternalLink className="w-4 h-4" />
               View Full Profile
             </Button>
