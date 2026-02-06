@@ -1,21 +1,23 @@
 /**
  * SuppliersEnhanced - Enhanced Suppliers Directory Page
- * Features: Table view, filters, bulk actions, CSV export, detail drawer
+ * Features: Table view, Trends view, filters, bulk actions, CSV export, detail drawer
  */
 
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Download, Inbox } from 'lucide-react';
+import { Plus, Download, Inbox, List, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   SupplierStats,
   SupplierFilters,
   SupplierTable,
   SupplierBulkActions,
   SupplierDetailDrawer,
+  SupplierPerformanceChart,
   type SupplierFiltersState,
 } from '@/components/suppliers';
 import {
@@ -27,11 +29,14 @@ import {
 } from '@/data/mockSuppliers';
 import type { RichSupplier } from '@/types/supplier';
 
+type ViewMode = 'list' | 'trends';
+
 const SuppliersEnhanced = () => {
   const navigate = useNavigate();
 
   // State
   const [suppliers] = useState<RichSupplier[]>(richSuppliers);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedSupplier, setSelectedSupplier] = useState<RichSupplier | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -135,6 +140,19 @@ const SuppliersEnhanced = () => {
             <p className="text-muted-foreground">
               Manage supplier directory and performance
             </p>
+            {/* View Toggle */}
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="mt-3">
+              <TabsList>
+                <TabsTrigger value="list" className="gap-2">
+                  <List className="h-4 w-4" />
+                  List
+                </TabsTrigger>
+                <TabsTrigger value="trends" className="gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Trends
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleOpenInbox}>
@@ -155,32 +173,43 @@ const SuppliersEnhanced = () => {
         {/* Stats */}
         <SupplierStats stats={stats} />
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="p-4">
-            <SupplierFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              countries={countries}
-              activeFilterCount={activeFilterCount}
-            />
-          </CardContent>
-        </Card>
+        {/* Filters - only show in list view */}
+        {viewMode === 'list' && (
+          <Card>
+            <CardContent className="p-4">
+              <SupplierFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                countries={countries}
+                activeFilterCount={activeFilterCount}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Bulk Actions */}
-        <SupplierBulkActions
-          selectedIds={selectedIds}
-          suppliers={filteredSuppliers}
-          onClearSelection={() => setSelectedIds(new Set())}
-        />
+        {/* Trends View */}
+        {viewMode === 'trends' && (
+          <SupplierPerformanceChart />
+        )}
 
-        {/* Table */}
-        <SupplierTable
-          suppliers={filteredSuppliers}
-          selectedIds={selectedIds}
-          onSelectionChange={setSelectedIds}
-          onViewDetails={handleViewDetails}
-        />
+        {/* Bulk Actions - only show in list view */}
+        {viewMode === 'list' && (
+          <SupplierBulkActions
+            selectedIds={selectedIds}
+            suppliers={filteredSuppliers}
+            onClearSelection={() => setSelectedIds(new Set())}
+          />
+        )}
+
+        {/* Table - only show in list view */}
+        {viewMode === 'list' && (
+          <SupplierTable
+            suppliers={filteredSuppliers}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onViewDetails={handleViewDetails}
+          />
+        )}
 
         {/* Detail Drawer */}
         <SupplierDetailDrawer
