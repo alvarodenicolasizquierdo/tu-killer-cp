@@ -49,6 +49,7 @@ const myOperationsItems: NavItem[] = [
   { icon: FileText, label: 'Care Labels', path: '/care-labelling', badge: '2' },
   { icon: Factory, label: 'GSW', path: '/gsw', badge: '1' },
   { icon: FileText, label: 'TRFs', path: '/trfs', badge: '12' },
+  { icon: Factory, label: 'Suppliers', path: '/suppliers', badge: '8' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
 ];
 

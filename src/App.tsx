@@ -12,7 +12,9 @@ import TRFs from "./pages/TRFs";
 import TRFDetail from "./pages/TRFDetail";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
-import Suppliers from "./pages/Suppliers";
+import SuppliersEnhanced from "./pages/SuppliersEnhanced";
+import SupplierCreate from "./pages/SupplierCreate";
+import SupplierInbox from "./pages/SupplierInbox";
 import Lab from "./pages/Lab";
 import Inspections from "./pages/Inspections";
 import InspectionDetail from "./pages/InspectionDetail";
@@ -55,7 +57,9 @@ const App = () => (
               <Route path="/trfs/:id" element={<TRFDetail />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/suppliers" element={<Suppliers />} />
+              <Route path="/suppliers" element={<SuppliersEnhanced />} />
+              <Route path="/suppliers/new" element={<SupplierCreate />} />
+              <Route path="/suppliers/inbox" element={<SupplierInbox />} />
               <Route path="/lab" element={<Lab />} />
               {/* Enhanced inspections module with table/kanban views */}
               <Route path="/inspections" element={<InspectionsEnhanced />} />
