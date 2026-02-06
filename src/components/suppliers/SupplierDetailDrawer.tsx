@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Send, ExternalLink, Tag } from 'lucide-react';
+import { Send, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getSupplierTasks } from '@/data/mockSuppliers';
 import type { RichSupplier } from '@/types/supplier';
@@ -13,6 +13,7 @@ import {
   SupplierActivity,
   SupplierContact,
   SupplierCertifications,
+  SupplierSpecializations,
   SupplierTasks,
   SupplierAuditSchedule,
 } from './drawer';
@@ -79,17 +80,7 @@ export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetail
 
           {supplier.specializations.length > 0 && (
             <>
-              <div>
-                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
-                  Specializations ({supplier.specializations.length})
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {supplier.specializations.map((spec) => (
-                    <Badge key={spec.id} variant="secondary">{spec.name}</Badge>
-                  ))}
-                </div>
-              </div>
+              <SupplierSpecializations specializations={supplier.specializations} />
               <Separator />
             </>
           )}
