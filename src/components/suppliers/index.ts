@@ -9,3 +9,4 @@ export { SupplierBulkActions } from './SupplierBulkActions';
 export { SupplierTierBadge } from './SupplierTierBadge';
 export { SupplierComplianceBadge } from './SupplierComplianceBadge';
 export { SupplierDetailDrawer } from './SupplierDetailDrawer';
+export { SupplierPerformanceChart } from './SupplierPerformanceChart';
