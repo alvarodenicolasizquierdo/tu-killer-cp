@@ -18,9 +18,12 @@ import { Brain, Target, AlertTriangle, Sparkles, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { mockActivities } from '@/data/mockData';
+import { useFeatureFlag } from '@/config/featureFlags';
+import { TodayNextStrip } from '@/components/home/TodayNextStrip';
 
 export default function Dashboard() {
   const { currentUser } = useUser();
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
   const { 
     context, 
     computedTasks, 
@@ -59,6 +62,13 @@ export default function Dashboard() {
   });
 
   const hasActiveScenario = scenarioState.dppEnforced || scenarioState.regulationThreshold > 0;
+
+  // Compute "Today / Next" metrics from existing data
+  const todayNextMetrics = {
+    needsAttention: context.criticalItems,
+    overdue: computedTasks.filter(t => t.priority === 'critical').length,
+    upcoming: computedTasks.filter(t => t.priority === 'at-risk').length,
+  };
 
   if (isComputing) {
     return (
@@ -123,6 +133,21 @@ export default function Dashboard() {
 
   return (
     <AppLayout>
+      {/* Today/Next Strip - Only shown when feature flag is enabled */}
+      {newNavEnabled && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 md:mb-6"
+        >
+          <TodayNextStrip 
+            needsAttention={todayNextMetrics.needsAttention}
+            overdue={todayNextMetrics.overdue}
+            upcoming={todayNextMetrics.upcoming}
+          />
+        </motion.div>
+      )}
+
       {/* Context Header - Role-adaptive greeting with Widget Config */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

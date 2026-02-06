@@ -32,6 +32,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useFeatureFlag } from '@/config/featureFlags';
+import { MobileSidebarSections } from '@/components/navigation/MobileSidebarSections';
+import { AdminBadge } from '@/components/ui/AdminBadge';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
@@ -56,6 +59,8 @@ export function MobileSidebar() {
   const location = useLocation();
   const { currentUser, availableUsers, setCurrentUser } = useUser();
   const [open, setOpen] = useState(false);
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
+  const isAdmin = currentUser.role === 'admin';
 
   const swipeHandlers = useSwipeGesture({
     onSwipeLeft: () => setOpen(false),
@@ -90,77 +95,93 @@ export function MobileSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 py-2 px-2 overflow-y-auto max-h-[calc(100vh-180px)]">
-          <div className="space-y-0.5">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <SheetClose asChild key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
-                      'active:scale-[0.98] touch-manipulation',
-                      isActive 
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground' 
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent'
-                    )}
-                  >
-                    <item.icon className="w-5 h-5 shrink-0" />
-                    <span className="flex-1">{item.label}</span>
-                    {item.badge && (
-                      <Badge 
-                        variant="secondary" 
+          {/* Feature Flag: New IA Navigation with sections */}
+          {newNavEnabled ? (
+            <>
+              {/* Admin Badge when new nav is enabled */}
+              {isAdmin && (
+                <div className="mb-4 px-1">
+                  <AdminBadge variant="sidebar" />
+                </div>
+              )}
+              <MobileSidebarSections isAdmin={isAdmin} />
+            </>
+          ) : (
+            <>
+              {/* Original navigation - unchanged */}
+              <div className="space-y-0.5">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <SheetClose asChild key={item.path}>
+                      <Link
+                        to={item.path}
                         className={cn(
-                          "ml-auto text-xs px-2 py-0.5",
+                          'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
+                          'active:scale-[0.98] touch-manipulation',
                           isActive 
-                            ? "bg-white/20 text-white" 
-                            : "bg-sidebar-accent text-sidebar-foreground"
+                            ? 'bg-sidebar-primary text-sidebar-primary-foreground' 
+                            : 'text-sidebar-foreground hover:bg-sidebar-accent'
                         )}
                       >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </Link>
-                </SheetClose>
-              );
-            })}
-          </div>
+                        <item.icon className="w-5 h-5 shrink-0" />
+                        <span className="flex-1">{item.label}</span>
+                        {item.badge && (
+                          <Badge 
+                            variant="secondary" 
+                            className={cn(
+                              "ml-auto text-xs px-2 py-0.5",
+                              isActive 
+                                ? "bg-white/20 text-white" 
+                                : "bg-sidebar-accent text-sidebar-foreground"
+                            )}
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
+              </div>
 
-          {/* Bottom Items */}
-          <div className="mt-6 pt-4 border-t border-sidebar-border space-y-0.5">
-            {bottomItems.map((item) => {
-              // Hide admin-only items from non-admins
-              if (item.adminOnly && currentUser.role !== 'admin') return null;
-              
-              const isActive = location.pathname === item.path || 
-                (item.path === '/support-center' && location.pathname.startsWith('/support'));
-              return (
-                <SheetClose asChild key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
-                      'active:scale-[0.98] touch-manipulation',
-                      isActive 
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent',
-                      item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
-                    )}
-                  >
-                    <item.icon className={cn(
-                      "w-5 h-5 shrink-0",
-                      item.path === '/support-center' && !isActive && 'text-ai-primary'
-                    )} />
-                    <span className={cn(
-                      item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
-                    )}>
-                      {item.label}
-                    </span>
-                  </Link>
-                </SheetClose>
-              );
-            })}
-          </div>
+              {/* Bottom Items */}
+              <div className="mt-6 pt-4 border-t border-sidebar-border space-y-0.5">
+                {bottomItems.map((item) => {
+                  // Hide admin-only items from non-admins
+                  if (item.adminOnly && currentUser.role !== 'admin') return null;
+                  
+                  const isActive = location.pathname === item.path || 
+                    (item.path === '/support-center' && location.pathname.startsWith('/support'));
+                  return (
+                    <SheetClose asChild key={item.path}>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-colors',
+                          'active:scale-[0.98] touch-manipulation',
+                          isActive 
+                            ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                            : 'text-sidebar-foreground hover:bg-sidebar-accent',
+                          item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
+                        )}
+                      >
+                        <item.icon className={cn(
+                          "w-5 h-5 shrink-0",
+                          item.path === '/support-center' && !isActive && 'text-ai-primary'
+                        )} />
+                        <span className={cn(
+                          item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
+                        )}>
+                          {item.label}
+                        </span>
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </nav>
 
         {/* User Section */}

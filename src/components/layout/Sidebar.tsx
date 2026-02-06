@@ -32,6 +32,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { useFeatureFlag } from '@/config/featureFlags';
+import { SidebarSections } from '@/components/navigation/SidebarSections';
+import { AdminBadge } from '@/components/ui/AdminBadge';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
@@ -56,6 +59,8 @@ export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { currentUser, availableUsers, setCurrentUser } = useUser();
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
+  const isAdmin = currentUser.role === 'admin';
 
   return (
     <motion.aside
@@ -91,95 +96,111 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 py-4 px-3 overflow-y-auto scrollbar-thin">
-        <div className="space-y-1">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'sidebar-link group relative',
-                  isActive && 'active'
-                )}
-              >
-                <item.icon className="w-5 h-5 shrink-0" />
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex-1 whitespace-nowrap"
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {item.badge && !isCollapsed && (
-                  <Badge 
-                    variant="secondary" 
+        {/* Feature Flag: New IA Navigation with sections */}
+        {newNavEnabled ? (
+          <>
+            {/* Admin Badge in sidebar when expanded */}
+            {isAdmin && !isCollapsed && (
+              <div className="mb-4 px-1">
+                <AdminBadge variant="sidebar" />
+              </div>
+            )}
+            <SidebarSections isCollapsed={isCollapsed} isAdmin={isAdmin} />
+          </>
+        ) : (
+          <>
+            {/* Original navigation - unchanged */}
+            <div className="space-y-1">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
                     className={cn(
-                      "ml-auto text-xs",
-                      isActive 
-                        ? "bg-white/20 text-white" 
-                        : "bg-sidebar-accent text-sidebar-foreground"
+                      'sidebar-link group relative',
+                      isActive && 'active'
                     )}
                   >
-                    {item.badge}
-                  </Badge>
-                )}
-                {item.badge && isCollapsed && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Bottom Section */}
-        <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
-          {bottomItems.map((item) => {
-            // Hide admin-only items from non-admins
-            if (item.adminOnly && currentUser.role !== 'admin') return null;
-            
-            const isActive = location.pathname === item.path || 
-              (item.path === '/support-center' && location.pathname.startsWith('/support'));
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'sidebar-link',
-                  isActive && 'active',
-                  item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
-                )}
-              >
-                <item.icon className={cn(
-                  "w-5 h-5 shrink-0",
-                  item.path === '/support-center' && !isActive && 'text-ai-primary'
-                )} />
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className={cn(
-                        "whitespace-nowrap",
-                        item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
+                    <item.icon className="w-5 h-5 shrink-0" />
+                    <AnimatePresence>
+                      {!isCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="flex-1 whitespace-nowrap"
+                        >
+                          {item.label}
+                        </motion.span>
                       )}
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Link>
-            );
-          })}
-        </div>
+                    </AnimatePresence>
+                    {item.badge && !isCollapsed && (
+                      <Badge 
+                        variant="secondary" 
+                        className={cn(
+                          "ml-auto text-xs",
+                          isActive 
+                            ? "bg-white/20 text-white" 
+                            : "bg-sidebar-accent text-sidebar-foreground"
+                        )}
+                      >
+                        {item.badge}
+                      </Badge>
+                    )}
+                    {item.badge && isCollapsed && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Bottom Section */}
+            <div className="mt-8 pt-4 border-t border-sidebar-border space-y-1">
+              {bottomItems.map((item) => {
+                // Hide admin-only items from non-admins
+                if (item.adminOnly && currentUser.role !== 'admin') return null;
+                
+                const isActive = location.pathname === item.path || 
+                  (item.path === '/support-center' && location.pathname.startsWith('/support'));
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      'sidebar-link',
+                      isActive && 'active',
+                      item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
+                    )}
+                  >
+                    <item.icon className={cn(
+                      "w-5 h-5 shrink-0",
+                      item.path === '/support-center' && !isActive && 'text-ai-primary'
+                    )} />
+                    <AnimatePresence>
+                      {!isCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className={cn(
+                            "whitespace-nowrap",
+                            item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
+                          )}
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </Link>
+                );
+              })}
+            </div>
+          </>
+        )}
       </nav>
 
       {/* Collapse Button */}
