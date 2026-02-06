@@ -8,6 +8,8 @@ import {
   LayoutGrid, 
   List,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Package,
   Layers,
   TestTube2,
@@ -35,12 +37,15 @@ import { AIAssistPanel } from '@/components/ai/AIAssistPanel';
 import { mockCollections, getCollectionStatusInfo } from '@/data/stylesData';
 import { cn } from '@/lib/utils';
 import { AIAssistSuggestion, ProductCollection } from '@/types/styles';
+import { useFeatureFlag } from '@/config/featureFlags';
 
 export default function Styles() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [seasonFilter, setSeasonFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showAllCollections, setShowAllCollections] = useState(false);
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
 
   const filteredCollections = useMemo(() => {
     return mockCollections.filter(collection => {
@@ -52,6 +57,14 @@ export default function Styles() {
       return matchesSearch && matchesStatus && matchesSeason;
     });
   }, [searchQuery, statusFilter, seasonFilter]);
+
+  // Progressive disclosure: show top 5 by default when flag is enabled
+  const initialDisplayCount = 5;
+  const hasMoreCollections = filteredCollections.length > initialDisplayCount;
+  const displayedCollections = (newNavEnabled && !showAllCollections && hasMoreCollections)
+    ? filteredCollections.slice(0, initialDisplayCount)
+    : filteredCollections;
+  const hiddenCount = filteredCollections.length - initialDisplayCount;
 
   // Generate AI suggestions based on current state
   const aiSuggestions: AIAssistSuggestion[] = useMemo(() => {
@@ -284,7 +297,7 @@ export default function Styles() {
               ? "grid grid-cols-1 md:grid-cols-2 gap-4" 
               : "space-y-3"
           )}>
-            {filteredCollections.map((collection, index) => {
+            {displayedCollections.map((collection, index) => {
               const statusInfo = getCollectionStatusInfo(collection.status);
               const testingProgress = getTestingProgress(collection);
               
@@ -414,6 +427,28 @@ export default function Styles() {
               );
             })}
           </div>
+
+          {/* Progressive Disclosure: Show more/less button */}
+          {newNavEnabled && hasMoreCollections && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAllCollections(!showAllCollections)}
+              className="w-full text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/30"
+            >
+              {showAllCollections ? (
+                <>
+                  <ChevronUp className="w-4 h-4 mr-1" />
+                  Show fewer collections
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4 mr-1" />
+                  Show more collections ({hiddenCount} more)
+                </>
+              )}
+            </Button>
+          )}
 
           {filteredCollections.length === 0 && (
             <Card>
