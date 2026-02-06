@@ -33,6 +33,7 @@ import {
 import { getInspectionDetail, mockInspectionDetails } from '@/data/inspectionDetailData';
 import { mockInspections } from '@/data/mockData';
 import { InspectionFinding, CorrectiveAction, InspectionChecklist } from '@/types/inspection';
+import { InspectionWorkflowProgress, InspectionDefectsSummary } from '@/components/inspection';
 
 interface LocationState {
   fromFactoryId?: string;
@@ -387,6 +388,16 @@ const InspectionDetail = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Workflow Progress */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Workflow Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <InspectionWorkflowProgress currentStatus={inspection.status} />
+              </CardContent>
+            </Card>
+
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Details Card */}
               <Card className="lg:col-span-2">
