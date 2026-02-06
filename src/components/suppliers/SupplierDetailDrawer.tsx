@@ -55,9 +55,7 @@ export function SupplierDetailDrawer({ supplier, open, onClose }: SupplierDetail
   };
 
   const handleSendQuestionnaire = () => {
-    toast.success('Questionnaire invitation sent', {
-      description: `Sent to ${supplier.primaryContact?.email}`,
-    });
+    window.open('https://suppllier-uki-questionnaire.manus.space/', '_blank');
   };
 
   const handleViewFullProfile = () => {
