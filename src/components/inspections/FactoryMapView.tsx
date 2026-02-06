@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Building2, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { factoryLocations } from '@/data/mockData';
 import { Inspection } from '@/types';
 import FactoryDetailsModal from './FactoryDetailsModal';
+
+// Lazy load the map component for better performance
+const WorldMap = lazy(() => import('./WorldMap'));
 
 interface FactoryMapViewProps {
   inspections: Inspection[];
@@ -61,14 +64,6 @@ const FactoryMapView = ({ inspections, onFactoryClick, initialOpenFactoryId }: F
     return grouped;
   }, [inspections]);
 
-  const getStatusColor = (status: 'active' | 'at-risk' | 'critical') => {
-    switch (status) {
-      case 'active': return 'bg-emerald-500';
-      case 'at-risk': return 'bg-amber-500';
-      case 'critical': return 'bg-red-500';
-    }
-  };
-
   const getStatusBgColor = (status: 'active' | 'at-risk' | 'critical') => {
     switch (status) {
       case 'active': return 'bg-emerald-500/10 border-emerald-200';
@@ -77,17 +72,21 @@ const FactoryMapView = ({ inspections, onFactoryClick, initialOpenFactoryId }: F
     }
   };
 
-  // Map dimensions (simplified world map projection)
-  const mapWidth = 900;
-  const mapHeight = 450;
-
-  // Convert lat/lng to x/y on our simplified map
-  const latLngToXY = (lat: number, lng: number) => {
-    // Simple Mercator-like projection centered on Asia-Pacific
-    const x = ((lng + 180) / 360) * mapWidth;
-    const y = ((90 - lat) / 180) * mapHeight;
-    return { x, y };
-  };
+  // Prepare markers for the map component
+  const mapMarkers = useMemo(() => {
+    return factoryLocations.map(factory => {
+      const data = factoryInspectionData[factory.id];
+      return {
+        id: factory.id,
+        name: factory.name,
+        lat: factory.lat,
+        lng: factory.lng,
+        status: factory.status,
+        inspectionCount: data?.inspections.length || 0,
+        hasCritical: (data?.critical || 0) > 0,
+      };
+    });
+  }, [factoryInspectionData]);
 
   return (
     <div className="space-y-6">
@@ -100,154 +99,20 @@ const FactoryMapView = ({ inspections, onFactoryClick, initialOpenFactoryId }: F
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="relative bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/10 overflow-x-auto">
-            <svg 
-              viewBox={`0 0 ${mapWidth} ${mapHeight}`} 
-              className="w-full min-w-[600px]" 
-              style={{ aspectRatio: `${mapWidth}/${mapHeight}` }}
-            >
-              {/* Simplified continent outlines */}
-              <defs>
-                <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="hsl(var(--muted))" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="hsl(var(--muted))" stopOpacity="0.5" />
-                </linearGradient>
-              </defs>
-              
-              {/* Asia simplified shape */}
-              <path 
-                d="M450 80 L550 60 L650 80 L700 150 L720 250 L680 300 L600 320 L500 300 L450 250 L420 180 Z" 
-                fill="url(#landGradient)" 
-                stroke="hsl(var(--border))" 
-                strokeWidth="1"
+          <div className="relative bg-gradient-to-br from-sky-50 to-blue-100 dark:from-sky-950/20 dark:to-blue-900/10 h-[400px] min-h-[300px]">
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Loading map...</p>
+                </div>
+              </div>
+            }>
+              <WorldMap
+                markers={mapMarkers}
+                onMarkerClick={handleFactoryClick}
               />
-              
-              {/* India */}
-              <path 
-                d="M480 200 L520 180 L550 200 L540 280 L500 320 L460 280 L470 220 Z" 
-                fill="url(#landGradient)" 
-                stroke="hsl(var(--border))" 
-                strokeWidth="1"
-              />
-              
-              {/* Southeast Asia */}
-              <path 
-                d="M560 280 L620 260 L660 300 L640 360 L580 380 L540 340 Z" 
-                fill="url(#landGradient)" 
-                stroke="hsl(var(--border))" 
-                strokeWidth="1"
-              />
-
-              {/* Grid lines */}
-              {[0, 1, 2, 3, 4].map(i => (
-                <line 
-                  key={`h-${i}`} 
-                  x1="0" 
-                  y1={i * (mapHeight / 4)} 
-                  x2={mapWidth} 
-                  y2={i * (mapHeight / 4)} 
-                  stroke="hsl(var(--border))" 
-                  strokeWidth="0.5" 
-                  strokeDasharray="4"
-                  opacity="0.3"
-                />
-              ))}
-              {[0, 1, 2, 3, 4, 5, 6].map(i => (
-                <line 
-                  key={`v-${i}`} 
-                  x1={i * (mapWidth / 6)} 
-                  y1="0" 
-                  x2={i * (mapWidth / 6)} 
-                  y2={mapHeight} 
-                  stroke="hsl(var(--border))" 
-                  strokeWidth="0.5" 
-                  strokeDasharray="4"
-                  opacity="0.3"
-                />
-              ))}
-
-              {/* Factory markers */}
-              {factoryLocations.map((factory, index) => {
-                const pos = latLngToXY(factory.lat, factory.lng);
-                const data = factoryInspectionData[factory.id];
-                const hasCritical = data?.critical > 0;
-                
-                return (
-                  <g key={factory.id}>
-                    {/* Pulse animation for critical */}
-                    {hasCritical && (
-                      <motion.circle
-                        cx={pos.x}
-                        cy={pos.y}
-                        r={20}
-                        fill="none"
-                        stroke="hsl(var(--destructive))"
-                        strokeWidth="2"
-                        initial={{ opacity: 0.8, scale: 1 }}
-                        animate={{ opacity: 0, scale: 2 }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                    )}
-                    
-                    {/* Main marker */}
-                    <motion.g
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: index * 0.1 }}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => handleFactoryClick(factory.id)}
-                    >
-                      <circle
-                        cx={pos.x}
-                        cy={pos.y}
-                        r={12}
-                        className={`${getStatusColor(factory.status)} transition-colors`}
-                        opacity="0.9"
-                      />
-                      <circle
-                        cx={pos.x}
-                        cy={pos.y}
-                        r={6}
-                        fill="white"
-                        opacity="0.9"
-                      />
-                      
-                      {/* Inspection count badge */}
-                      {data && data.inspections.length > 0 && (
-                        <>
-                          <circle
-                            cx={pos.x + 10}
-                            cy={pos.y - 10}
-                            r={8}
-                            fill="hsl(var(--primary))"
-                          />
-                          <text
-                            x={pos.x + 10}
-                            y={pos.y - 6}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize="9"
-                            fontWeight="bold"
-                          >
-                            {data.inspections.length}
-                          </text>
-                        </>
-                      )}
-                    </motion.g>
-                    
-                    {/* Factory label */}
-                    <text
-                      x={pos.x}
-                      y={pos.y + 25}
-                      textAnchor="middle"
-                      className="fill-foreground text-[10px] font-medium"
-                    >
-                      {factory.name.length > 15 ? factory.name.slice(0, 15) + '...' : factory.name}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
+            </Suspense>
           </div>
         </CardContent>
       </Card>
