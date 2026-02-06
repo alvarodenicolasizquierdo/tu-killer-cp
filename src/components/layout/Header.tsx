@@ -14,6 +14,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { mockNotifications } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { useFeatureFlag } from '@/config/featureFlags';
+import { useUser } from '@/contexts/UserContext';
+import { AdminBadge } from '@/components/ui/AdminBadge';
 
 interface HeaderProps {
   title?: string;
@@ -23,6 +26,9 @@ interface HeaderProps {
 export function Header({ title, subtitle }: HeaderProps) {
   const [searchFocused, setSearchFocused] = useState(false);
   const unreadCount = mockNotifications.filter(n => !n.isRead).length;
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
+  const { currentUser } = useUser();
+  const isAdmin = currentUser.role === 'admin';
 
   return (
     <header className="h-14 md:h-16 bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-40 hidden md:block">
@@ -36,6 +42,13 @@ export function Header({ title, subtitle }: HeaderProps) {
             <p className="text-xs md:text-sm text-muted-foreground truncate">{subtitle}</p>
           )}
         </div>
+        
+        {/* Admin Badge - shown when feature flag is enabled and user is admin */}
+        {newNavEnabled && isAdmin && (
+          <div className="shrink-0 mr-2">
+            <AdminBadge variant="header" />
+          </div>
+        )}
 
         {/* Right - Search & Actions */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
