@@ -50,6 +50,41 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## How can I compare branches?
+
+To see the differences between the current branch and another branch (e.g., `sgs-new-cp`), you can use the following git commands:
+
+**View a summary of file changes:**
+```sh
+# Compare current branch with another branch
+git diff --stat origin/sgs-new-cp
+
+# Or explicitly specify both branches
+git diff --stat origin/sgs-new-cp..HEAD
+```
+
+**View detailed code differences:**
+```sh
+# See full diff between branches
+git diff origin/sgs-new-cp
+
+# See diff for a specific file
+git diff origin/sgs-new-cp -- path/to/file.ts
+```
+
+**View commit history differences:**
+```sh
+# Show commits in current branch that are not in sgs-new-cp
+git log origin/sgs-new-cp..HEAD --oneline
+
+# Show commits in sgs-new-cp that are not in current branch
+git log HEAD..origin/sgs-new-cp --oneline
+```
+
+**Compare branches on GitHub:**
+You can also compare branches directly on GitHub by visiting:
+`https://github.com/alvarodenicolasizquierdo/tu-killer-cp/compare/sgs-new-cp...YOUR_BRANCH_NAME`
+
 ## What technologies are used for this project?
 
 This project is built with:
