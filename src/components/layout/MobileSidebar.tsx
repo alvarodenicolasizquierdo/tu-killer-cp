@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -14,6 +15,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -51,16 +53,26 @@ const bottomItems = [
 export function MobileSidebar() {
   const location = useLocation();
   const { currentUser, availableUsers, setCurrentUser } = useUser();
+  const [open, setOpen] = useState(false);
+
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => setOpen(false),
+    threshold: 50,
+  });
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden min-h-[48px] min-w-[48px] h-12 w-12 touch-manipulation active:scale-95">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] p-0 bg-sidebar border-sidebar-border">
+      <SheetContent 
+        side="left" 
+        className="w-[280px] p-0 bg-sidebar border-sidebar-border"
+        {...swipeHandlers}
+      >
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-3">
