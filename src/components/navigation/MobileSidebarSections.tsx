@@ -100,10 +100,10 @@ const partnersItems: NavItem[] = [
 // INSIGHTS section - includes GSW as submenu item
 const insightsGroup: NavGroup = {
   icon: LineChart,
-  label: 'Analytics',
+  label: 'Insights',
   badge: null,
   items: [
-    { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
+    { icon: BarChart3, label: 'Insights', path: '/analytics', badge: null },
     { icon: ShieldCheck, label: 'Compliance Scores', path: '/gsw', badge: '1' },
   ],
 };
