@@ -106,7 +106,7 @@ const insightsGroup: NavGroup = {
   badge: null,
   items: [
     { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
-    { icon: ShieldCheck, label: 'Compliance Scores (GSW)', path: '/gsw', badge: '1' },
+    { icon: ShieldCheck, label: 'Compliance Scores', path: '/gsw', badge: '1' },
   ],
 };
 
