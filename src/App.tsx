@@ -16,6 +16,8 @@ import Suppliers from "./pages/Suppliers";
 import Lab from "./pages/Lab";
 import Inspections from "./pages/Inspections";
 import InspectionDetail from "./pages/InspectionDetail";
+import InspectionsEnhanced from "./pages/InspectionsEnhanced";
+import InspectionCreate from "./pages/InspectionCreate";
 import Analytics from "./pages/Analytics";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
@@ -55,7 +57,10 @@ const App = () => (
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/lab" element={<Lab />} />
-              <Route path="/inspections" element={<Inspections />} />
+              {/* Enhanced inspections module with table/kanban views */}
+              <Route path="/inspections" element={<InspectionsEnhanced />} />
+              <Route path="/inspections/new" element={<InspectionCreate />} />
+              <Route path="/inspections/calendar" element={<Inspections />} />
               <Route path="/inspections/:id" element={<InspectionDetail />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/notifications" element={<Dashboard />} />
