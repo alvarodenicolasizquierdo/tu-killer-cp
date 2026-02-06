@@ -482,24 +482,24 @@ const Products = () => {
               exit={{ opacity: 0 }}
             >
               <Card>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 touch-pan-x">
+                  <table className="w-full min-w-[800px] md:min-w-0">
                     <thead>
                       <tr className="border-b bg-muted/50">
-                        <th className="p-4 w-10">
+                        <th className="p-3 md:p-4 w-10">
                           <Checkbox 
                             checked={isAllSelected} 
                             onCheckedChange={toggleSelectAll}
                           />
                         </th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Product</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Category</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Supplier</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Status</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Pass Rate</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">Risk</th>
-                        <th className="p-4 text-left text-sm font-medium text-muted-foreground">TRFs</th>
-                        <th className="p-4 w-10"></th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Product</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Category</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Supplier</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Pass Rate</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">Risk</th>
+                        <th className="p-3 md:p-4 text-left text-sm font-medium text-muted-foreground whitespace-nowrap">TRFs</th>
+                        <th className="p-3 md:p-4 w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
