@@ -21,7 +21,7 @@ import Inspections from "./pages/Inspections";
 import InspectionDetail from "./pages/InspectionDetail";
 import InspectionsEnhanced from "./pages/InspectionsEnhanced";
 import InspectionCreate from "./pages/InspectionCreate";
-import Analytics from "./pages/Analytics";
+import Insight from "./pages/Insight";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -68,7 +68,7 @@ const App = () => (
               <Route path="/inspections/new" element={<InspectionCreate />} />
               <Route path="/inspections/calendar" element={<Inspections />} />
               <Route path="/inspections/:id" element={<InspectionDetail />} />
-              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/analytics" element={<Insight />} />
               <Route path="/notifications" element={<Dashboard />} />
               <Route path="/support-center" element={<SupportCenter />} />
               <Route path="/ai-assistant" element={<SupportCenter />} />
