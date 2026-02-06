@@ -1,8 +1,17 @@
 /**
- * SidebarSections - Grouped navigation with section headings
+ * SidebarSections - Grouped navigation with section headings and submenus
  * Used when NEW_IA_NAV_AND_HOME feature flag is enabled
+ * 
+ * New consolidated IA structure:
+ * - MY WORK: Dashboard
+ * - PRODUCTS: Styles, Components, Care & Labeling (submenu)
+ * - TESTING: Test Requests, Inspections, Test Coverage (submenu)
+ * - PARTNERS: Suppliers
+ * - INSIGHTS: Analytics, Compliance Scores (GSW)
+ * - SUPPORT: Support Center
  */
 
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -13,14 +22,24 @@ import {
   FlaskConical, 
   ClipboardCheck,
   BarChart3, 
-  Bell, 
   Settings,
   HelpCircle,
   BookMarked,
   LucideIcon,
+  ChevronDown,
+  Tag,
+  TestTube,
+  ShieldCheck,
+  Users,
+  LineChart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 interface NavItem {
   icon: LucideIcon;
@@ -30,53 +49,232 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
+interface NavGroup {
+  icon: LucideIcon;
+  label: string;
+  items: NavItem[];
+  badge?: string | null;
+}
+
 interface SidebarSectionsProps {
   isCollapsed: boolean;
   isAdmin: boolean;
 }
 
-// Section definitions with items grouped by category
-const myPrioritiesItems: NavItem[] = [
+// ============================================
+// SECTION DEFINITIONS - New Consolidated IA
+// ============================================
+
+// MY WORK section
+const myWorkItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
-  { icon: Bell, label: 'Notifications', path: '/notifications', badge: '4' },
 ];
 
-const myOperationsItems: NavItem[] = [
-  { icon: Package, label: 'Styles', path: '/styles', badge: '6' },
-  { icon: FlaskConical, label: 'Components', path: '/components', badge: null },
-  { icon: FileText, label: 'Testing Levels', path: '/testing-levels', badge: '3' },
-  { icon: ClipboardCheck, label: 'Inspections', path: '/inspections', badge: '5' },
-  { icon: FileText, label: 'Care Labels', path: '/care-labelling', badge: '2' },
-  { icon: Factory, label: 'GSW', path: '/gsw', badge: '1' },
-  { icon: FileText, label: 'TRFs', path: '/trfs', badge: '12' },
-  { icon: Factory, label: 'Suppliers', path: '/suppliers', badge: '8' },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
+// PRODUCTS section - submenu
+const productsGroup: NavGroup = {
+  icon: Package,
+  label: 'Products',
+  badge: '6',
+  items: [
+    { icon: Package, label: 'Styles', path: '/styles', badge: '6' },
+    { icon: FlaskConical, label: 'Components', path: '/components', badge: null },
+    { icon: Tag, label: 'Care & Labeling', path: '/care-labelling', badge: '2' },
+  ],
+};
+
+// TESTING section - submenu
+const testingGroup: NavGroup = {
+  icon: TestTube,
+  label: 'Testing & Inspections',
+  badge: '12',
+  items: [
+    { icon: FileText, label: 'Test Requests', path: '/trfs', badge: '12' },
+    { icon: ClipboardCheck, label: 'Inspections', path: '/inspections', badge: '5' },
+    { icon: FileText, label: 'Test Coverage', path: '/testing-levels', badge: '3' },
+  ],
+};
+
+// PARTNERS section
+const partnersItems: NavItem[] = [
+  { icon: Users, label: 'Suppliers', path: '/suppliers', badge: '8' },
 ];
 
+// INSIGHTS section - includes GSW as submenu item
+const insightsGroup: NavGroup = {
+  icon: LineChart,
+  label: 'Analytics',
+  badge: null,
+  items: [
+    { icon: BarChart3, label: 'Analytics', path: '/analytics', badge: null },
+    { icon: ShieldCheck, label: 'Compliance Scores (GSW)', path: '/gsw', badge: '1' },
+  ],
+};
+
+// SUPPORT section
+const supportItems: NavItem[] = [
+  { icon: HelpCircle, label: 'Support Center', path: '/support-center' },
+];
+
+// GOVERNANCE section (admin only)
 const governanceItems: NavItem[] = [
   { icon: BookMarked, label: 'Documentation', path: '/documentation', adminOnly: true },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
-const supportItems: NavItem[] = [
-  { icon: HelpCircle, label: 'Support Center', path: '/support-center' },
-];
+// ============================================
+// COMPONENT: Single nav item link
+// ============================================
+interface NavLinkItemProps {
+  item: NavItem;
+  isCollapsed: boolean;
+  isActive: boolean;
+  isSubItem?: boolean;
+}
 
+function NavLinkItem({ item, isCollapsed, isActive, isSubItem }: NavLinkItemProps) {
+  return (
+    <Link
+      to={item.path}
+      className={cn(
+        'sidebar-link group relative',
+        isActive && 'active',
+        isSubItem && 'pl-9',
+        item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
+      )}
+    >
+      <item.icon className={cn(
+        "w-5 h-5 shrink-0",
+        isSubItem && "w-4 h-4",
+        item.path === '/support-center' && !isActive && 'text-ai-primary'
+      )} />
+      <AnimatePresence>
+        {!isCollapsed && (
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              "flex-1 whitespace-nowrap",
+              item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
+            )}
+          >
+            {item.label}
+          </motion.span>
+        )}
+      </AnimatePresence>
+      {item.badge && !isCollapsed && (
+        <Badge 
+          variant="secondary" 
+          className={cn(
+            "ml-auto text-xs",
+            isActive 
+              ? "bg-white/20 text-white" 
+              : "bg-sidebar-accent text-sidebar-foreground"
+          )}
+        >
+          {item.badge}
+        </Badge>
+      )}
+      {item.badge && isCollapsed && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+          {item.badge}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+// ============================================
+// COMPONENT: Collapsible submenu group
+// ============================================
+interface CollapsibleNavGroupProps {
+  group: NavGroup;
+  isCollapsed: boolean;
+}
+
+function CollapsibleNavGroup({ group, isCollapsed }: CollapsibleNavGroupProps) {
+  const location = useLocation();
+  const isAnyChildActive = group.items.some(item => location.pathname === item.path);
+  const [isOpen, setIsOpen] = useState(isAnyChildActive);
+
+  // When collapsed, show as a single link that expands
+  if (isCollapsed) {
+    return (
+      <div className="relative">
+        <Link
+          to={group.items[0].path}
+          className={cn(
+            'sidebar-link group',
+            isAnyChildActive && 'active'
+          )}
+        >
+          <group.icon className="w-5 h-5 shrink-0" />
+        </Link>
+        {group.badge && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
+            {group.badge}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className={cn(
+        'sidebar-link group w-full justify-between',
+        isAnyChildActive && 'text-sidebar-foreground font-medium'
+      )}>
+        <div className="flex items-center gap-3">
+          <group.icon className="w-5 h-5 shrink-0" />
+          <span className="whitespace-nowrap">{group.label}</span>
+        </div>
+        <ChevronDown className={cn(
+          "w-4 h-4 transition-transform",
+          isOpen && "rotate-180"
+        )} />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-1 space-y-0.5">
+          {group.items.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <NavLinkItem
+                key={item.path}
+                item={item}
+                isCollapsed={false}
+                isActive={isActive}
+                isSubItem
+              />
+            );
+          })}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+// ============================================
+// COMPONENT: Section with heading
+// ============================================
 interface SectionProps {
   title: string;
-  items: NavItem[];
+  items?: NavItem[];
+  group?: NavGroup;
   isCollapsed: boolean;
   isAdmin: boolean;
   showDivider?: boolean;
   dividerLabel?: string;
 }
 
-function SidebarSection({ title, items, isCollapsed, isAdmin, showDivider, dividerLabel }: SectionProps) {
+function SidebarSection({ title, items, group, isCollapsed, isAdmin, showDivider, dividerLabel }: SectionProps) {
   const location = useLocation();
 
-  const visibleItems = items.filter(item => !item.adminOnly || isAdmin);
+  // Filter items by admin visibility if items are provided
+  const visibleItems = items?.filter(item => !item.adminOnly || isAdmin) || [];
   
-  if (visibleItems.length === 0) return null;
+  // If we have neither items nor group, or items exist but all are hidden, return null
+  if (!group && visibleItems.length === 0) return null;
 
   return (
     <div className="mb-4">
@@ -103,84 +301,77 @@ function SidebarSection({ title, items, isCollapsed, isAdmin, showDivider, divid
         )}
       </AnimatePresence>
 
-      {/* Section Items */}
+      {/* Section Items - either flat list or collapsible group */}
       <div className="space-y-1">
-        {visibleItems.map((item) => {
-          const isActive = location.pathname === item.path || 
-            (item.path === '/support-center' && location.pathname.startsWith('/support'));
-          
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                'sidebar-link group relative',
-                isActive && 'active',
-                item.path === '/support-center' && !isActive && 'hover:bg-gradient-to-r hover:from-ai-primary/20 hover:to-ai-secondary/20'
-              )}
-            >
-              <item.icon className={cn(
-                "w-5 h-5 shrink-0",
-                item.path === '/support-center' && !isActive && 'text-ai-primary'
-              )} />
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className={cn(
-                      "flex-1 whitespace-nowrap",
-                      item.path === '/support-center' && !isActive && 'ai-gradient-text font-medium'
-                    )}
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              {item.badge && !isCollapsed && (
-                <Badge 
-                  variant="secondary" 
-                  className={cn(
-                    "ml-auto text-xs",
-                    isActive 
-                      ? "bg-white/20 text-white" 
-                      : "bg-sidebar-accent text-sidebar-foreground"
-                  )}
-                >
-                  {item.badge}
-                </Badge>
-              )}
-              {item.badge && isCollapsed && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-priority-critical rounded-full text-[10px] text-white flex items-center justify-center">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+        {group ? (
+          <CollapsibleNavGroup group={group} isCollapsed={isCollapsed} />
+        ) : (
+          visibleItems.map((item) => {
+            const isActive = location.pathname === item.path || 
+              (item.path === '/support-center' && location.pathname.startsWith('/support'));
+            
+            return (
+              <NavLinkItem
+                key={item.path}
+                item={item}
+                isCollapsed={isCollapsed}
+                isActive={isActive}
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );
 }
 
+// ============================================
+// MAIN EXPORT: SidebarSections
+// ============================================
 export function SidebarSections({ isCollapsed, isAdmin }: SidebarSectionsProps) {
   return (
     <div className="space-y-2">
+      {/* MY WORK */}
       <SidebarSection 
-        title="My Priorities" 
-        items={myPrioritiesItems} 
+        title="My Work" 
+        items={myWorkItems} 
         isCollapsed={isCollapsed}
         isAdmin={isAdmin}
       />
       
+      {/* PRODUCTS - Submenu */}
       <SidebarSection 
-        title="My Operations" 
-        items={myOperationsItems} 
+        title="Products" 
+        group={productsGroup}
         isCollapsed={isCollapsed}
         isAdmin={isAdmin}
       />
 
+      {/* TESTING - Submenu */}
+      <SidebarSection 
+        title="Testing" 
+        group={testingGroup}
+        isCollapsed={isCollapsed}
+        isAdmin={isAdmin}
+      />
+
+      {/* PARTNERS */}
+      <SidebarSection 
+        title="Partners" 
+        items={partnersItems} 
+        isCollapsed={isCollapsed}
+        isAdmin={isAdmin}
+      />
+
+      {/* INSIGHTS - Submenu with GSW */}
+      <SidebarSection 
+        title="Insights" 
+        group={insightsGroup}
+        isCollapsed={isCollapsed}
+        isAdmin={isAdmin}
+      />
+
+      {/* SUPPORT */}
       <SidebarSection 
         title="Support" 
         items={supportItems} 
@@ -188,6 +379,7 @@ export function SidebarSections({ isCollapsed, isAdmin }: SidebarSectionsProps) 
         isAdmin={isAdmin}
       />
       
+      {/* GOVERNANCE - Admin only */}
       {isAdmin && (
         <SidebarSection 
           title="Governance" 
@@ -199,6 +391,7 @@ export function SidebarSections({ isCollapsed, isAdmin }: SidebarSectionsProps) 
         />
       )}
       
+      {/* Settings for non-admin users */}
       {!isAdmin && (
         <SidebarSection 
           title="Settings" 
