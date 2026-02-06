@@ -35,11 +35,14 @@ import {
   CheckCircle,
   FileText,
   MoreHorizontal,
-  ArrowUpDown
+  ArrowUpDown,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { useFeatureFlag } from '@/config/featureFlags';
 
 const statusConfig: Record<TRFStatus, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   draft: { label: 'Draft', color: 'bg-gray-100 text-gray-700 border-gray-200', icon: FileText },
@@ -169,6 +172,8 @@ export default function TRFs() {
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showAllTRFs, setShowAllTRFs] = useState(false);
+  const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
 
   const filteredTRFs = mockTRFs.filter(trf => {
     const matchesSearch = 
@@ -178,6 +183,14 @@ export default function TRFs() {
     const matchesStatus = statusFilter === 'all' || trf.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // Progressive disclosure: show top 5 by default when flag is enabled
+  const initialDisplayCount = 5;
+  const hasMoreTRFs = filteredTRFs.length > initialDisplayCount;
+  const displayedTRFs = (newNavEnabled && !showAllTRFs && hasMoreTRFs) 
+    ? filteredTRFs.slice(0, initialDisplayCount) 
+    : filteredTRFs;
+  const hiddenCount = filteredTRFs.length - initialDisplayCount;
 
   // Group TRFs by status for Kanban view
   const kanbanColumns: { status: TRFStatus; title: string; trfs: TRF[] }[] = [
@@ -261,11 +274,35 @@ export default function TRFs() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTRFs.map((trf, index) => (
+                {displayedTRFs.map((trf, index) => (
                   <TRFTableRow key={trf.id} trf={trf} index={index} onClick={() => navigate(`/trfs/${trf.id}`)} />
                 ))}
               </TableBody>
             </Table>
+            
+            {/* Progressive Disclosure: Show more/less button */}
+            {newNavEnabled && hasMoreTRFs && (
+              <div className="border-t border-border p-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAllTRFs(!showAllTRFs)}
+                  className="w-full text-muted-foreground hover:text-foreground border border-dashed border-border hover:border-primary/30"
+                >
+                  {showAllTRFs ? (
+                    <>
+                      <ChevronUp className="w-4 h-4 mr-1" />
+                      Show fewer TRFs
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4 mr-1" />
+                      Show more TRFs ({hiddenCount} more)
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : (
