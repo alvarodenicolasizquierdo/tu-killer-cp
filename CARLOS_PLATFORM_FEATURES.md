@@ -9,6 +9,19 @@
 
 ---
 
+## Comparison Target
+
+**Note**: The comparison was requested against `carl-portal-star` repository:
+- URL: https://github.com/alvarodenicolasizquierdo/carl-portal-star
+- **Status**: Repository returns 404 (Not Found)
+- This indicates the repository is either **private** or **does not exist**
+
+If you need a comparison, please:
+1. Make `carl-portal-star` repository public, OR
+2. Grant access to the Copilot agent
+
+---
+
 ## Table of Contents
 
 1. [Platform Architecture](#platform-architecture)
