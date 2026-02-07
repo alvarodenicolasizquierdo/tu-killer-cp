@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { markdownToSafeHtml } from '@/lib/sanitize';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -140,12 +141,7 @@ export default function KnowledgeHub() {
               <div 
                 className="prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{
-                  __html: selectedArticle.content
-                    .replace(/## (.*)/g, '<h2 class="text-lg font-semibold mt-6 mb-3">$1</h2>')
-                    .replace(/### (.*)/g, '<h3 class="text-base font-medium mt-4 mb-2">$1</h3>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\n\n/g, '</p><p class="mb-3">')
-                    .replace(/\n/g, '<br/>')
+                  __html: markdownToSafeHtml(selectedArticle.content)
                 }}
               />
 
