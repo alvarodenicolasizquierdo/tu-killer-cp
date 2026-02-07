@@ -34,6 +34,7 @@ import GSW from "./pages/GSW";
 import SelfApprovalLevels from "./pages/SelfApprovalLevels";
 import SupportCenter from "./pages/SupportCenter";
 import Documentation from "./pages/Documentation";
+import FeatureSpec from "./pages/FeatureSpec";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/ai-assistant" element={<SupportCenter />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/documentation" element={<Documentation />} />
+              <Route path="/feature-spec" element={<FeatureSpec />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             {/* Global Help Drawer - available on all pages */}
