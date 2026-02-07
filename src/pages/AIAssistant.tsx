@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { chatMessageToSafeHtml } from '@/lib/sanitize';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -153,10 +154,7 @@ export default function AIAssistant() {
                             message.role === 'user' && "text-primary-foreground prose-invert"
                           )}
                           dangerouslySetInnerHTML={{ 
-                            __html: message.content
-                              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                              .replace(/\n/g, '<br />')
-                              .replace(/\|/g, ' | ')
+                            __html: chatMessageToSafeHtml(message.content)
                           }}
                         />
                       </div>

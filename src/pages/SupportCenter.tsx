@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { chatMessageToSafeHtml, markdownToSafeHtml } from '@/lib/sanitize';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -163,9 +164,7 @@ function AskCarlosTab() {
                         message.role === 'user' && "text-primary-foreground prose-invert"
                       )}
                       dangerouslySetInnerHTML={{ 
-                        __html: message.content
-                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                          .replace(/\n/g, '<br />')
+                        __html: chatMessageToSafeHtml(message.content)
                       }}
                     />
                   </div>
@@ -324,12 +323,7 @@ function KnowledgeHubTab() {
             <div 
               className="prose prose-sm max-w-none"
               dangerouslySetInnerHTML={{
-                __html: selectedArticle.content
-                  .replace(/## (.*)/g, '<h2 class="text-lg font-semibold mt-6 mb-3">$1</h2>')
-                  .replace(/### (.*)/g, '<h3 class="text-base font-medium mt-4 mb-2">$1</h3>')
-                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                  .replace(/\n\n/g, '</p><p class="mb-3">')
-                  .replace(/\n/g, '<br/>')
+                __html: markdownToSafeHtml(selectedArticle.content)
               }}
             />
 
