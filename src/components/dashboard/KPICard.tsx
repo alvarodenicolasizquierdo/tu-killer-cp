@@ -36,8 +36,8 @@ export function KPICard({ data, index = 0 }: KPICardProps) {
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-muted-foreground font-medium">{data.label}</p>
-          <p className="text-3xl font-bold text-foreground mt-1">{data.value}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium">{data.label}</p>
+          <p className="text-3xl font-bold text-foreground tracking-[-0.02em] mt-1">{data.value}</p>
         </div>
         
         {data.change !== undefined && (

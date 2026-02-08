@@ -33,12 +33,12 @@ export function Header({ title, subtitle }: HeaderProps) {
   const isAdmin = currentUser.role === 'admin';
 
   return (
-    <header className="h-14 md:h-16 bg-background/80 backdrop-blur-lg border-b border-border sticky top-0 z-40 hidden md:block">
+    <header className="h-14 md:h-16 bg-background/80 backdrop-blur-lg border-b border-border/50 sticky top-0 z-40 hidden md:block">
       <div className="h-full flex items-center justify-between px-4 md:px-6">
         {/* Left - Title */}
         <div className="min-w-0 flex-1 mr-4">
           {title && (
-            <h1 className="text-lg md:text-xl font-semibold text-foreground truncate">{title}</h1>
+            <h1 className="text-lg md:text-xl font-semibold text-foreground tracking-[-0.01em] truncate">{title}</h1>
           )}
           {subtitle && (
             <p className="text-xs md:text-sm text-muted-foreground truncate">{subtitle}</p>

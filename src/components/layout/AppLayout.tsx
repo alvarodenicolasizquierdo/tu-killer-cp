@@ -15,16 +15,16 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       {/* Mobile Header with Hamburger */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background border-b border-border z-40 flex items-center px-4 gap-3">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/80 backdrop-blur-lg border-b border-border/50 z-40 flex items-center px-4 gap-3">
         <MobileSidebar />
         <span className="font-semibold text-foreground">{title || 'CARLOS'}</span>
       </div>
       <main className="md:ml-[260px] min-h-screen pt-14 md:pt-0">
         <Header title={title} subtitle={subtitle} />
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="p-4 md:p-6"
         >
           {children}

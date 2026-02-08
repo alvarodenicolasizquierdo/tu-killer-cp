@@ -96,10 +96,11 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'glow-primary': '0 0 20px -5px hsl(var(--primary) / 0.4)',
-        'glow-accent': '0 0 20px -5px hsl(var(--accent) / 0.4)',
-        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+        'soft': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 4px 16px -4px rgba(0, 0, 0, 0.08), 0 1px 4px -1px rgba(0, 0, 0, 0.03)',
+        'glow-primary': '0 0 20px -5px hsl(var(--primary) / 0.3)',
+        'glow-accent': '0 0 20px -5px hsl(var(--accent) / 0.3)',
+        'inner-soft': 'inset 0 1px 2px 0 rgba(0, 0, 0, 0.04)',
       },
       keyframes: {
         "accordion-down": {

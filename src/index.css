@@ -41,7 +41,7 @@
     --destructive-foreground: 210 40% 98%;
 
     /* Borders and inputs */
-    --border: 220 13% 91%;
+    --border: 220 13% 93%;
     --input: 220 13% 91%;
     --ring: 221 83% 53%;
 
@@ -155,7 +155,7 @@
 
   /* Glass morphism cards */
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg shadow-black/5;
+    @apply bg-white/80 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/[0.03];
   }
 
   /* AI Gradient backgrounds */
@@ -172,11 +172,11 @@
 
   /* Subtle hover lift */
   .hover-lift {
-    @apply transition-all duration-200 ease-out;
+    @apply transition-all duration-300 ease-out;
   }
   
   .hover-lift:hover {
-    @apply -translate-y-0.5 shadow-lg;
+    @apply -translate-y-px shadow-md;
   }
 
   /* Sidebar link styles */
@@ -192,15 +192,15 @@
 
   /* KPI Card variants */
   .kpi-card {
-    @apply relative overflow-hidden rounded-xl p-5 bg-card border border-border 
-           shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply relative overflow-hidden rounded-xl p-5 bg-card border border-border/60 
+           shadow-sm hover:shadow-md transition-all duration-300 ease-out hover:-translate-y-px;
   }
 
   /* Task cards */
   .task-card {
-    @apply p-4 rounded-lg bg-card border border-border 
-           hover:border-primary/30 hover:shadow-md 
-           transition-all duration-200 cursor-pointer;
+    @apply p-4 rounded-xl bg-card border border-border/60 
+           hover:border-primary/20 hover:shadow-md 
+           transition-all duration-300 ease-out cursor-pointer hover:-translate-y-px;
   }
 
   /* Status badges */
