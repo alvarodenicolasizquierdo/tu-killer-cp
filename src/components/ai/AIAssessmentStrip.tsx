@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { AIAssessment } from '@/types/ai-context';
 import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
 import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
+import { InternalOnly } from '@/components/demo';
 
 interface AIAssessmentStripProps {
   assessment: AIAssessment;
@@ -99,15 +100,18 @@ export function AIAssessmentStrip({ assessment, compact = false, onExplainClick 
                 </div>
               </div>
               
-              {onExplainClick && (
-                <button
-                  onClick={onExplainClick}
-                  className="text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 shrink-0"
-                >
-                  Why am I seeing this?
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              )}
+              {/* "Why am I seeing this?" — internal debug, hidden in demo */}
+              <InternalOnly>
+                {onExplainClick && (
+                  <button
+                    onClick={onExplainClick}
+                    className="text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 shrink-0"
+                  >
+                    Why am I seeing this?
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
+                )}
+              </InternalOnly>
             </div>
             <AIDisclaimerLine />
           </div>

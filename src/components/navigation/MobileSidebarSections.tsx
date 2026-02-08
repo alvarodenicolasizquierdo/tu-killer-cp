@@ -39,6 +39,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { useDemoMode } from '@/contexts/DemoModeContext';
 
 interface NavItem {
   icon: LucideIcon;
@@ -292,53 +293,63 @@ function MobileSidebarSection({ title, items, group, isAdmin, showDivider, divid
 // ============================================
 // MAIN EXPORT: MobileSidebarSections
 // ============================================
+// Demo mode: allowed nav paths
+const DEMO_ALLOWED_PATHS = [
+  '/',
+  '/styles',
+  '/components',
+  '/care-labelling',
+  '/trfs',
+  '/suppliers',
+  '/inspections',
+  '/testing-levels',
+  '/gsw',
+  '/analytics',
+  '/support-center',
+  '/products',
+];
+
+function isDemoAllowed(path: string): boolean {
+  return DEMO_ALLOWED_PATHS.some(r => path === r || path.startsWith(r + '/'));
+}
+
+function filterGroupForDemo(group: NavGroup): NavGroup | null {
+  const filtered = group.items.filter(item => isDemoAllowed(item.path));
+  if (filtered.length === 0) return null;
+  return { ...group, items: filtered };
+}
+
 export function MobileSidebarSections({ isAdmin }: MobileSidebarSectionsProps) {
+  const { isDemoMode } = useDemoMode();
+
+  const filteredMyWork = isDemoMode ? myWorkItems.filter(i => isDemoAllowed(i.path)) : myWorkItems;
+  const filteredProducts = isDemoMode ? filterGroupForDemo(productsGroup) : productsGroup;
+  const filteredTesting = isDemoMode ? filterGroupForDemo(testingGroup) : testingGroup;
+  const filteredPartners = isDemoMode ? partnersItems.filter(i => isDemoAllowed(i.path)) : partnersItems;
+  const filteredInsights = isDemoMode ? filterGroupForDemo(insightsGroup) : insightsGroup;
+  const filteredSupport = isDemoMode ? supportItems.filter(i => isDemoAllowed(i.path)) : supportItems;
+
   return (
     <div className="space-y-2">
-      {/* MY WORK */}
-      <MobileSidebarSection 
-        title="My Work" 
-        items={myWorkItems} 
-        isAdmin={isAdmin}
-      />
+      <MobileSidebarSection title="My Work" items={filteredMyWork} isAdmin={isAdmin} />
       
-      {/* PRODUCTS - Submenu */}
-      <MobileSidebarSection 
-        title="Products" 
-        group={productsGroup}
-        isAdmin={isAdmin}
-      />
+      {filteredProducts && (
+        <MobileSidebarSection title="Products" group={filteredProducts} isAdmin={isAdmin} />
+      )}
 
-      {/* TESTING - Submenu */}
-      <MobileSidebarSection 
-        title="Testing" 
-        group={testingGroup}
-        isAdmin={isAdmin}
-      />
+      {filteredTesting && (
+        <MobileSidebarSection title="Testing" group={filteredTesting} isAdmin={isAdmin} />
+      )}
 
-      {/* PARTNERS */}
-      <MobileSidebarSection 
-        title="Partners" 
-        items={partnersItems} 
-        isAdmin={isAdmin}
-      />
+      <MobileSidebarSection title="Partners" items={filteredPartners} isAdmin={isAdmin} />
 
-      {/* INSIGHTS - Submenu with GSW */}
-      <MobileSidebarSection 
-        title="Insights" 
-        group={insightsGroup}
-        isAdmin={isAdmin}
-      />
+      {filteredInsights && (
+        <MobileSidebarSection title="Insights" group={filteredInsights} isAdmin={isAdmin} />
+      )}
 
-      {/* SUPPORT */}
-      <MobileSidebarSection 
-        title="Support" 
-        items={supportItems} 
-        isAdmin={isAdmin}
-      />
+      <MobileSidebarSection title="Support" items={filteredSupport} isAdmin={isAdmin} />
       
-      {/* GOVERNANCE - Admin only */}
-      {isAdmin && (
+      {!isDemoMode && isAdmin && (
         <MobileSidebarSection 
           title="Governance" 
           items={governanceItems} 
@@ -348,8 +359,7 @@ export function MobileSidebarSections({ isAdmin }: MobileSidebarSectionsProps) {
         />
       )}
       
-      {/* Settings for non-admin users */}
-      {!isAdmin && (
+      {!isDemoMode && !isAdmin && (
         <MobileSidebarSection 
           title="Settings" 
           items={governanceItems.filter(item => !item.adminOnly)} 

@@ -40,6 +40,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { useDemoMode } from '@/contexts/DemoModeContext';
 
 interface NavItem {
   icon: LucideIcon;
@@ -328,59 +329,101 @@ function SidebarSection({ title, items, group, isCollapsed, isAdmin, showDivider
 // ============================================
 // MAIN EXPORT: SidebarSections
 // ============================================
+// Demo mode: allowed nav paths (product screens only)
+const DEMO_ALLOWED_PATHS = [
+  '/',
+  '/styles',
+  '/components',
+  '/care-labelling',
+  '/trfs',
+  '/suppliers',
+  '/inspections',
+  '/testing-levels',
+  '/gsw',
+  '/analytics',
+  '/support-center',
+  '/products',
+];
+
+function isDemoAllowed(path: string): boolean {
+  return DEMO_ALLOWED_PATHS.some(r => path === r || path.startsWith(r + '/'));
+}
+
+function filterGroupForDemo(group: NavGroup): NavGroup | null {
+  const filtered = group.items.filter(item => isDemoAllowed(item.path));
+  if (filtered.length === 0) return null;
+  return { ...group, items: filtered };
+}
+
 export function SidebarSections({ isCollapsed, isAdmin }: SidebarSectionsProps) {
+  const { isDemoMode } = useDemoMode();
+
+  // In demo mode, filter out non-product nav items
+  const filteredMyWork = isDemoMode ? myWorkItems.filter(i => isDemoAllowed(i.path)) : myWorkItems;
+  const filteredProducts = isDemoMode ? filterGroupForDemo(productsGroup) : productsGroup;
+  const filteredTesting = isDemoMode ? filterGroupForDemo(testingGroup) : testingGroup;
+  const filteredPartners = isDemoMode ? partnersItems.filter(i => isDemoAllowed(i.path)) : partnersItems;
+  const filteredInsights = isDemoMode ? filterGroupForDemo(insightsGroup) : insightsGroup;
+  const filteredSupport = isDemoMode ? supportItems.filter(i => isDemoAllowed(i.path)) : supportItems;
+
   return (
     <div className="space-y-2">
       {/* MY WORK */}
       <SidebarSection 
         title="My Work" 
-        items={myWorkItems} 
+        items={filteredMyWork} 
         isCollapsed={isCollapsed}
         isAdmin={isAdmin}
       />
       
       {/* PRODUCTS - Submenu */}
-      <SidebarSection 
-        title="Products" 
-        group={productsGroup}
-        isCollapsed={isCollapsed}
-        isAdmin={isAdmin}
-      />
+      {filteredProducts && (
+        <SidebarSection 
+          title="Products" 
+          group={filteredProducts}
+          isCollapsed={isCollapsed}
+          isAdmin={isAdmin}
+        />
+      )}
 
       {/* TESTING - Submenu */}
-      <SidebarSection 
-        title="Testing" 
-        group={testingGroup}
-        isCollapsed={isCollapsed}
-        isAdmin={isAdmin}
-      />
+      {filteredTesting && (
+        <SidebarSection 
+          title="Testing" 
+          group={filteredTesting}
+          isCollapsed={isCollapsed}
+          isAdmin={isAdmin}
+        />
+      )}
 
       {/* PARTNERS */}
       <SidebarSection 
         title="Partners" 
-        items={partnersItems} 
+        items={filteredPartners} 
         isCollapsed={isCollapsed}
         isAdmin={isAdmin}
       />
 
       {/* INSIGHTS - Submenu with GSW */}
-      <SidebarSection 
-        title="Insights" 
-        group={insightsGroup}
-        isCollapsed={isCollapsed}
-        isAdmin={isAdmin}
-      />
+      {filteredInsights && (
+        <SidebarSection 
+          title="Insights" 
+          group={filteredInsights}
+          isCollapsed={isCollapsed}
+          isAdmin={isAdmin}
+        />
+      )}
 
       {/* SUPPORT */}
       <SidebarSection 
         title="Support" 
-        items={supportItems} 
+        items={filteredSupport} 
         isCollapsed={isCollapsed}
         isAdmin={isAdmin}
       />
       
-      {/* GOVERNANCE - Admin only */}
-      {isAdmin && (
+      {/* GOVERNANCE - Admin only, hidden in demo mode */}
+      {!isDemoMode && isAdmin && (
         <SidebarSection 
           title="Governance" 
           items={governanceItems} 
@@ -391,8 +434,8 @@ export function SidebarSections({ isCollapsed, isAdmin }: SidebarSectionsProps) 
         />
       )}
       
-      {/* Settings for non-admin users */}
-      {!isAdmin && (
+      {/* Settings for non-admin users, hidden in demo mode */}
+      {!isDemoMode && !isAdmin && (
         <SidebarSection 
           title="Settings" 
           items={governanceItems.filter(item => !item.adminOnly)} 

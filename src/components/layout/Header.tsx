@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useFeatureFlag } from '@/config/featureFlags';
 import { useUser } from '@/contexts/UserContext';
 import { AdminBadge } from '@/components/ui/AdminBadge';
+import { DemoModeToggle } from '@/components/demo';
+import { InternalOnly } from '@/components/demo';
 
 interface HeaderProps {
   title?: string;
@@ -43,12 +45,19 @@ export function Header({ title, subtitle }: HeaderProps) {
           )}
         </div>
         
+        {/* Demo Mode Toggle */}
+        <div className="shrink-0 mr-2">
+          <DemoModeToggle />
+        </div>
+
         {/* Admin Badge - shown when feature flag is enabled and user is admin */}
-        {newNavEnabled && isAdmin && (
-          <div className="shrink-0 mr-2">
-            <AdminBadge variant="header" />
-          </div>
-        )}
+        <InternalOnly>
+          {newNavEnabled && isAdmin && (
+            <div className="shrink-0 mr-2">
+              <AdminBadge variant="header" />
+            </div>
+          )}
+        </InternalOnly>
 
         {/* Right - Search & Actions */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
