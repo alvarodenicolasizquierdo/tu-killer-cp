@@ -16,14 +16,14 @@ const alerts: RegulatoryAlert[] = [
   {
     id: '1',
     title: 'EU REACH Regulation Update',
-    message: 'New restrictions on PFAS chemicals effective March 2026. Review your product testing requirements.',
+    message: 'New restrictions on PFAS chemicals effective March 2026 (as announced). Review your product testing requirements.',
     type: 'warning',
     date: '2026-02-01'
   },
   {
     id: '2',
     title: 'California Prop 65 Amendment',
-    message: 'Updated warning label requirements for products sold in California.',
+    message: 'Updated warning label requirements for products sold in California. Effective date: Q2 2026 (as announced).',
     type: 'info',
     date: '2026-01-28'
   }
@@ -83,6 +83,10 @@ export function RegulatoryAlerts() {
               alert.type === 'info' && "text-blue-700"
             )}>
               {alert.message}
+            </p>
+            {/* FIX 6 [C-06]: Regulatory date disclaimer */}
+            <p className="text-[9px] md:text-[10px] mt-0.5 text-muted-foreground italic">
+              Dates reflect publicly announced regulatory timelines and are subject to change. Not an AI prediction.
             </p>
           </div>
           <Button

@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, Minus, AlertTriangle, Clock, User } from 'luc
 import { ReadinessScore, ReadinessGap } from '@/types/ai-context';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { DPPEvidenceChecklist } from '@/components/compliance/DPPEvidenceChecklist';
+import { LastUpdatedTimestamp } from '@/components/compliance/LastUpdatedTimestamp';
 
 interface ReadinessGaugeProps {
   readiness: ReadinessScore;
@@ -107,6 +109,12 @@ export function ReadinessGauge({ readiness, showGaps = true }: ReadinessGaugePro
           </p>
         </div>
       </div>
+
+      {/* FIX 4 [C-03]: DPP Evidence Checklist replaces bare percentage */}
+      <DPPEvidenceChecklist />
+
+      {/* FIX 9: Last updated timestamp */}
+      <LastUpdatedTimestamp timestamp={readiness.lastUpdated} />
 
       {/* Gaps List */}
       {showGaps && readiness.gaps.length > 0 && (

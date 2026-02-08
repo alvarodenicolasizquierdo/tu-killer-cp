@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import { SupplierMethodologyTooltip } from '@/components/compliance/SupplierMethodologyTooltip';
+import { LastUpdatedTimestamp } from '@/components/compliance/LastUpdatedTimestamp';
 
 interface SupplierScoresProps {
   overallScore: number;
@@ -27,11 +29,17 @@ export function SupplierScores({ overallScore, complianceScore, qualityScore, de
       <div className="grid grid-cols-2 gap-4">
         {scores.map(({ value, label }) => (
           <div key={label} className="text-center p-3 rounded-lg bg-muted/50">
-            <p className={cn("text-2xl font-bold", getScoreColor(value))}>{value}%</p>
+            <div className="flex items-center justify-center gap-1">
+              <p className={cn("text-2xl font-bold", getScoreColor(value))}>{value}%</p>
+              {/* FIX 3 [C-04]: Methodology disclosure */}
+              <SupplierMethodologyTooltip score={value} label={label} />
+            </div>
             <p className="text-xs text-muted-foreground">{label}</p>
           </div>
         ))}
       </div>
+      {/* FIX 9 [NEW]: Last-updated timestamp */}
+      <LastUpdatedTimestamp />
     </div>
   );
 }

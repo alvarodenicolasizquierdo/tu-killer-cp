@@ -4,6 +4,8 @@ import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, BarChart3, Users, Package, FileText } from 'lucide-react';
 import { managerKPIs } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { LastUpdatedTimestamp } from '@/components/compliance/LastUpdatedTimestamp';
+import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
 
 export function ConfidenceDashboardWidget() {
   const overallConfidence = 87;
@@ -25,7 +27,10 @@ export function ConfidenceDashboardWidget() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold">{overallConfidence}%</span>
+            <div className="text-right">
+              <span className="text-2xl font-bold">{overallConfidence}%</span>
+              <AIConfidenceMetadata confidence={overallConfidence} dataSource="Real-time operational metrics" sampleSize={312} />
+            </div>
             {trend === 'up' ? (
               <TrendingUp className="w-5 h-5 text-emerald-500" />
             ) : (
@@ -83,6 +88,8 @@ export function ConfidenceDashboardWidget() {
               <span className="text-sm">24 Open TRFs</span>
             </div>
           </div>
+          {/* FIX 9 [NEW]: Last-updated timestamp */}
+          <LastUpdatedTimestamp />
         </div>
       </CardContent>
     </Card>

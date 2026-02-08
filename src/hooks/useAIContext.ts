@@ -183,9 +183,10 @@ function getConsequence(task: any): string {
   return 'Operational inefficiency and potential compliance audit findings.';
 }
 
+// FIX 2 [C-02]: Reframe as prioritisation, not approval recommendation
 function getFastestFix(task: any): string {
   if (task.type === 'approval') {
-    return 'Review test results (est. 15 min) and approve with conditions if within tolerance bands.';
+    return 'Review test results (est. 15 min) and assess against tolerance bands for compliance decision.';
   }
   if (task.type === 'upload') {
     return 'Request document from supplier via automated workflow (response expected within 24h).';
@@ -194,7 +195,7 @@ function getFastestFix(task: any): string {
 }
 
 function getRecommendedAction(task: any): string {
-  if (task.type === 'approval') return 'Review & Approve';
+  if (task.type === 'approval') return 'Review Details';
   if (task.type === 'review') return 'Open Details';
   if (task.type === 'upload') return 'Request Document';
   return 'Take Action';

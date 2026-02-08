@@ -38,6 +38,7 @@ import { mockCollections, getCollectionStatusInfo } from '@/data/stylesData';
 import { cn } from '@/lib/utils';
 import { AIAssistSuggestion, ProductCollection } from '@/types/styles';
 import { useFeatureFlag } from '@/config/featureFlags';
+import { AutoArchiveCountdown } from '@/components/compliance/AutoArchiveCountdown';
 
 export default function Styles() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -378,7 +379,7 @@ export default function Styles() {
 
                             {/* Footer */}
                             <div className="mt-3 flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 flex-wrap">
                                 <span className="flex items-center gap-1 text-muted-foreground">
                                   <Layers className="w-3.5 h-3.5" />
                                   {collection.componentIds.length} components
@@ -398,6 +399,8 @@ export default function Styles() {
                               </div>
                               <ChevronRight className="w-4 h-4 text-muted-foreground" />
                             </div>
+                            {/* FIX 8 [C-19]: Auto-archive countdown */}
+                            <AutoArchiveCountdown createdDate={collection.createdAt || '2025-12-15'} />
                           </>
                         )}
 

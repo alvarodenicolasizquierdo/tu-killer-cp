@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { Brain, TrendingDown, TrendingUp, Minus, AlertTriangle, Lightbulb, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AIAssessment } from '@/types/ai-context';
+import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
+import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
 
 interface AIAssessmentStripProps {
   assessment: AIAssessment;
@@ -56,11 +58,11 @@ export function AIAssessmentStrip({ assessment, compact = false, onExplainClick 
               <span className="text-xs text-muted-foreground">Readiness</span>
             </div>
 
-            {/* Confidence */}
+            {/* Confidence — FIX 5 [C-05] */}
             <div>
-              <div className={cn("text-lg font-semibold capitalize", confidenceColor)}>
-                {assessment.confidence}
-              </div>
+              <AIConfidenceMetadata 
+                confidence={assessment.confidence === 'high' ? 90 : assessment.confidence === 'medium' ? 70 : 45} 
+              />
               <span className="text-xs text-muted-foreground">Confidence</span>
             </div>
 
@@ -78,33 +80,36 @@ export function AIAssessmentStrip({ assessment, compact = false, onExplainClick 
             )}
           </div>
 
-          {/* Recommendation */}
+          {/* AI Suggested Review Order — FIX 2 [C-02] */}
           <div className={cn(
             "mt-3 pt-3 border-t border-border/50",
-            "flex items-center justify-between gap-2"
+            "flex flex-col gap-2"
           )}>
-            <div className="flex items-start gap-2 flex-1">
-              <Lightbulb className="w-4 h-4 text-ai-primary mt-0.5 shrink-0" />
-              <div>
-                <span className="text-xs font-medium text-ai-primary">Recommendation:</span>
-                <p className="text-sm text-muted-foreground">{assessment.recommendation}</p>
-                {assessment.estimatedResolutionDays && (
-                  <span className="text-xs text-muted-foreground">
-                    Est. resolution: {assessment.estimatedResolutionDays} days
-                  </span>
-                )}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-start gap-2 flex-1">
+                <Lightbulb className="w-4 h-4 text-ai-primary mt-0.5 shrink-0" />
+                <div>
+                  <span className="text-xs font-medium text-ai-primary">AI Suggested Review Order:</span>
+                  <p className="text-sm text-muted-foreground">{assessment.recommendation}</p>
+                  {assessment.estimatedResolutionDays && (
+                    <span className="text-xs text-muted-foreground">
+                      Est. resolution: {assessment.estimatedResolutionDays} days
+                    </span>
+                  )}
+                </div>
               </div>
+              
+              {onExplainClick && (
+                <button
+                  onClick={onExplainClick}
+                  className="text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 shrink-0"
+                >
+                  Why am I seeing this?
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              )}
             </div>
-            
-            {onExplainClick && (
-              <button
-                onClick={onExplainClick}
-                className="text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 shrink-0"
-              >
-                Why am I seeing this?
-                <ChevronRight className="w-3 h-3" />
-              </button>
-            )}
+            <AIDisclaimerLine />
           </div>
         </div>
       </div>

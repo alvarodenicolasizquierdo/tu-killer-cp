@@ -4,6 +4,9 @@ import { cn } from '@/lib/utils';
 import { Task } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useBuyerReadOnly } from '@/hooks/useBuyerReadOnly';
+import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
+import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
 
 interface TaskCardProps {
   task: Task;
@@ -11,6 +14,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, index = 0 }: TaskCardProps) {
+  const { isBuyerReadOnly } = useBuyerReadOnly();
   const priorityStyles = {
     critical: {
       border: 'border-l-priority-critical',
@@ -110,33 +114,40 @@ export function TaskCard({ task, index = 0 }: TaskCardProps) {
             </div>
           )}
 
-          {/* AI Recommendation */}
+          {/* AI Review Prioritisation [FIX 2: C-02] */}
           {task.aiRecommendation && (
             <div className="mt-3 p-2 rounded-md bg-gradient-to-r from-ai-primary/5 to-ai-secondary/5 border border-ai-primary/10">
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles className="w-3 h-3 text-ai-primary" />
-                <span className="text-xs font-medium text-ai-primary">AI Recommendation</span>
-                {task.aiConfidence && (
-                  <span className="text-xs text-muted-foreground">({task.aiConfidence}% confidence)</span>
-                )}
+                <span className="text-xs font-medium text-ai-primary">AI Review Prioritisation</span>
               </div>
-              <p className="text-xs text-muted-foreground">{task.aiRecommendation}</p>
+              {task.aiConfidence && (
+                <AIConfidenceMetadata confidence={task.aiConfidence} />
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                {task.type === 'approval' 
+                  ? `High priority for review — approaching SLA deadline`
+                  : task.aiRecommendation.replace(/approve|reject|approve with conditions/gi, 'review')}
+              </p>
+              <AIDisclaimerLine />
             </div>
           )}
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-        <Button size="sm" variant="default" className="h-7 text-xs">
-          {task.type === 'approval' ? 'Review & Approve' : 
-           task.type === 'review' ? 'Open Details' :
-           task.type === 'upload' ? 'Upload Files' : 'Take Action'}
-        </Button>
-        <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground">
-          Dismiss
-        </Button>
-      </div>
+      {/* Quick Actions — hidden for Buyer role [FIX 1: C-01] */}
+      {!isBuyerReadOnly && (
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+          <Button size="sm" variant="default" className="h-7 text-xs">
+            {task.type === 'approval' ? 'Review & Approve' : 
+             task.type === 'review' ? 'Open Details' :
+             task.type === 'upload' ? 'Upload Files' : 'Take Action'}
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground">
+            Dismiss
+          </Button>
+        </div>
+      )}
     </motion.div>
   );
 }

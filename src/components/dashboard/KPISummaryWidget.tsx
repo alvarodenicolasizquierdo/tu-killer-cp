@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LastUpdatedTimestamp } from '@/components/compliance/LastUpdatedTimestamp';
 
 interface KPI {
   label: string;
@@ -47,6 +48,8 @@ export function KPISummaryWidget() {
               <span className="hidden sm:inline"> {kpi.changeLabel}</span>
             </span>
           </div>
+          {/* FIX 9 [NEW]: Last-updated timestamp */}
+          <LastUpdatedTimestamp />
         </motion.div>
       ))}
     </div>
