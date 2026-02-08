@@ -35,6 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { useFeatureFlag } from '@/config/featureFlags';
 import { SidebarSections } from '@/components/navigation/SidebarSections';
 import { AdminBadge } from '@/components/ui/AdminBadge';
+import { InternalOnly } from '@/components/demo';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
@@ -99,12 +100,14 @@ export function Sidebar() {
         {/* Feature Flag: New IA Navigation with sections */}
         {newNavEnabled ? (
           <>
-            {/* Admin Badge in sidebar when expanded */}
-            {isAdmin && !isCollapsed && (
-              <div className="mb-4 px-1">
-                <AdminBadge variant="sidebar" />
-              </div>
-            )}
+            {/* Admin Badge in sidebar when expanded — hidden in demo mode */}
+            <InternalOnly>
+              {isAdmin && !isCollapsed && (
+                <div className="mb-4 px-1">
+                  <AdminBadge variant="sidebar" />
+                </div>
+              )}
+            </InternalOnly>
             <SidebarSections isCollapsed={isCollapsed} isAdmin={isAdmin} />
           </>
         ) : (

@@ -35,6 +35,7 @@ import {
 import { useFeatureFlag } from '@/config/featureFlags';
 import { MobileSidebarSections } from '@/components/navigation/MobileSidebarSections';
 import { AdminBadge } from '@/components/ui/AdminBadge';
+import { InternalOnly } from '@/components/demo';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/', badge: null },
@@ -98,12 +99,14 @@ export function MobileSidebar() {
           {/* Feature Flag: New IA Navigation with sections */}
           {newNavEnabled ? (
             <>
-              {/* Admin Badge when new nav is enabled */}
-              {isAdmin && (
-                <div className="mb-4 px-1">
-                  <AdminBadge variant="sidebar" />
-                </div>
-              )}
+              {/* Admin Badge — hidden in demo mode */}
+              <InternalOnly>
+                {isAdmin && (
+                  <div className="mb-4 px-1">
+                    <AdminBadge variant="sidebar" />
+                  </div>
+                )}
+              </InternalOnly>
               <MobileSidebarSections isAdmin={isAdmin} />
             </>
           ) : (
