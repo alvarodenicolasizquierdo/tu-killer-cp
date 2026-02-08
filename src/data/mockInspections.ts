@@ -50,7 +50,7 @@ export interface RichInspection {
 
 // Avatar imports for inspectors
 import alvaroAvatar from '@/assets/avatars/alvaro.jpg';
-import karukaAvatar from '@/assets/avatars/karuka.jpg';
+import karukaAvatar from '@/assets/avatars/karuka.webp';
 import ammAvatar from '@/assets/avatars/amm.jpg';
 import saritaAvatar from '@/assets/avatars/sarita.jpg';
 import markAvatar from '@/assets/avatars/mark.png';
