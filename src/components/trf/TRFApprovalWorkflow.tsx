@@ -20,6 +20,10 @@ import {
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { DisabledButtonHelp } from '@/components/help/InlineHelpTooltip';
+import { useBuyerReadOnly } from '@/hooks/useBuyerReadOnly';
+import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
+import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
+import { MandatoryCommentModal } from '@/components/compliance/MandatoryCommentModal';
 
 interface TRFApprovalWorkflowProps {
   trf: TRF;
@@ -28,6 +32,8 @@ interface TRFApprovalWorkflowProps {
 export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const { isBuyerReadOnly } = useBuyerReadOnly();
 
   const handleApprove = () => {
     setIsSubmitting(true);
@@ -39,17 +45,12 @@ export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
     }, 1000);
   };
 
-  const handleReject = () => {
-    if (!comment.trim()) {
-      toast.error('Comment Required', {
-        description: 'Please provide a reason for rejection.'
-      });
-      return;
-    }
+  const handleReject = (rejectionComment: string) => {
     setIsSubmitting(true);
+    setRejectModalOpen(false);
     setTimeout(() => {
       toast.error('TRF Rejected', {
-        description: `${trf.reference} has been rejected.`
+        description: `${trf.reference} has been rejected. Reason: ${rejectionComment.slice(0, 50)}...`
       });
       setIsSubmitting(false);
       setComment('');
@@ -66,21 +67,32 @@ export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
     }, 1000);
   };
 
-  // Simulate AI recommendation
+  // FIX 2 [C-02]: Reframed as prioritisation, not approval recommendation
   const aiRecommendation = {
-    action: 'approve' as const,
+    action: 'review' as const,
     confidence: 87,
-    reasoning: 'All critical tests passed. pH level deviation (9.1 vs 9.0 threshold) is within acceptable tolerance per company guidelines. Historical data shows similar deviations have no quality impact.',
+    reasoning: 'High priority for review — 3 pending TRFs approaching SLA deadline. Suggested review order based on submission date and test complexity.',
     risks: [
       'Minor pH deviation may require documentation for EU export',
-      'Recommend adding wash care instructions for pH-sensitive colors'
-    ]
+      'Recommend verifying wash care instructions for pH-sensitive colors'
+    ],
+    dataSource: 'Based on 45 historical TRFs from this supplier',
   };
 
-  const isActionable = trf.status === 'pending_review' || trf.status === 'in_progress';
+  const isActionable = !isBuyerReadOnly && (trf.status === 'pending_review' || trf.status === 'in_progress');
 
   return (
     <div className="space-y-4">
+      {/* Mandatory Comment Modal for Reject [FIX 7: C-20] */}
+      <MandatoryCommentModal
+        open={rejectModalOpen}
+        onClose={() => setRejectModalOpen(false)}
+        onSubmit={handleReject}
+        actionLabel="Confirm Rejection"
+        actionVariant="destructive"
+        title="Reject TRF — Comment Required"
+        description="You must provide a reason for rejection. This will be recorded in the audit trail for DA-09 compliance."
+      />
       {/* AI Recommendation */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-4">
@@ -90,14 +102,13 @@ export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <h4 className="font-semibold text-sm">AI Recommendation</h4>
-                <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-200">
-                  {aiRecommendation.confidence}% confidence
-                </Badge>
+                <h4 className="font-semibold text-sm">AI Review Prioritisation</h4>
+                <AIConfidenceMetadata confidence={aiRecommendation.confidence} dataSource={aiRecommendation.dataSource} sampleSize={45} />
               </div>
-              <p className="text-sm text-muted-foreground mb-3">
+              <p className="text-sm text-muted-foreground mb-1">
                 {aiRecommendation.reasoning}
               </p>
+              <AIDisclaimerLine />
               
               {aiRecommendation.risks.length > 0 && (
                 <div className="space-y-1">
@@ -196,7 +207,7 @@ export function TRFApprovalWorkflow({ trf }: TRFApprovalWorkflowProps) {
               <Button 
                 variant="destructive" 
                 className="flex-1"
-                onClick={handleReject}
+                onClick={() => setRejectModalOpen(true)}
               >
                 <XCircle className="w-4 h-4 mr-2" />
                 Reject

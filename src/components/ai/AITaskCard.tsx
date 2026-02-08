@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { AIReasoningPanel } from './AIReasoningPanel';
+import { useBuyerReadOnly } from '@/hooks/useBuyerReadOnly';
+import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
+import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
 
 interface AITaskCardProps {
   task: AIComputedTask;
@@ -15,6 +18,7 @@ interface AITaskCardProps {
 
 export function AITaskCard({ task, index = 0 }: AITaskCardProps) {
   const [showReasoning, setShowReasoning] = useState(false);
+  const { isBuyerReadOnly } = useBuyerReadOnly();
 
   const priorityStyles = {
     critical: {
@@ -122,17 +126,22 @@ export function AITaskCard({ task, index = 0 }: AITaskCardProps) {
           </div>
         )}
 
-        {/* AI Recommendation */}
+        {/* AI Review Prioritisation [FIX 2: C-02] */}
         <div className="p-2 md:p-2.5 rounded-md bg-gradient-to-r from-ai-primary/5 to-ai-secondary/5 border border-ai-primary/10 mb-2 md:mb-3">
           <div className="flex items-center gap-1 md:gap-1.5 mb-0.5 md:mb-1 flex-wrap">
             <Brain className="w-3 md:w-3.5 h-3 md:h-3.5 text-ai-primary" />
-            <span className="text-[10px] md:text-xs font-medium text-ai-primary">AI Recommendation</span>
-            <span className="text-[10px] md:text-xs text-muted-foreground hidden sm:inline">({task.recommendedAction.confidence}%)</span>
+            <span className="text-[10px] md:text-xs font-medium text-ai-primary">AI Suggested Review Order</span>
           </div>
-          <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-2">{task.reasoning.fastestFix}</p>
+          <AIConfidenceMetadata confidence={task.recommendedAction.confidence} />
+          <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-2 mt-0.5">
+            {task.reasoning.fastestFix
+              .replace(/approve with conditions if within tolerance bands/gi, 'Review test results and assess against tolerance bands')
+              .replace(/approve/gi, 'review')}
+          </p>
+          <AIDisclaimerLine />
         </div>
 
-        {/* Actions */}
+        {/* Actions — hidden for Buyer role [FIX 1: C-01] */}
         <div className="flex items-center justify-between pt-2 md:pt-3 border-t border-border/50 gap-2">
           <button
             onClick={() => setShowReasoning(true)}
@@ -143,11 +152,13 @@ export function AITaskCard({ task, index = 0 }: AITaskCardProps) {
             <span className="sm:hidden">Why?</span>
           </button>
           
-          <Button size="sm" className="h-7 md:h-8 text-[10px] md:text-xs gap-1 md:gap-1.5 px-2 md:px-3">
-            <Zap className="w-3 h-3 shrink-0" />
-            <span className="truncate max-w-[80px] md:max-w-none">{task.recommendedAction.label}</span>
-            <ChevronRight className="w-3 h-3 shrink-0" />
-          </Button>
+          {!isBuyerReadOnly && (
+            <Button size="sm" className="h-7 md:h-8 text-[10px] md:text-xs gap-1 md:gap-1.5 px-2 md:px-3">
+              <Zap className="w-3 h-3 shrink-0" />
+              <span className="truncate max-w-[80px] md:max-w-none">{task.recommendedAction.label}</span>
+              <ChevronRight className="w-3 h-3 shrink-0" />
+            </Button>
+          )}
         </div>
       </motion.div>
 

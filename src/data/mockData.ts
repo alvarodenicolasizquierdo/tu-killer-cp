@@ -317,7 +317,7 @@ export const mockTasks: Task[] = [
     objectId: 'trf-001',
     dueDate: '2026-02-05',
     slaRemaining: 24,
-    aiRecommendation: 'Approve with conditions. Minor color deviation within tolerance.',
+    aiRecommendation: 'High priority for review — SLA deadline approaching. Suggested review order based on submission date.',
     aiConfidence: 87,
     isRead: false,
     createdAt: '2026-02-04T08:00:00Z'
@@ -331,7 +331,7 @@ export const mockTasks: Task[] = [
     objectType: 'trf',
     objectId: 'trf-002',
     dueDate: '2026-02-05',
-    aiRecommendation: 'Request retest. Historical data shows 80% pass rate on retests.',
+    aiRecommendation: 'Suggested review order: prioritise retest request based on historical 80% pass rate on retests.',
     aiConfidence: 72,
     isRead: false,
     createdAt: '2026-02-04T07:30:00Z'
