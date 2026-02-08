@@ -20,7 +20,7 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import sgsLogo from '@/assets/sgs-logo.png';
+import sgsLogo from '@/assets/sgs-logo-small.webp';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export function MobileSidebar() {
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-3">
-            <img src={sgsLogo} alt="SGS Logo" className="h-8 w-auto" />
+            <img src={sgsLogo} alt="SGS Logo" width={65} height={32} className="h-8 w-auto" />
             <span className="text-sidebar-foreground font-semibold text-lg">CARLOS</span>
           </Link>
           <SheetClose asChild>

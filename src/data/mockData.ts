@@ -1,7 +1,7 @@
 import { User, TRF, Task, Supplier, LabSample, KPIData, Notification, Activity, TRFTimelineEvent, TRFTest, TRFDocument, Product, ProductImage, Inspection } from '@/types';
 
 // Import avatar images
-import karukaAvatar from '@/assets/avatars/karuka.jpg';
+import karukaAvatar from '@/assets/avatars/karuka.webp';
 import alvaroAvatar from '@/assets/avatars/alvaro.jpg';
 import ammAvatar from '@/assets/avatars/amm.jpg';
 import saritaAvatar from '@/assets/avatars/sarita.jpg';

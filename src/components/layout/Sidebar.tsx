@@ -22,7 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import sgsLogo from '@/assets/sgs-logo.png';
+import sgsLogo from '@/assets/sgs-logo-small.webp';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +76,8 @@ export function Sidebar() {
           <img 
             src={sgsLogo} 
             alt="SGS Logo" 
+            width={65}
+            height={32}
             className="h-8 w-auto shrink-0"
           />
           <AnimatePresence>
