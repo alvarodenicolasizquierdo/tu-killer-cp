@@ -52,7 +52,7 @@ export function AITaskCard({ task, index = 0 }: AITaskCardProps) {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: index * 0.05 }}
         className={cn(
-          "rounded-lg border-l-4 border bg-card p-3 md:p-4 shadow-sm hover:shadow-md transition-shadow",
+          "rounded-xl border-l-4 border border-border/60 bg-card p-3 md:p-4 shadow-sm hover:shadow-md hover:-translate-y-px transition-all duration-300 ease-out",
           styles.border,
           styles.bg
         )}

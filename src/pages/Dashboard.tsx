@@ -163,7 +163,7 @@ export default function Dashboard() {
                 {getRoleDisplayName(currentUser.role)}
               </Badge>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-foreground mb-1">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground tracking-[-0.02em] mb-1">
               {roleGreeting.split('!')[0]}!
             </h1>
             <p className="text-sm md:text-base text-muted-foreground">
@@ -243,7 +243,7 @@ export default function Dashboard() {
       )}
 
       {/* Main Grid - AI assembles based on role context */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
         {/* Primary Column - Role-specific content */}
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           {/* Supplier-specific dashboard */}
