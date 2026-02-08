@@ -22,19 +22,23 @@ export function TourSpotlight({ selector, padding = 12 }: TourSpotlightProps) {
       return;
     }
 
+    let rafId: number;
     const updateRect = () => {
-      const element = document.querySelector(selector);
-      if (element) {
-        const bounds = element.getBoundingClientRect();
-        setRect({
-          top: bounds.top - padding,
-          left: bounds.left - padding,
-          width: bounds.width + padding * 2,
-          height: bounds.height + padding * 2,
-        });
-      } else {
-        setRect(null);
-      }
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const element = document.querySelector(selector);
+        if (element) {
+          const bounds = element.getBoundingClientRect();
+          setRect({
+            top: bounds.top - padding,
+            left: bounds.left - padding,
+            width: bounds.width + padding * 2,
+            height: bounds.height + padding * 2,
+          });
+        } else {
+          setRect(null);
+        }
+      });
     };
 
     // Delay initial calculation to account for smooth scroll animation
@@ -48,6 +52,7 @@ export function TourSpotlight({ selector, padding = 12 }: TourSpotlightProps) {
 
     return () => {
       clearTimeout(initialTimer);
+      cancelAnimationFrame(rafId);
       window.removeEventListener('scroll', updateRect, true);
       window.removeEventListener('resize', updateRect);
     };

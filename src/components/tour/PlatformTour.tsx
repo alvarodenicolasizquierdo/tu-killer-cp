@@ -33,20 +33,24 @@ export function PlatformTour() {
     const element = document.querySelector(step.selector);
     if (!element) return;
     
-    // Check if element is fully visible in viewport
-    const rect = element.getBoundingClientRect();
-    const isVisible = (
-      rect.top >= 0 &&
-      rect.bottom <= window.innerHeight
-    );
+    // Use rAF to avoid forced reflow when reading geometric properties
+    const rafId = requestAnimationFrame(() => {
+      const rect = element.getBoundingClientRect();
+      const isVisible = (
+        rect.top >= 0 &&
+        rect.bottom <= window.innerHeight
+      );
+      
+      if (!isVisible) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    });
     
-    if (!isVisible) {
-      element.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center',
-        inline: 'nearest'
-      });
-    }
+    return () => cancelAnimationFrame(rafId);
   }, [currentStep, isOpen]);
 
   // Keyboard navigation
