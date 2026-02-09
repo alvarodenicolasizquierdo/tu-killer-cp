@@ -63,7 +63,7 @@ export function SupplierTable({
   };
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
@@ -92,7 +92,7 @@ export function SupplierTable({
               {suppliers.map((supplier) => (
                 <TableRow
                   key={supplier.id}
-                  className="cursor-pointer hover:bg-muted/50"
+                  className="cursor-pointer hover:bg-muted/40 transition-colors duration-200"
                   onClick={() => onViewDetails(supplier)}
                 >
                   <TableCell onClick={(e) => e.stopPropagation()}>
@@ -105,7 +105,7 @@ export function SupplierTable({
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className={cn(
-                        "w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
+                        "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0",
                         supplier.status === 'active' && "bg-emerald-100 text-emerald-700",
                         supplier.status === 'at-risk' && "bg-amber-100 text-amber-700",
                         supplier.status === 'inactive' && "bg-gray-100 text-gray-700"
@@ -113,7 +113,7 @@ export function SupplierTable({
                         {supplier.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium">{supplier.name}</p>
+                        <p className="font-medium tracking-[-0.01em]">{supplier.name}</p>
                         <p className="text-xs text-muted-foreground">{supplier.code}</p>
                       </div>
                     </div>

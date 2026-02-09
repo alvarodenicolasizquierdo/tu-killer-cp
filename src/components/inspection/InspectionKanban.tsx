@@ -52,18 +52,18 @@ function DraggableCard({ inspection }: { inspection: RichInspection }) {
       )}
     >
       <Card
-        className="cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+        className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-300 hover:-translate-y-px"
         onClick={handleClick}
       >
-        <CardContent className="p-3 space-y-2">
+        <CardContent className="p-3 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-primary">{inspection.inspectionNumber}</span>
+            <span className="text-sm font-semibold tracking-[-0.01em] text-primary">{inspection.inspectionNumber}</span>
             <InspectionTypeBadge typeCode={inspection.typeCode} />
           </div>
           
           <div>
             <p className="text-xs text-muted-foreground">{inspection.poNumber}</p>
-            <p className="text-sm font-medium line-clamp-1">{inspection.productName}</p>
+            <p className="text-sm font-medium tracking-[-0.01em] line-clamp-1">{inspection.productName}</p>
           </div>
 
           <div className="text-xs text-muted-foreground">
@@ -71,7 +71,7 @@ function DraggableCard({ inspection }: { inspection: RichInspection }) {
             <p>{inspection.factoryName}</p>
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t">
+          <div className="flex items-center justify-between pt-1.5 border-t border-border/50">
             <div className="flex items-center gap-1.5">
               <Avatar className="h-5 w-5">
                 <AvatarImage src={inspection.inspectorAvatar} />
@@ -114,11 +114,11 @@ function DroppableColumn({
 
   return (
     <div className="flex-1 min-w-[280px]">
-      <Card className={cn('h-full border-t-4', column.color)}>
+      <Card className={cn('h-full border-t-4 shadow-sm', column.color)}>
         <CardHeader className="p-3 pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">{column.label}</CardTitle>
-            <Badge variant="secondary" className="text-xs">
+            <CardTitle className="text-sm font-semibold tracking-[-0.01em]">{column.label}</CardTitle>
+            <Badge variant="secondary" className="text-xs font-medium">
               {inspections.length}
             </Badge>
           </div>

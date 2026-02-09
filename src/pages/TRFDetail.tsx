@@ -82,11 +82,11 @@ function CollapsibleSection({ title, icon: Icon, defaultOpen = true, badge, chil
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <Card>
         <CollapsibleTrigger className="w-full">
-          <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+          <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors duration-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Icon className="w-4 h-4 text-muted-foreground" />
-                <CardTitle className="text-base">{title}</CardTitle>
+                <CardTitle className="text-base tracking-[-0.01em]">{title}</CardTitle>
                 {badge && (
                   <Badge variant="secondary" className="text-xs">
                     {badge}
@@ -221,9 +221,9 @@ export default function TRFDetail() {
         }}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Main content - 2 columns */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-5">
           {/* Header Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -240,7 +240,7 @@ export default function TRFDetail() {
                       <div className={cn("w-2 h-2 rounded-full", priority.color)} />
                       <span className="text-xs text-muted-foreground">{priority.label}</span>
                     </div>
-                    <h1 className="text-xl font-semibold">{trf.productName}</h1>
+                    <h1 className="text-xl font-semibold tracking-[-0.02em]">{trf.productName}</h1>
                     {trf.description && (
                       <p className="text-sm text-muted-foreground mt-1">{trf.description}</p>
                     )}
@@ -263,7 +263,7 @@ export default function TRFDetail() {
                 </div>
 
                 {/* Meta grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-muted-foreground" />
                     <div>
@@ -297,7 +297,7 @@ export default function TRFDetail() {
                 <Separator className="my-4" />
 
                 {/* Additional info */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
                   <div>
                     <p className="text-muted-foreground">Product Code</p>
                     <p className="font-mono">{trf.productCode || '—'}</p>
@@ -385,7 +385,7 @@ export default function TRFDetail() {
         </div>
 
         {/* Sidebar - 1 column */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Approval Workflow */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -396,7 +396,7 @@ export default function TRFDetail() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <CheckSquare className="w-4 h-4 text-muted-foreground" />
-                  <CardTitle className="text-base">Approval Workflow</CardTitle>
+                  <CardTitle className="text-base tracking-[-0.01em]">Approval Workflow</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -413,7 +413,7 @@ export default function TRFDetail() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Test Summary</CardTitle>
+                <CardTitle className="text-base tracking-[-0.01em]">Test Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -457,7 +457,7 @@ export default function TRFDetail() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Related TRFs</CardTitle>
+                <CardTitle className="text-base tracking-[-0.01em]">Related TRFs</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
