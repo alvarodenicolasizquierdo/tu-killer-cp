@@ -27,6 +27,7 @@ export function KPISummaryWidget() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
           className="p-2.5 md:p-4 rounded-lg bg-card border"
+          whileHover={{ y: -2, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
         >
           <p className="text-[10px] md:text-xs text-muted-foreground mb-0.5 md:mb-1 truncate">{kpi.label}</p>
           <p className="text-lg md:text-2xl font-bold text-foreground">{kpi.value}</p>
