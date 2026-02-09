@@ -1,12 +1,7 @@
-/**
- * TodayNextStrip - A read-only status strip for the dashboard
- * Shows "Today / Next" with tiles for Needs attention, Overdue, Upcoming
- * Only visible when NEW_IA_NAV_AND_HOME feature flag is enabled
- */
-
 import { AlertCircle, Clock, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface TodayNextStripProps {
   /** Number of items needing attention, or undefined if not available */
@@ -22,9 +17,10 @@ interface TileProps {
   value: number | undefined;
   icon: React.ReactNode;
   variant: 'attention' | 'overdue' | 'upcoming';
+  index: number;
 }
 
-function StatusTile({ label, value, icon, variant }: TileProps) {
+function StatusTile({ label, value, icon, variant, index }: TileProps) {
   const hasValue = typeof value === 'number';
   
   const variantStyles = {
@@ -46,10 +42,16 @@ function StatusTile({ label, value, icon, variant }: TileProps) {
   };
 
   return (
-    <div className={cn(
-      "flex items-center gap-3 p-3 rounded-lg border transition-colors",
-      variantStyles[variant]
-    )}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -2, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-lg border transition-colors",
+        variantStyles[variant]
+      )}
+    >
       <div className={cn(
         "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
         iconStyles[variant]
@@ -65,7 +67,7 @@ function StatusTile({ label, value, icon, variant }: TileProps) {
           {hasValue ? value : '—'}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -84,18 +86,21 @@ export function TodayNextStrip({ needsAttention, overdue, upcoming }: TodayNextS
             value={needsAttention}
             icon={<AlertCircle className="w-4 h-4" />}
             variant="attention"
+            index={0}
           />
           <StatusTile
             label="Overdue"
             value={overdue}
             icon={<Clock className="w-4 h-4" />}
             variant="overdue"
+            index={1}
           />
           <StatusTile
             label="Upcoming"
             value={upcoming}
             icon={<Calendar className="w-4 h-4" />}
             variant="upcoming"
+            index={2}
           />
         </div>
       </CardContent>
