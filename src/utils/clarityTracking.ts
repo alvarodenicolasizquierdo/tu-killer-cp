@@ -43,6 +43,11 @@ export function tagEvent(eventName: string, value?: string) {
   safeClarity('set', eventName, value || 'true');
 }
 
+export function tagIdentity(userId: string, role: string, displayName?: string) {
+  safeClarity('identify', userId, undefined, undefined, displayName || userId);
+  safeClarity('set', 'role', role);
+}
+
 export function initClarityTracking() {
   tagApp();
   tagEntryType();
