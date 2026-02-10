@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { AIReasoningPanel } from './AIReasoningPanel';
 import { useBuyerReadOnly } from '@/hooks/useBuyerReadOnly';
+import { InternalOnly } from '@/components/demo';
 import { AIConfidenceMetadata } from '@/components/compliance/AIConfidenceMetadata';
 import { AIDisclaimerLine } from '@/components/compliance/AIDisclaimerLine';
 
@@ -143,14 +144,16 @@ export function AITaskCard({ task, index = 0 }: AITaskCardProps) {
 
         {/* Actions — hidden for Buyer role [FIX 1: C-01] */}
         <div className="flex items-center justify-between pt-2 md:pt-3 border-t border-border/50 gap-2">
-          <button
-            onClick={() => setShowReasoning(true)}
-            className="text-[10px] md:text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 min-h-[32px]"
-          >
-            <Brain className="w-3 h-3 shrink-0" />
-            <span className="hidden sm:inline">Why am I seeing this?</span>
-            <span className="sm:hidden">Why?</span>
-          </button>
+          <InternalOnly>
+            <button
+              onClick={() => setShowReasoning(true)}
+              className="text-[10px] md:text-xs text-ai-primary hover:text-ai-primary/80 flex items-center gap-1 min-h-[32px]"
+            >
+              <Brain className="w-3 h-3 shrink-0" />
+              <span className="hidden sm:inline">Why am I seeing this?</span>
+              <span className="sm:hidden">Why?</span>
+            </button>
+          </InternalOnly>
           
           {!isBuyerReadOnly && (
             <Button size="sm" className="h-7 md:h-8 text-[10px] md:text-xs gap-1 md:gap-1.5 px-2 md:px-3">
