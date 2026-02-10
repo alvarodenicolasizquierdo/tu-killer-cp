@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { tagScreen } from '@/utils/clarityTracking';
+import { tagScreen, tagEvent } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, Calendar, List, LayoutGrid } from 'lucide-react';
 import { toast } from 'sonner';
@@ -164,7 +164,7 @@ const InspectionsEnhanced = () => {
               />
 
               {/* View Toggle */}
-              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+              <Tabs value={viewMode} onValueChange={(v) => { setViewMode(v as ViewMode); tagEvent('inspection_view', v); }}>
                 <TabsList>
                   <TabsTrigger value="table" className="gap-1.5">
                     <List className="h-4 w-4" />

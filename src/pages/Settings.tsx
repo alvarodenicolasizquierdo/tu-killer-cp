@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { tagScreen } from '@/utils/clarityTracking';
+import { tagScreen, tagEvent } from '@/utils/clarityTracking';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -220,7 +220,7 @@ export default function Settings() {
                 {availableUsers.map((user) => (
                   <div
                     key={user.id}
-                    onClick={() => setCurrentUser(user)}
+                    onClick={() => { setCurrentUser(user); tagEvent('persona_switch', user.role); }}
                     className={cn(
                       "p-4 rounded-lg border cursor-pointer transition-all",
                       currentUser.id === user.id 
