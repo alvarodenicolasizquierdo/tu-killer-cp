@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { chatMessageToSafeHtml, markdownToSafeHtml } from '@/lib/sanitize';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -475,6 +476,7 @@ function KnowledgeHubTab() {
 
 export default function SupportCenter() {
   const { currentUser } = useUser();
+  useEffect(() => { tagScreen('portal-support'); }, []);
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'manager';
 
   return (

@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Grid3X3, List, Package, AlertTriangle, CheckCircle2, Clock, ChevronRight, Download, RefreshCw, X, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +19,7 @@ import { CSVImportDialog } from '@/components/products/CSVImportDialog';
 
 const Products = () => {
   const navigate = useNavigate();
+  useEffect(() => { tagScreen('portal-products'); }, []);
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');

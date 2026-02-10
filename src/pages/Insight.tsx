@@ -3,7 +3,8 @@
  * Replaces Analytics with richer reporting capabilities
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ import { transactions } from '@/data/mockReports';
 
 export default function Insight() {
   const [activeTab, setActiveTab] = useState('risk');
+  useEffect(() => { tagScreen('portal-analytics'); }, []);
 
   return (
     <AppLayout 

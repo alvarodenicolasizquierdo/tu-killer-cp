@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { tagScreen } from '@/utils/clarityTracking';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +27,7 @@ import { cn } from '@/lib/utils';
 
 export default function Settings() {
   const { currentUser, availableUsers, setCurrentUser } = useUser();
+  useEffect(() => { tagScreen('portal-settings'); }, []);
 
   return (
     <AppLayout title="Settings" subtitle="Manage your account, preferences, and system configuration">

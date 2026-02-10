@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { motion } from 'framer-motion';
 import { 
   Plus, 
@@ -41,6 +42,7 @@ import { cn } from '@/lib/utils';
 import { Component, ComponentType, AIAssistSuggestion } from '@/types/styles';
 
 export default function Components() {
+  useEffect(() => { tagScreen('portal-components'); }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');

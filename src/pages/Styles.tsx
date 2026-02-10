@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -41,6 +42,7 @@ import { useFeatureFlag } from '@/config/featureFlags';
 import { AutoArchiveCountdown } from '@/components/compliance/AutoArchiveCountdown';
 
 export default function Styles() {
+  useEffect(() => { tagScreen('portal-styles'); }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [seasonFilter, setSeasonFilter] = useState<string>('all');
