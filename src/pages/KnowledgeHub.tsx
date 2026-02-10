@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { tagEvent } from '@/utils/clarityTracking';
 import { markdownToSafeHtml } from '@/lib/sanitize';
 import { Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -298,7 +299,7 @@ export default function KnowledgeHub() {
                     <ArticleCard
                       key={article.id}
                       article={article}
-                      onClick={() => setSelectedArticle(article)}
+                    onClick={() => { setSelectedArticle(article); tagEvent('knowledge_article_view', article.title); }}
                     />
                   ))}
                 </div>
@@ -311,7 +312,7 @@ export default function KnowledgeHub() {
                 <ArticleCard
                   key={article.id}
                   article={article}
-                  onClick={() => setSelectedArticle(article)}
+                  onClick={() => { setSelectedArticle(article); tagEvent('knowledge_article_view', article.title); }}
                 />
               ))}
             </div>

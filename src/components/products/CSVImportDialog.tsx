@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { tagEvent } from '@/utils/clarityTracking';
 import { Upload, FileText, AlertCircle, CheckCircle2, X, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -198,6 +199,7 @@ export const CSVImportDialog = ({ open, onOpenChange, onImport }: CSVImportDialo
   const handleImport = useCallback(() => {
     const validProducts = parsedProducts.filter(p => p.isValid);
     onImport(validProducts);
+    tagEvent('csv_import_complete', String(validProducts.length));
     
     toast({
       title: 'Import Successful',

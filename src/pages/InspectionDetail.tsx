@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { tagScreen } from '@/utils/clarityTracking';
+import { tagScreen, tagEvent } from '@/utils/clarityTracking';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import {
@@ -49,7 +49,7 @@ const InspectionDetail = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedChecklists, setExpandedChecklists] = useState<Set<string>>(new Set());
 
-  useEffect(() => { tagScreen('portal-inspection-detail'); }, []);
+  useEffect(() => { tagScreen('portal-inspection-detail'); tagEvent('inspection_detail_view', id || 'unknown'); }, [id]);
 
   // Try to get extended data, fall back to basic inspection data
   const extendedInspection = id ? getInspectionDetail(id) : undefined;
