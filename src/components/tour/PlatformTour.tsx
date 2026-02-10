@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tagEvent } from '@/utils/clarityTracking';
 import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
@@ -115,6 +116,7 @@ export function PlatformTour() {
   const handleRestart = useCallback(() => {
     setCurrentStep(0);
     setIsOpen(true);
+    tagEvent('platform_tour', 'start');
   }, []);
 
   const handleStepClick = useCallback((index: number) => {

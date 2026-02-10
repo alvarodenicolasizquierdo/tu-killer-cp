@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { tagEvent } from '@/utils/clarityTracking';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -107,7 +108,7 @@ export function HelpDrawer() {
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={(open) => { setIsOpen(open); if (open) tagEvent('help_drawer', 'open'); }}>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
