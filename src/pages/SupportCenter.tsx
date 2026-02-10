@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { tagScreen } from '@/utils/clarityTracking';
+import { tagScreen, tagEvent } from '@/utils/clarityTracking';
 import { chatMessageToSafeHtml, markdownToSafeHtml } from '@/lib/sanitize';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -424,7 +424,7 @@ function KnowledgeHubTab() {
           <motion.button
             key={article.id}
             whileHover={{ y: -2 }}
-            onClick={() => setSelectedArticle(article)}
+            onClick={() => { setSelectedArticle(article); tagEvent('knowledge_article_view', article.title); }}
             className="p-4 rounded-xl border bg-card hover:border-primary/30 hover:shadow-md transition-all text-left w-full group"
           >
             <div className="flex items-start gap-3">
