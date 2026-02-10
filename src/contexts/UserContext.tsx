@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, UserRole } from '@/types';
 import { demoUsers } from '@/data/mockData';
+import { tagIdentity } from '@/utils/clarityTracking';
 
 interface UserContextType {
   currentUser: User;
@@ -12,7 +13,11 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(demoUsers[0]); // Default to buyer
+  const [currentUser, setCurrentUser] = useState<User>(demoUsers[0]);
+
+  useEffect(() => {
+    tagIdentity(currentUser.id, currentUser.role, currentUser.name);
+  }, [currentUser]);
 
   const switchRole = (role: UserRole) => {
     const user = demoUsers.find(u => u.role === role);
