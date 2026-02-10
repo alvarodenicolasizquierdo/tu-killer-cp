@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { tagEvent } from '@/utils/clarityTracking';
 
 export const DemoModeToggle = () => {
   const { isDemoMode, toggleDemoMode } = useDemoMode();
@@ -21,7 +22,10 @@ export const DemoModeToggle = () => {
       <div className="flex items-center gap-2">
         <Switch
           checked={isDemoMode}
-          onCheckedChange={toggleDemoMode}
+          onCheckedChange={() => {
+            toggleDemoMode();
+            tagEvent('demo_mode', isDemoMode ? 'off' : 'on');
+          }}
           id="demo-mode"
         />
         <Label htmlFor="demo-mode" className="text-sm font-medium cursor-pointer">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { exportAsJSON, exportAsMarkdown, copyMarkdownToClipboard, generateDocumentationExport } from '@/docs/exporters';
+import { tagEvent } from '@/utils/clarityTracking';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ export function ExportTab() {
 
   const handleExportJSON = async () => {
     setIsExportingJSON(true);
+    tagEvent('export', 'json');
     try {
       exportAsJSON();
       toast({
@@ -34,6 +36,7 @@ export function ExportTab() {
 
   const handleExportMarkdown = async () => {
     setIsExportingMD(true);
+    tagEvent('export', 'markdown');
     try {
       exportAsMarkdown();
       toast({

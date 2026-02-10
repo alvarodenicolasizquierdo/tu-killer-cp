@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tagEvent } from '@/utils/clarityTracking';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Sparkles, Check, X, ChevronRight, Lightbulb, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,7 @@ export function AIAssistPanel({
 
   const handleApply = (suggestion: AIAssistSuggestion) => {
     setAppliedIds(prev => new Set(prev).add(suggestion.id));
+    tagEvent('ai_assist_apply', suggestion.type);
     onApplySuggestion?.(suggestion);
   };
 
