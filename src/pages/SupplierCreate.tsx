@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { tagScreen } from '@/utils/clarityTracking';
+import { tagScreen, tagEvent } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Building2, Users, Shield, Award, Tag, ClipboardCheck, Upload, File, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -123,6 +123,7 @@ const SupplierCreate = () => {
 
   const handleNext = () => {
     if (currentStep < steps.length) {
+      tagEvent('supplier_wizard_step', String(currentStep + 1));
       setCurrentStep(currentStep + 1);
     }
   };
