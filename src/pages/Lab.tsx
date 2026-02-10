@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { tagScreen } from '@/utils/clarityTracking';
 import { mockLabSamples } from '@/data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,6 +135,7 @@ function SampleCard({ sample, index }: { sample: LabSample; index: number }) {
 }
 
 export default function Lab() {
+  useEffect(() => { tagScreen('portal-lab'); }, []);
   const queuedSamples = mockLabSamples.filter(s => s.status === 'queued' || s.status === 'received');
   const testingSamples = mockLabSamples.filter(s => s.status === 'testing');
 

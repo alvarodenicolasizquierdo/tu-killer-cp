@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { mockTRFs } from '@/data/mockData';
@@ -169,6 +170,7 @@ function TRFKanbanCard({ trf, index, onClick }: { trf: TRF; index: number; onCli
 
 export default function TRFs() {
   const navigate = useNavigate();
+  useEffect(() => { tagScreen('portal-trfs'); }, []);
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');

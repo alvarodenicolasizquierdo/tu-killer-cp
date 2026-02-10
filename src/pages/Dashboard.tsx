@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useUser, getRoleDisplayName, getRoleGreeting } from '@/contexts/UserContext';
 import { useAIContext } from '@/hooks/useAIContext';
 import { useWidgetConfig } from '@/hooks/useWidgetConfig';
@@ -23,6 +25,7 @@ import { TodayNextStrip } from '@/components/home/TodayNextStrip';
 
 export default function Dashboard() {
   const { currentUser } = useUser();
+  useEffect(() => { tagScreen('portal-dashboard'); }, []);
   const newNavEnabled = useFeatureFlag('NEW_IA_NAV_AND_HOME');
   const { 
     context, 

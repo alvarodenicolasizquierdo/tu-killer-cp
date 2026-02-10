@@ -3,7 +3,8 @@
  * Features: Table view, Trends view, filters, bulk actions, CSV export, detail drawer
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, Inbox, List, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -33,6 +34,7 @@ type ViewMode = 'list' | 'trends';
 
 const SuppliersEnhanced = () => {
   const navigate = useNavigate();
+  useEffect(() => { tagScreen('portal-suppliers'); }, []);
 
   // State - load suppliers from localStorage + mock data
   const [suppliers] = useState<RichSupplier[]>(() => getAllSuppliers());

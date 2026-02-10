@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, Calendar, List, LayoutGrid } from 'lucide-react';
 import { toast } from 'sonner';
@@ -27,6 +28,7 @@ type ViewMode = 'table' | 'kanban';
 
 const InspectionsEnhanced = () => {
   const navigate = useNavigate();
+  useEffect(() => { tagScreen('portal-inspections'); }, []);
   
   // State
   const [viewMode, setViewMode] = useState<ViewMode>('table');

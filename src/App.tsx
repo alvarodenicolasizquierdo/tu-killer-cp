@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { initClarityTracking } from "@/utils/clarityTracking";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -43,7 +44,12 @@ const FeatureSpec = lazy(() => import("./pages/FeatureSpec"));
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    initClarityTracking();
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <UserProvider>
       <DemoModeProvider>
@@ -97,6 +103,7 @@ const App = () => (
       </DemoModeProvider>
     </UserProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
