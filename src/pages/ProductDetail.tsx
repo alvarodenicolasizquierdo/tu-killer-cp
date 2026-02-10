@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { tagScreen } from '@/utils/clarityTracking';
 import { ArrowLeft, Package, Building2, MapPin, FileText, AlertTriangle, CheckCircle2, Clock, ExternalLink, ChevronRight, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -22,6 +24,8 @@ import {
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  useEffect(() => { tagScreen('portal-product-detail'); }, []);
 
   const product = mockProducts.find(p => p.id === id);
   const supplier = mockSuppliers.find(s => s.id === product?.supplierId);

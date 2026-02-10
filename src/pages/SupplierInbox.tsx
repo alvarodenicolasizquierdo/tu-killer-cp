@@ -2,7 +2,8 @@
  * SupplierInbox - Task inbox with priority groups and SLA indicators
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, AlertTriangle, CheckCircle, Play, FileText, Send, Calendar, User, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -187,6 +188,8 @@ const SupplierInbox = () => {
   const [tasks, setTasks] = useState<SupplierTask[]>(supplierTasks);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+
+  useEffect(() => { tagScreen('portal-supplier-inbox'); }, []);
 
   // Filter tasks
   const filteredTasks = useMemo(() => {

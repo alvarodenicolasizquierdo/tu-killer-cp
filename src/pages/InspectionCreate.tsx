@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
@@ -33,6 +34,9 @@ interface FormData {
 const InspectionCreate = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => { tagScreen('portal-inspection-create'); }, []);
+
   const [formData, setFormData] = useState<FormData>({
     poNumber: '',
     productName: '',

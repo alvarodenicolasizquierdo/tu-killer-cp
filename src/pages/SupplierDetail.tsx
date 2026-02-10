@@ -3,7 +3,8 @@
  * Shows comprehensive supplier information including scores, contacts, certifications, and linked styles
  */
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Factory, Mail, Phone, Calendar, Award, Package, FileText, Send, ExternalLink, TrendingUp, TrendingDown, AlertTriangle, Building2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -22,6 +23,8 @@ import { getSupplierById, getSupplierTasks, getLinkedStyles } from '@/data/mockS
 const SupplierDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  useEffect(() => { tagScreen('portal-supplier-detail'); }, []);
 
   const supplier = useMemo(() => getSupplierById(id || ''), [id]);
   const tasks = useMemo(() => getSupplierTasks(id || ''), [id]);

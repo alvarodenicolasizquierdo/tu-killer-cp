@@ -3,7 +3,8 @@
  * Steps: Company Info → Contacts → Tier/Compliance → Certifications → Specializations → Review
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Building2, Users, Shield, Award, Tag, ClipboardCheck, Upload, File, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -79,6 +80,8 @@ const SupplierCreate = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
+
+  useEffect(() => { tagScreen('portal-supplier-create'); }, []);
   const [formData, setFormData] = useState<FormData>({
     companyName: '',
     companyCode: '',

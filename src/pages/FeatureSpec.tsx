@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +12,8 @@ import { canonicalFeatureSpec, getSpecSummary } from '@/data/canonicalFeatureSpe
 export default function FeatureSpec() {
   const summary = getSpecSummary();
   const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => { tagScreen('portal-feature-spec'); }, []);
 
   const handleDownload = () => {
     setDownloading(true);
