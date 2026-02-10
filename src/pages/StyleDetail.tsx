@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -58,6 +59,8 @@ export default function StyleDetail() {
   const { id } = useParams<{ id: string }>();
   const { currentUser } = useUser();
   const [activeTab, setActiveTab] = useState('overview');
+
+  useEffect(() => { tagScreen('portal-style-detail'); }, []);
 
   const collection = useMemo(() => {
     return mockCollections.find(c => c.id === id);

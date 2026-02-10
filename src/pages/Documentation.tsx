@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { tagScreen } from '@/utils/clarityTracking';
 import { useUser } from '@/contexts/UserContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +9,8 @@ import { Map, Users, GitBranch, Database, Download } from 'lucide-react';
 
 export default function Documentation() {
   const { currentUser } = useUser();
+
+  useEffect(() => { tagScreen('portal-documentation'); }, []);
 
   // Admin-only access
   if (currentUser.role !== 'admin') {
