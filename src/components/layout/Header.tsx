@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Bell, MessageSquare, Command } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -62,8 +62,8 @@ export function Header({ title, subtitle }: HeaderProps) {
         {/* Right - Search & Actions */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
           {/* AI Search - Hidden on small mobile, compact on tablet */}
-          <motion.div
-            animate={{ width: searchFocused ? 400 : 280 }}
+          <div
+            style={{ width: searchFocused ? 400 : 280, transition: 'width 0.2s ease-in-out' }}
             className="relative hidden sm:block"
           >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -79,7 +79,7 @@ export function Header({ title, subtitle }: HeaderProps) {
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden md:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
               <Command className="w-3 h-3" />K
             </kbd>
-          </motion.div>
+          </div>
 
           {/* Mobile Search Button */}
           <Button variant="ghost" size="icon" className="sm:hidden min-h-[44px] min-w-[44px] touch-manipulation active:scale-95">

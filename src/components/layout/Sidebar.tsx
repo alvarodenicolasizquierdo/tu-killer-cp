@@ -64,10 +64,8 @@ export function Sidebar() {
   const isAdmin = currentUser.role === 'admin';
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: isCollapsed ? 72 : 260 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
+    <aside
+      style={{ width: isCollapsed ? 72 : 260, transition: 'width 0.2s ease-in-out' }}
       className="fixed left-0 top-0 h-screen bg-sidebar flex-col z-50 hidden md:flex"
     >
       {/* Logo Section */}
@@ -281,6 +279,6 @@ export function Sidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </motion.aside>
+    </aside>
   );
 }

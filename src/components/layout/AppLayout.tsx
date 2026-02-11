@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { MobileSidebar } from './MobileSidebar';
-import { motion } from 'framer-motion';
+
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -21,14 +21,9 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
       </div>
       <main className="md:ml-[260px] min-h-screen pt-14 md:pt-0">
         <Header title={title} subtitle={subtitle} />
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="p-4 md:p-6"
-        >
+        <div className="p-4 md:p-6 animate-fade-in">
           {children}
-        </motion.div>
+        </div>
       </main>
     </div>
   );
