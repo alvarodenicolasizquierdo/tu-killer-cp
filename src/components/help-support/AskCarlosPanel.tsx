@@ -88,7 +88,7 @@ This usually happens when ${causesSummary.toLowerCase()}.
 
 Here's the quick fix — I've loaded the step-by-step guide for you. Just follow the numbered steps and you should be sorted in about 60 seconds.
 
-If that doesn't work, you can always escalate to the SGS support team.`;
+If that doesn't work, you can always escalate to the THT support team.`;
 }
 
 export function AskCarlosPanel({ onResolutionMatch }: AskCarlosPanelProps) {

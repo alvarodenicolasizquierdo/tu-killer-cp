@@ -20,7 +20,7 @@ export function tagEntryType() {
   const referrer = document.referrer;
   if (!referrer) {
     safeClarity('set', 'entry', 'direct');
-  } else if (referrer.includes('carloshub-launchpad.dnaventures.es')) {
+  } else if (referrer.includes('carloshub-launchpad.lovable.app')) {
     safeClarity('set', 'entry', 'hub');
   } else {
     safeClarity('set', 'entry', new URL(referrer).hostname);

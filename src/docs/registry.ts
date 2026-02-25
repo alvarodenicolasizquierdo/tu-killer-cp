@@ -1493,7 +1493,7 @@ export const enumRegistry: EnumDef[] = [
     values: [
       { value: 'buyer', description: 'Buyer / QA Manager - Primary user managing quality assurance' },
       { value: 'supplier', description: 'Supplier User - External supplier submitting documents' },
-      { value: 'lab_technician', description: 'Lab Technician - SGS lab staff conducting tests' },
+      { value: 'lab_technician', description: 'Lab Technician - THT lab staff conducting tests' },
       { value: 'manager', description: 'Manager / Executive - Executive oversight and analytics' },
       { value: 'admin', description: 'System Admin - Platform configuration and administration' },
     ],
@@ -1655,7 +1655,7 @@ export const rolesRegistry: RoleDef[] = [
   {
     role: 'lab_technician',
     displayName: 'Lab Technician',
-    description: 'SGS laboratory staff who conducts physical testing and records results.',
+    description: 'THT laboratory staff who conducts physical testing and records results.',
     primaryResponsibilities: [
       'Process testing queue based on priority',
       'Conduct physical tests per protocol',
