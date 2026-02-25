@@ -207,7 +207,7 @@ export default function HelpSupport() {
               <GuidedResolution
                 data={activeResolution}
                 onEscalate={() => {
-                  console.log('Escalating to SGS support');
+                  console.log('Escalating to THT support');
                 }}
               />
             </div>
