@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useUser, getRoleDisplayName } from '@/contexts/UserContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import sgsLogo from '@/assets/sgs-logo-small.webp';
 
 import {
   DropdownMenu,
@@ -71,6 +72,7 @@ export function Sidebar() {
       {/* Logo Section */}
       <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3">
+          <img src={sgsLogo} alt="CARLOS" className="w-8 h-8 shrink-0" />
           <AnimatePresence>
             {!isCollapsed && (
               <motion.div
